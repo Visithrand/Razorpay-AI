@@ -1,0 +1,295 @@
+txn_id,utr,amount,fee,net_amount,date,description,status,payment_method,fixture_type
+pay_ahxthv3a3zmf8m,RAZORPAY4332181960013389,3187.8,75.23,3112.57,2024-01-12,Payment for FastTrack Logistics - order_DD4V30T9NT3W,captured,upi,clean
+pay_qj7yhl1c32oc6u,RAZORPAY1647525534192832,431999.33,10195.18,421804.15,2024-01-08,Payment for CloudBiz - order_ZHR5XFF0T0PV,captured,wallet,clean
+pay_epq85jsg65kxvf,RAZORPAY2691669784801845,101835.42,2403.32,99432.1,2024-01-19,Payment for GreenLeaf Organics - order_1T2TALA753LC,captured,wallet,clean
+pay_eimvihcwi64ciy,RAZORPAY7824896383465787,90343.99,2132.12,88211.87,2024-01-02,Payment for Apex Commerce - order_HE7UR23GDPPQ,captured,wallet,clean
+pay_frhocn9j2qp89u,RAZORPAY7262473178108013,596.99,14.09,582.9,2024-01-03,Payment for DigiMart - order_ZFK8UT0CVS4F,captured,upi,clean
+pay_jexq77awudtsem,RAZORPAY9399091699854353,28393.89,670.1,27723.79,2024-01-29,Payment for TechSolutions Ltd - order_CIKPTK93TYT7,captured,upi,clean
+pay_wj0tpac56t4ufe,RAZORPAY9353487401640052,9989.58,235.75,9753.83,2024-01-30,Payment for QuickShop - order_L6246HID25OW,captured,card,clean
+pay_xokc1msy4la5ju,RAZORPAY6342160733754330,2322.55,54.81,2267.74,2024-01-30,Payment for DigiMart - order_9BVM2P9E6GBP,captured,wallet,clean
+pay_ktakpuxqphr62g,RAZORPAY1484656482366299,322883.04,7620.04,315263.0,2024-01-25,Payment for FastTrack Logistics - order_DSWM31YIHAIR,captured,wallet,clean
+pay_eqtul1p36p6qf5,RAZORPAY7632016328708317,1786.43,42.16,1744.27,2024-01-05,Payment for TechSolutions Ltd - order_Q14J1RIPZIM6,captured,wallet,clean
+pay_148p0tvhhpbmyo,RAZORPAY5876036690967054,1124.94,26.55,1098.39,2024-01-11,Payment for PrimeServices - order_FQEWAOUAXEQB,captured,netbanking,clean
+pay_feyuhz1gv0e38d,RAZORPAY6417080531003309,2385.33,56.29,2329.04,2024-01-26,Payment for NextGen Solutions - order_ALY8OZCYWD14,captured,upi,clean
+pay_q3vli7kq1uymrl,RAZORPAY5067165726284987,4396.31,103.75,4292.56,2024-01-23,Payment for Fusion Foods - order_RMJKV5USGIOT,captured,wallet,clean
+pay_izl08yg0jv1v93,RAZORPAY3495788568557444,1100.34,25.97,1074.37,2024-01-19,Payment for ACME Corp - order_KMKZEBBK7W1D,captured,wallet,clean
+pay_1v2isqp49kwv08,RAZORPAY7116719022941318,148664.84,3508.49,145156.35,2024-01-28,Payment for Apex Commerce - order_HHXFGCAQVKIZ,captured,card,clean
+pay_eyz7srcbpljd84,RAZORPAY3618324210249947,24607.41,580.73,24026.68,2024-01-27,Payment for Sunrise Traders - order_U89YJB1QX6GV,captured,wallet,clean
+pay_3a5qbswrpbjek5,RAZORPAY2567468071545168,395.81,9.34,386.47,2024-01-27,Payment for Sunrise Traders - order_RBW2ZLAOI4E8,captured,netbanking,clean
+pay_3kkv9rftmttqlg,RAZORPAY7378263982146584,15768.74,372.14,15396.6,2024-01-02,Payment for SwiftPay Inc - order_ZUI1B0Z3NX39,captured,netbanking,clean
+pay_5bcw790pdw5py6,RAZORPAY0262174596158657,2289.54,54.03,2235.51,2024-01-16,Payment for Fusion Foods - order_B2KNFTU2GC5W,captured,wallet,clean
+pay_dnmkza3oa52960,RAZORPAY7482175946474367,172.08,4.06,168.02,2024-01-29,Payment for TechSolutions Ltd - order_361I2HGJ11YE,captured,wallet,clean
+pay_2qc1iyyo4udoje,RAZORPAY4562328588424745,4978.67,117.5,4861.17,2024-01-03,Payment for Sunrise Traders - order_N0JNWNYQW7LV,captured,wallet,clean
+pay_w7kyhqin9n6xcj,RAZORPAY7113826758692617,173051.35,4084.01,168967.34,2024-01-25,Payment for FastTrack Logistics - order_883DHX8BM92H,captured,card,clean
+pay_ajepecqnvqhw06,RAZORPAY9042284210205395,496.75,11.72,485.03,2024-01-03,Payment for QuickShop - order_XKXB94PDZP6L,captured,netbanking,clean
+pay_pxnf7c3dd03uvu,RAZORPAY9611836736576615,14977.17,353.46,14623.71,2024-01-16,Payment for Sunrise Traders - order_LEMX15Z8VMUH,captured,netbanking,clean
+pay_gfxc08dtnqfll7,RAZORPAY3689980940244550,804.64,18.99,785.65,2024-01-14,Payment for CloudBiz - order_V5F1BCPPVOHS,captured,wallet,clean
+pay_nzs43c5ba75uuz,RAZORPAY9003432445107622,1078.87,25.46,1053.41,2024-01-03,Payment for DigiMart - order_PEAL2W37D4IV,captured,netbanking,clean
+pay_8wquuy5x9l8lpq,RAZORPAY8835523124329212,1638.08,38.66,1599.42,2024-01-17,Payment for NextGen Solutions - order_W2VMCQBNKX9D,captured,upi,clean
+pay_vn7n1ybwmlunj4,RAZORPAY7820715182037788,11341.99,267.67,11074.32,2024-01-13,Payment for DigiMart - order_8VFCX7LXXEZD,captured,upi,clean
+pay_x5wvfgyw6zbnz8,RAZORPAY4235733221418880,3001.34,70.83,2930.51,2024-01-10,Payment for BlueOcean Pvt Ltd - order_V12II826GYUP,captured,wallet,clean
+pay_d6357oonncildz,RAZORPAY4075818141247826,95047.31,2243.12,92804.19,2024-01-18,Payment for QuickShop - order_MFB7R31QW6AH,captured,netbanking,clean
+pay_mugysm8t2sa5bn,RAZORPAY9711798089324609,1136.59,26.82,1109.77,2024-01-06,Payment for Sunrise Traders - order_N0MCIXDU1EMM,captured,card,clean
+pay_m25len606n9rr7,RAZORPAY0430305486874034,28449.14,671.4,27777.74,2024-01-06,Payment for PrimeServices - order_S20CV3TLCXLV,captured,wallet,clean
+pay_nuvy8n1utoxie0,RAZORPAY0165820297021355,14460.86,341.28,14119.58,2024-01-06,Payment for SwiftPay Inc - order_RNUJJQ9K6RE4,captured,netbanking,clean
+pay_q9e5cozroouelc,RAZORPAY4225831323705895,1424.1,33.61,1390.49,2024-01-06,Payment for Smart Retail - order_QSE3TV1ES53S,captured,card,clean
+pay_zv4u3bbxux1oxr,RAZORPAY4384249818299229,427588.84,10091.1,417497.74,2024-01-05,Payment for NextGen Solutions - order_WK8R2YKCCPRH,captured,netbanking,clean
+pay_8637zgf9q5rdoq,RAZORPAY1537147321046963,272040.66,6420.16,265620.5,2024-01-25,Payment for CloudBiz - order_IVBKV4YKADEJ,captured,upi,clean
+pay_71hssbelrqvslw,RAZORPAY4168784991216558,12469.4,294.28,12175.12,2024-01-19,Payment for PrimeServices - order_F90KM3TZK3NY,captured,wallet,clean
+pay_ppohswq40zsu9r,RAZORPAY9309728962309130,394796.15,9317.19,385478.96,2024-01-18,Payment for Smart Retail - order_N8QTTY5Y2JR8,captured,netbanking,clean
+pay_8c7x0h3jujd0ib,RAZORPAY5758441986652404,1806.72,42.64,1764.08,2024-01-29,Payment for GreenLeaf Organics - order_6IIDLRYE89FX,captured,card,clean
+pay_ud9k9tr74qgefq,RAZORPAY1938026206724004,1667.86,39.36,1628.5,2024-01-04,Payment for Sunrise Traders - order_JG02U1G463SD,captured,wallet,clean
+pay_y751yw7nh8rq9n,RAZORPAY7454990453017426,1051.4,24.81,1026.59,2024-01-19,Payment for GreenLeaf Organics - order_Z61231YV2STN,captured,card,clean
+pay_uylajahcpztc69,RAZORPAY7139718707286790,2158.04,50.93,2107.11,2024-01-22,Payment for TechSolutions Ltd - order_QKGEX08N6Q7N,captured,upi,clean
+pay_70e3p15ahdbvzb,RAZORPAY3004786863375243,6002.04,141.65,5860.39,2024-01-27,Payment for Sunrise Traders - order_0OIH5CSK30LV,captured,netbanking,clean
+pay_kgtii4fqcootnj,RAZORPAY4089268705685662,13872.91,327.4,13545.51,2024-01-24,Payment for NextGen Solutions - order_LCQNT3BNVBC2,captured,card,clean
+pay_lm5q201lhlb50a,RAZORPAY3317393638546785,2286.14,53.95,2232.19,2024-01-24,Payment for SwiftPay Inc - order_TVZKHIUIT7M1,captured,card,clean
+pay_snwywrratatj9a,RAZORPAY7280801006231203,1842.74,43.49,1799.25,2024-01-13,Payment for CloudBiz - order_3Y36DDFGS3JO,captured,card,clean
+pay_9967i6yuj7yktx,RAZORPAY1016668700217659,2095.95,49.46,2046.49,2024-01-29,Payment for Sunrise Traders - order_G4AHF337KUU4,captured,card,clean
+pay_itngvn1kicjn2f,RAZORPAY5016315999650477,16271.8,384.01,15887.79,2024-01-12,Payment for TechSolutions Ltd - order_OMD7Q1DDPUSD,captured,netbanking,clean
+pay_pprcjiwvhdk8lw,RAZORPAY1839826224447212,1061.33,25.05,1036.28,2024-01-10,Payment for CloudBiz - order_2LM349EL8HL8,captured,card,clean
+pay_wixz2c9ros7yt2,RAZORPAY1939828073741672,214679.51,5066.44,209613.07,2024-01-25,Payment for PrimeServices - order_M6TWD1XMXB9Y,captured,upi,clean
+pay_o8e7flqhrrpzlk,RAZORPAY8993756798250714,1905.1,44.96,1860.14,2024-01-26,Payment for Fusion Foods - order_3E4XYF9IGFU8,captured,card,clean
+pay_heyr8lnoemqgy2,RAZORPAY3796603341918255,22778.18,537.57,22240.61,2024-01-21,Payment for SwiftPay Inc - order_7VYLIENFNVUP,captured,card,clean
+pay_gu2hbik2u1rsuj,RAZORPAY9050723688767677,2128.67,50.24,2078.43,2024-01-15,Payment for ACME Corp - order_T9T11PHP0XI5,captured,upi,clean
+pay_g9ku8s63e1ocjx,RAZORPAY9596292330958498,141364.65,3336.21,138028.44,2024-01-29,Payment for BlueOcean Pvt Ltd - order_ZEFLI4OFWWNC,captured,netbanking,clean
+pay_te4261bw4a7fq9,RAZORPAY9017518636374545,15921.22,375.74,15545.48,2024-01-13,Payment for ACME Corp - order_P965K55DMCXX,captured,wallet,clean
+pay_d3dnkn35xycuvf,RAZORPAY1293870051627136,651.54,15.38,636.16,2024-01-11,Payment for PrimeServices - order_MH07WPH6FE0M,captured,netbanking,clean
+pay_iwc5amln4ptgq9,RAZORPAY9404389836403761,19000.22,448.41,18551.81,2024-01-18,Payment for Sunrise Traders - order_CVAH78OKZ1PO,captured,upi,clean
+pay_vl00ezzf8s2zge,RAZORPAY2856914630316179,487927.29,11515.08,476412.21,2024-01-02,Payment for CloudBiz - order_2J51B3JCZUCQ,captured,card,clean
+pay_ii6l3ueybisbo5,RAZORPAY1380003075622086,450306.16,10627.23,439678.93,2024-01-25,Payment for BlueOcean Pvt Ltd - order_51LDQNK20IN8,captured,card,clean
+pay_76szn9dde3cup8,RAZORPAY0506413836702410,1422.63,33.57,1389.06,2024-01-04,Payment for QuickShop - order_IJL2Z0LJCH2V,captured,wallet,clean
+pay_8obk3g84utdd2e,RAZORPAY3747411249035213,29027.45,685.05,28342.4,2024-01-29,Payment for Fusion Foods - order_C2IHOY7DV7C9,captured,upi,clean
+pay_5bwikotckeh5sw,RAZORPAY0296670662532447,2364.36,55.8,2308.56,2024-01-01,Payment for Fusion Foods - order_2292MTR6SNGL,captured,wallet,clean
+pay_6bz8uug95rlrdi,RAZORPAY1334803965223955,487770.54,11511.38,476259.16,2024-01-05,Payment for GreenLeaf Organics - order_HSA7HEZ74LAV,captured,netbanking,clean
+pay_3n0kgazu41ugl3,RAZORPAY9154522675289539,20708.84,488.73,20220.11,2024-01-29,Payment for Apex Commerce - order_WXDRLCMLW83Y,captured,upi,clean
+pay_xyfc4kl8cgn0t6,RAZORPAY1006762676586179,12138.23,286.46,11851.77,2024-01-18,Payment for Apex Commerce - order_DVWRB7F6FDHG,captured,netbanking,clean
+pay_9re2q6jxnnngbp,RAZORPAY7205061497310324,17615.72,415.73,17199.99,2024-01-27,Payment for PrimeServices - order_J4UFZDY3O1IC,captured,wallet,clean
+pay_cyh3fvl03dut4s,RAZORPAY0898992172233206,4671.26,110.24,4561.02,2024-01-04,Payment for BlueOcean Pvt Ltd - order_7AZV2EFUU8DD,captured,netbanking,clean
+pay_76a3kkrzd5e9p3,RAZORPAY9702462996065307,15853.58,374.14,15479.44,2024-01-23,Payment for Smart Retail - order_JPXGH30153SF,captured,upi,clean
+pay_g5vmf60yknfu84,RAZORPAY7053457861035797,147260.42,3475.35,143785.07,2024-01-20,Payment for Smart Retail - order_XYJOA21A6XVA,captured,wallet,clean
+pay_c9x5jz6kf1622v,RAZORPAY4896910858994417,8500.75,200.62,8300.13,2024-01-23,Payment for Apex Commerce - order_XYZX9JPNBZUG,captured,wallet,clean
+pay_p5nvqebwuwqhey,RAZORPAY2824172482513534,10755.36,253.83,10501.53,2024-01-16,Payment for TechSolutions Ltd - order_TO5F9M969F5G,captured,netbanking,clean
+pay_hnal3gywiymenv,RAZORPAY2927129666676008,8258.02,194.89,8063.13,2024-01-06,Payment for Fusion Foods - order_G3KK0VM59M6M,captured,card,clean
+pay_pntrfzwkxxjve3,RAZORPAY8215064890901001,201.5,4.76,196.74,2024-01-18,Payment for ACME Corp - order_DZEEDHHJSHZK,captured,wallet,clean
+pay_354mype46aexl6,RAZORPAY1972181143744701,359.16,8.48,350.68,2024-01-26,Payment for GreenLeaf Organics - order_8J0NMEOQ4YRP,captured,card,clean
+pay_5pcxa5s00i85sy,RAZORPAY1697972965902771,426844.43,10073.53,416770.9,2024-01-28,Payment for DigiMart - order_WP0RXXF36WA7,captured,card,clean
+pay_l90aobt328w6ux,RAZORPAY4083866317797177,927.6,21.89,905.71,2024-01-08,Payment for Sunrise Traders - order_QM334L1VZNQD,captured,netbanking,clean
+pay_zdo74v1qx8ertb,RAZORPAY1027261493316373,12781.98,301.65,12480.33,2024-01-29,Payment for DigiMart - order_74RS7GU0ENV5,captured,card,clean
+pay_9x8sylemruyp04,RAZORPAY2269848583339452,242837.48,5730.96,237106.52,2024-01-02,Payment for FastTrack Logistics - order_K43SAFYH1FKJ,captured,upi,clean
+pay_h54piwznv0h0gq,RAZORPAY8386384066658004,2189.88,51.68,2138.2,2024-01-05,Payment for GreenLeaf Organics - order_9C80EBKJF4AQ,captured,netbanking,clean
+pay_om5xlk8wru1xem,RAZORPAY7985158328182688,20701.98,488.57,20213.41,2024-01-27,Payment for DigiMart - order_IX7IB5N2EJ0A,captured,wallet,clean
+pay_0fqldb2uuijnwp,RAZORPAY8112880133613861,120480.82,2843.35,117637.47,2024-01-20,Payment for Smart Retail - order_AYTXW1VZC7D2,captured,wallet,clean
+pay_vt8k06moxsfh4g,RAZORPAY3268424508821009,517.36,12.21,505.15,2024-01-11,Payment for SwiftPay Inc - order_G24479QTKCD0,captured,card,clean
+pay_2zxjmylrq1rdxc,RAZORPAY7759492995562053,604.72,14.27,590.45,2024-01-19,Payment for BlueOcean Pvt Ltd - order_K36H0W064W3U,captured,netbanking,clean
+pay_y1ffuu5f07b1ij,RAZORPAY5639427881658039,23817.92,562.1,23255.82,2024-01-27,Payment for Smart Retail - order_IYS2N75BXD8W,captured,card,clean
+pay_fcxhgnzei3zrrh,RAZORPAY1846386557790827,20466.76,483.02,19983.74,2024-01-20,Payment for PrimeServices - order_F4ABUFWBUCJG,captured,upi,clean
+pay_indh4spfdrwb2s,RAZORPAY2369292984257991,437632.13,10328.12,427304.01,2024-01-26,Payment for Fusion Foods - order_EREV361XSNBT,captured,netbanking,clean
+pay_ueaxylnfxj4pnj,RAZORPAY9162473149864300,423479.54,9994.12,413485.42,2024-01-28,Payment for FastTrack Logistics - order_Y1O2RNTJLMZ0,captured,wallet,clean
+pay_nv07oxk8c1gra4,RAZORPAY5890260127961143,1344.61,31.73,1312.88,2024-01-25,Payment for Smart Retail - order_7SH2SZWYMX9D,captured,wallet,clean
+pay_jodck82853uy8u,RAZORPAY1184895543937690,22765.45,537.26,22228.19,2024-01-26,Payment for Fusion Foods - order_118QQVAECW9Y,captured,netbanking,clean
+pay_0iiji44m2ec8ra,RAZORPAY4165182755394237,9742.12,229.91,9512.21,2024-01-08,Payment for PrimeServices - order_484NL65UJG1S,captured,wallet,clean
+pay_gjj8mgpp1noqu9,RAZORPAY2718750036915594,966.13,22.8,943.33,2024-01-29,Payment for QuickShop - order_Y3Z2T4H20RAP,captured,netbanking,clean
+pay_omyvuxt9kls1qc,RAZORPAY2034717545588450,382.59,9.03,373.56,2024-01-11,Payment for CloudBiz - order_WQ85X7PWO6CM,captured,wallet,clean
+pay_c5tao1cjfx5lik,RAZORPAY9876220234132611,471221.82,11120.83,460100.99,2024-01-18,Payment for Apex Commerce - order_WE4BX4LR9TJQ,captured,wallet,clean
+pay_s1ektyr1k12v2t,RAZORPAY8457831745642400,234439.36,5532.77,228906.59,2024-01-26,Payment for NextGen Solutions - order_G5PIZX3HCWS2,captured,netbanking,clean
+pay_jz0ifrml29q2l4,RAZORPAY7974973502080214,830.55,19.6,810.95,2024-01-15,Payment for BlueOcean Pvt Ltd - order_8C1CQG433E1I,captured,card,clean
+pay_9ipa2voi8uyyf1,RAZORPAY7645208814743503,29508.19,696.39,28811.8,2024-01-18,Payment for CloudBiz - order_IRYM81CMFTDR,captured,card,clean
+pay_6tcfkjnawnga41,RAZORPAY0778487392855749,6205.13,146.44,6058.69,2024-01-22,Payment for DigiMart - order_IZXTNSRTWLXD,captured,card,clean
+pay_x73qxm0632cwt0,RAZORPAY1096789940539103,1290.62,30.46,1260.16,2024-01-14,Payment for DigiMart - order_4CHSDINGXU8U,captured,netbanking,clean
+pay_1p0vuh17j8qo09,RAZORPAY2286852897558556,26777.66,631.95,26145.71,2024-01-19,Payment for DigiMart - order_VS9KKH4A3YJT,captured,upi,clean
+pay_3dxb3n27m5p7e1,RAZORPAY9334419693157279,1012.64,23.9,988.74,2024-01-24,Payment for Sunrise Traders - order_047WWBSLULZF,captured,upi,clean
+pay_houu9sijpyueon,RAZORPAY5179086416862278,99565.83,2349.75,97216.08,2024-01-12,Payment for Sunrise Traders - order_GMX1GM32WP7I,captured,upi,clean
+pay_tw9zyn6sjchzjq,RAZORPAY4051477053833884,465562.96,10987.29,454575.67,2024-01-04,Payment for Apex Commerce - order_8CXX6MDK5N9S,captured,upi,clean
+pay_jcjn9978imoe0s,RAZORPAY0038457620555438,293523.14,6927.15,286595.99,2024-01-26,Payment for Sunrise Traders - order_Y5YPUPLVQEXU,captured,netbanking,clean
+pay_p767j2dg1wjuii,RAZORPAY2925188125205664,232130.22,5478.27,226651.95,2024-01-14,Payment for ACME Corp - order_YMYRSVZN4REG,captured,wallet,clean
+pay_7utxzbdq55it9b,RAZORPAY1279757366096569,386155.0,9113.26,377041.74,2024-01-05,Payment for GreenLeaf Organics - order_N18GP51KFK7Y,captured,upi,clean
+pay_zeeqnsn2s8nn16,RAZORPAY8266570279371452,1525.8,36.01,1489.79,2024-01-07,Payment for QuickShop - order_UXF5GZPL1QWE,captured,netbanking,clean
+pay_kw3hgbmfbuvldd,RAZORPAY0973397767199038,285445.55,6736.51,278709.04,2024-01-12,Payment for CloudBiz - order_9FKXZUU80MB1,captured,wallet,clean
+pay_p4juw7wr0r35ik,RAZORPAY4586833901981794,466.18,11.0,455.18,2024-01-07,Payment for Sunrise Traders - order_GEQ20HWOBM3H,captured,upi,clean
+pay_fq56q37csuytau,RAZORPAY1556990235577027,23593.4,556.8,23036.6,2024-01-28,Payment for TechSolutions Ltd - order_L62CF4MNTFVG,captured,upi,clean
+pay_fmr5ll1d9s9hbn,RAZORPAY7438421503178078,9035.16,213.23,8821.93,2024-01-10,Payment for BlueOcean Pvt Ltd - order_5ELB45L6D10A,captured,card,clean
+pay_j72ugl6tbb6bnd,RAZORPAY1422410988138585,23751.65,560.54,23191.11,2024-01-25,Payment for GreenLeaf Organics - order_OZ6WYQMLH13C,captured,card,clean
+pay_rmqg1ved32lx2t,RAZORPAY7733294562557701,15028.56,354.67,14673.89,2024-01-23,Payment for DigiMart - order_OOWT9NM3V2P2,captured,upi,clean
+pay_rxd356wafftouh,RAZORPAY9975817246191965,15882.33,374.82,15507.51,2024-01-28,Payment for PrimeServices - order_YLU6K7P9MDA9,captured,upi,clean
+pay_xrgn74f9yecazr,RAZORPAY8514036965666683,30396.36,717.35,29679.01,2024-01-13,Payment for SwiftPay Inc - order_P9DXOQ2VPGST,captured,card,clean
+pay_f0992qc6dr08cw,RAZORPAY3846895009751971,25787.11,608.58,25178.53,2024-01-06,Payment for Smart Retail - order_2LBM2QSQ0P82,captured,netbanking,clean
+pay_wjj0v60xng2igs,RAZORPAY9290490471281442,1628.86,38.44,1590.42,2024-01-24,Payment for NextGen Solutions - order_B98V341ONX0G,captured,netbanking,clean
+pay_y8yb7w8p74mjdx,RAZORPAY7478366742860476,1240.44,29.27,1211.17,2024-01-14,Payment for ACME Corp - order_O100VHMYGTY3,captured,upi,clean
+pay_2gdgkxcq91yy1j,RAZORPAY3009109391119269,815.75,19.25,796.5,2024-01-16,Payment for Sunrise Traders - order_2JCN9J3GC9HO,captured,wallet,clean
+pay_z6us7rp422ta83,RAZORPAY4101194707200642,1187.72,28.03,1159.69,2024-01-25,Payment for SwiftPay Inc - order_RU7MYOW8DT8C,captured,card,clean
+pay_2xr838ammzohxs,RAZORPAY6157173203093761,10718.93,252.97,10465.96,2024-01-05,Payment for Sunrise Traders - order_75T0IC0RA6WI,captured,upi,clean
+pay_tl8hbgcj1gnfiu,RAZORPAY9111799313656519,7193.96,169.78,7024.18,2024-01-26,Payment for Apex Commerce - order_E2WNF5CA7ZVK,captured,card,clean
+pay_99w59sqwhbef46,RAZORPAY2909279145608331,13830.86,326.41,13504.45,2024-01-06,Payment for DigiMart - order_RF7BNHJW6QDB,captured,wallet,clean
+pay_cvbphvgnqgmjmb,RAZORPAY9956353153136363,369059.45,8709.8,360349.65,2024-01-18,Payment for NextGen Solutions - order_UKDQP1HKF286,captured,wallet,clean
+pay_9bq1btr23qiua0,RAZORPAY7740633569392906,131728.02,3108.78,128619.24,2024-01-05,Payment for BlueOcean Pvt Ltd - order_8EKXDRKZ40AQ,captured,netbanking,clean
+pay_s6nbnqbnxzu1em,RAZORPAY1658046498931950,26160.52,617.39,25543.13,2024-01-03,Payment for ACME Corp - order_TX015Z11L6SP,captured,wallet,clean
+pay_feffh8aoy7rp0a,RAZORPAY8847951371162411,250977.01,5923.06,245053.95,2024-01-15,Payment for DigiMart - order_GA24SMUX2RXT,captured,card,clean
+pay_fe9upnhzx9fq9t,RAZORPAY7540254729284222,761.02,17.96,743.06,2024-01-10,Payment for GreenLeaf Organics - order_EA7187F8TSXK,captured,wallet,clean
+pay_s21hd4y89orvsc,RAZORPAY2814069375150939,27254.8,643.21,26611.59,2024-01-14,Payment for Apex Commerce - order_YOZPNAMLQUH5,captured,card,clean
+pay_ouz1egntb34kuq,RAZORPAY9912347851961064,13890.33,327.81,13562.52,2024-01-25,Payment for TechSolutions Ltd - order_AAJ84RX6PRYI,captured,upi,clean
+pay_fjp6mkt7s1gd1t,RAZORPAY4715890429025725,18053.3,426.06,17627.24,2024-01-14,Payment for SwiftPay Inc - order_53YKYYDU3ASN,captured,upi,clean
+pay_fp9s8gk0eeyylh,RAZORPAY8988816711207545,592.78,13.99,578.79,2024-01-09,Payment for GreenLeaf Organics - order_9P1EARPHBXVQ,captured,netbanking,clean
+pay_sc31tz8g1a0774,RAZORPAY3932501249552893,462446.09,10913.73,451532.36,2024-01-04,Payment for SwiftPay Inc - order_RZGYD49PSO1L,captured,netbanking,clean
+pay_7nayyosyeoz906,RAZORPAY7164794738646317,4761.82,112.38,4649.44,2024-01-26,Payment for BlueOcean Pvt Ltd - order_GNHH4OIPR11V,captured,wallet,clean
+pay_nyfwdc112hxrjm,RAZORPAY2711477320101702,270364.82,6380.61,263984.21,2024-01-25,Payment for FastTrack Logistics - order_4T8BP6NLNQBU,captured,wallet,clean
+pay_8wm9lbb4m0a6md,RAZORPAY1978897782806479,15905.01,375.36,15529.65,2024-01-02,Payment for CloudBiz - order_MMMXIXV6CKMA,captured,wallet,clean
+pay_k8hw9c4hjku2w8,RAZORPAY5696591713578529,3111.5,73.43,3038.07,2024-01-18,Payment for Sunrise Traders - order_ZUVJUTPMC3SK,captured,wallet,clean
+pay_hqi014o46w4jkf,RAZORPAY8208297374896908,20967.91,494.84,20473.07,2024-01-05,Payment for Smart Retail - order_YIIFA2LR9P6H,captured,netbanking,clean
+pay_07s387j5ie3lvo,RAZORPAY7001594165162319,3661.39,86.41,3574.98,2024-01-18,Payment for CloudBiz - order_0IPFG8PJVRN8,captured,card,clean
+pay_a877k71k4fpl3x,RAZORPAY4090034864518376,22180.96,523.47,21657.49,2024-01-17,Payment for Smart Retail - order_2JC2R07LP7DF,captured,wallet,clean
+pay_z1xevo7q5egvlk,RAZORPAY0027206345911238,14964.7,353.17,14611.53,2024-01-07,Payment for SwiftPay Inc - order_DNON4UAAUWID,captured,upi,clean
+pay_nphh30gg2b9iqi,RAZORPAY5291086771333447,6604.41,155.86,6448.55,2024-01-02,Payment for DigiMart - order_UXDQ59OHNPVC,captured,card,clean
+pay_grmqdzpjl9r9km,RAZORPAY9004896465280924,471481.31,11126.96,460354.35,2024-01-22,Payment for GreenLeaf Organics - order_P6J37SPF0R8U,captured,card,clean
+pay_d5ggsj6vv8suoc,RAZORPAY2761707587771215,1255.08,29.62,1225.46,2024-01-23,Payment for FastTrack Logistics - order_1Y5AYYOV84FC,captured,netbanking,clean
+pay_ji1oahnox8fk20,RAZORPAY9759230450189616,253.04,5.97,247.07,2024-01-26,Payment for PrimeServices - order_76VMDNHQNJVD,captured,card,clean
+pay_4skbcbdpdxujjc,RAZORPAY7327881476174224,1356.35,32.01,1324.34,2024-01-26,Payment for NextGen Solutions - order_SEXGGOC5KVQY,captured,card,clean
+pay_3wy8y2deg3zgar,RAZORPAY1680061027769749,19111.45,451.03,18660.42,2024-01-16,Payment for SwiftPay Inc - order_FI44TD1FPE60,captured,wallet,clean
+pay_s0765icautjx6e,RAZORPAY6050166799840767,2099.21,49.54,2049.67,2024-01-27,Payment for FastTrack Logistics - order_WXQPF0QPSVY7,captured,netbanking,clean
+pay_7riu9mjyg4s3me,RAZORPAY5729341722329716,421547.95,9948.53,411599.42,2024-01-23,Payment for TechSolutions Ltd - order_IUR9211U645V,captured,wallet,clean
+pay_fn3eh81a4rkgjz,RAZORPAY9180812135247871,397376.63,9378.09,387998.54,2024-01-12,Payment for Sunrise Traders - order_OWI1T2EP768S,captured,card,clean
+pay_5z5zlm36vfox5w,RAZORPAY1556260602908466,473512.13,11174.89,462337.24,2024-01-18,Payment for DigiMart - order_WPM3X15DTOZ5,captured,upi,clean
+pay_e17quami0uz7x4,RAZORPAY2008943468105485,23318.77,550.32,22768.45,2024-01-04,Payment for SwiftPay Inc - order_IKY3UFN0DSG2,captured,wallet,clean
+pay_0pfsrq8stzqbfu,RAZORPAY3715869886497677,6076.74,143.41,5933.33,2024-01-05,Payment for QuickShop - order_7E4DNKSEKNKB,captured,netbanking,clean
+pay_eew1yf0dwwn6mb,RAZORPAY0185106794975679,1888.2,44.56,1843.64,2024-01-18,Payment for NextGen Solutions - order_YPJDFAW1LXXD,captured,card,clean
+pay_5apo4ljedgfjdl,RAZORPAY8204339718956907,86533.09,2042.18,84490.91,2024-01-02,Payment for TechSolutions Ltd - order_OGWLACOLOLN3,captured,card,clean
+pay_1xeuq4s2ftgi88,RAZORPAY0578617063048913,5664.74,133.69,5531.05,2024-01-27,Payment for CloudBiz - order_TB38WXGC7JJY,captured,netbanking,clean
+pay_xlh8l6e7vaaguz,RAZORPAY1612846398554743,4423.22,104.39,4318.83,2024-01-12,Payment for NextGen Solutions - order_ROC5XT63QE8N,captured,upi,clean
+pay_hh3o5urtxuyuce,RAZORPAY3045319433750479,238951.5,5639.26,233312.24,2024-01-29,Payment for DigiMart - order_CJUIS2GY9YTJ,captured,wallet,clean
+pay_lom539iy87hlcw,RAZORPAY6641877580304687,2356.08,55.6,2300.48,2024-01-03,Payment for Fusion Foods - order_BPA274IR833S,captured,wallet,clean
+pay_4owo52wqqpwdxy,RAZORPAY6512070496110804,460855.76,10876.2,449979.56,2024-01-24,Payment for SwiftPay Inc - order_ASVDAZV46ESM,captured,card,clean
+pay_vycs44phh62myz,RAZORPAY6854982274954508,882.42,20.83,861.59,2024-01-21,Payment for ACME Corp - order_9VLU8WPFQ2BH,captured,wallet,clean
+pay_gv1bbhg5zmtga4,RAZORPAY5636205015081247,23629.58,557.66,23071.92,2024-01-20,Payment for BlueOcean Pvt Ltd - order_6AYN2D7KI3X7,captured,upi,clean
+pay_wkesvr022wgn51,RAZORPAY6559630993842530,120090.21,2834.13,117256.08,2024-01-08,Payment for Fusion Foods - order_NSGZSR8RUW2X,captured,card,clean
+pay_wpqo2lngixmc4s,RAZORPAY2548121478539078,12869.78,303.73,12566.05,2024-01-07,Payment for Smart Retail - order_X27DCBHHLK3Y,captured,netbanking,clean
+pay_10q2lg1zhqunue,RAZORPAY6690782633373898,964.59,22.76,941.83,2024-01-02,Payment for BlueOcean Pvt Ltd - order_7A34MPYO2TLA,captured,netbanking,clean
+pay_dtbyrgc8kixccs,RAZORPAY6636186371597412,299723.01,7073.46,292649.55,2024-01-27,Payment for PrimeServices - order_G4OFDTRC85EH,captured,netbanking,clean
+pay_0k5qzzkw3gi60q,RAZORPAY3027169385977790,15121.3,356.86,14764.44,2024-01-29,Payment for Apex Commerce - order_6GUO8I5JWK6Z,captured,wallet,clean
+pay_04oae7l0rcti8f,RAZORPAY1856724380701765,1016.52,23.99,992.53,2024-01-06,Payment for CloudBiz - order_34GADKTOC1YF,captured,card,clean
+pay_p9mgyh523ggodl,RAZORPAY1647090063353310,411410.56,9709.29,401701.27,2024-01-08,Payment for SwiftPay Inc - order_UGHT7EHMGOLO,captured,netbanking,clean
+pay_mvvnxiv9iw6l01,RAZORPAY7189241956252571,23607.49,557.14,23050.35,2024-01-11,Payment for Smart Retail - order_WCNKFHB7V80L,captured,wallet,clean
+pay_5cgwfhdv37ic0l,RAZORPAY5533803396852701,137634.71,3248.18,134386.53,2024-01-16,Payment for QuickShop - order_ZIGIKQWJ2C9O,captured,wallet,clean
+pay_rlzh6a50nooo0n,RAZORPAY1498282467474689,1046.34,24.69,1021.65,2024-01-17,Payment for CloudBiz - order_L9C59E7F1811,captured,upi,clean
+pay_x7ov6sgp3jk8xn,RAZORPAY0502497243992011,9164.7,216.29,8948.41,2024-01-01,Payment for Smart Retail - order_LO50DW1MF07O,captured,upi,clean
+pay_h03g95p6dwcdec,RAZORPAY4622522372817932,13963.16,329.53,13633.63,2024-01-20,Payment for PrimeServices - order_BIR1AJ8X2BH2,captured,wallet,clean
+pay_v5kz3nwxrog983,RAZORPAY5535669055107620,12696.59,299.64,12396.95,2024-01-16,Payment for GreenLeaf Organics - order_AMB3LPVOWCP7,captured,netbanking,clean
+pay_h1xdpzf761hjr6,RAZORPAY9802714872717833,1372.13,32.38,1339.75,2024-01-24,Payment for Apex Commerce - order_EET0DY571VXN,captured,wallet,clean
+pay_t49lny2svhotqf,RAZORPAY1159319525690409,833.79,19.68,814.11,2024-01-09,Payment for TechSolutions Ltd - order_74RQVFX2ZVL9,captured,wallet,clean
+pay_1otkzh4oe1u24z,RAZORPAY2330276420865675,2053.99,48.47,2005.52,2024-01-26,Payment for Sunrise Traders - order_QFEZKFH00A0U,captured,wallet,clean
+pay_kvg019ydq3nwqa,RAZORPAY7201859626301367,75142.43,1773.36,73369.07,2024-01-23,Payment for Sunrise Traders - order_EEX6IV9RYDVN,captured,card,clean
+pay_gvgt2eehfu4b9s,RAZORPAY8260688871898131,26210.79,618.57,25592.22,2024-01-11,Payment for Apex Commerce - order_NTP8AK8S2XQU,captured,card,clean
+pay_jn6ocjpztc09zg,RAZORPAY3243298395429618,141437.17,3337.92,138099.25,2024-01-22,Payment for TechSolutions Ltd - order_NX3VPF9PAVCE,captured,netbanking,clean
+pay_tz5tv6g8om08tv,RAZORPAY2340163611284971,395693.35,9338.36,386354.99,2024-01-25,Payment for Apex Commerce - order_4REASFEN0B09,captured,wallet,clean
+pay_8fc0tr58ps0rs9,RAZORPAY7844683414651113,12235.04,288.75,11946.29,2024-01-29,Payment for FastTrack Logistics - order_5ZOW60ZZ0I08,captured,wallet,clean
+pay_344krjawo778s6,RAZORPAY3215285067625153,388943.91,9179.08,379764.83,2024-01-16,Payment for PrimeServices - order_764CAQKDM0OA,captured,card,clean
+pay_mpm5hgbo06fhrx,RAZORPAY4376545628417722,1958.2,46.21,1911.99,2024-01-04,Payment for TechSolutions Ltd - order_JPT2ZL15S74N,captured,card,clean
+pay_i159i3hz3zsg9v,RAZORPAY5690674471639282,141157.32,3331.31,137826.01,2024-01-08,Payment for Sunrise Traders - order_WIEB97PWDBOL,captured,wallet,clean
+pay_q6dg8nkdat5l0n,RAZORPAY1454563502000534,3920.53,92.52,3828.01,2024-01-27,Payment for Sunrise Traders - order_2TNXHN5E0EV6,captured,wallet,clean
+pay_6cp7savzebu2y0,RAZORPAY4738202368485571,320934.87,7574.06,313360.81,2024-01-19,Payment for Fusion Foods - order_OY58F1N2OJGF,captured,wallet,clean
+pay_5b99hexw8l85je,RAZORPAY3448123083402424,10843.78,255.91,10587.87,2024-01-19,Payment for BlueOcean Pvt Ltd - order_6K9WAM0KJAX5,captured,netbanking,clean
+pay_gg5gr0xafgovcc,RAZORPAY7354396273652717,8169.37,192.8,7976.57,2024-01-30,Payment for Sunrise Traders - order_I68DS03VNA31,captured,card,clean
+pay_itjtabtd5oaiin,RAZORPAY0018513279724572,1624.35,38.33,1586.02,2024-01-20,Payment for TechSolutions Ltd - order_MK7YYZ6R9I8K,captured,netbanking,clean
+pay_73zca7fxloz2rc,RAZORPAY2685926249451475,314118.0,7413.18,306704.82,2024-01-05,Payment for CloudBiz - order_U8KD9GNLPYO2,captured,wallet,clean
+pay_red6m42fq4t7ph,RAZORPAY3619689313503058,17143.05,404.58,16738.47,2024-01-28,Payment for NextGen Solutions - order_I0EZF0ZPBDUR,captured,card,clean
+pay_5b1sa3y5t37szp,RAZORPAY6227284765704120,179.32,4.23,175.09,2024-01-23,Payment for FastTrack Logistics - order_F9S9EHWHG0U4,captured,netbanking,clean
+pay_cv1ltwbj9uu2bl,RAZORPAY5634111595034281,107467.45,2536.23,104931.22,2024-01-17,Payment for Apex Commerce - order_7AMKOH109ZDO,captured,card,clean
+pay_qekw7bzyi9v8u9,RAZORPAY0422711332288985,26392.34,622.86,25769.48,2024-01-12,Payment for NextGen Solutions - order_DA1L526RQGKC,captured,upi,clean
+pay_48nysj5ywx0i3a,RAZORPAY4721970546692758,1262.16,29.79,1232.37,2024-01-06,Payment for TechSolutions Ltd - order_4KFOCNQDQX6Q,captured,wallet,clean
+pay_91c329hha1pjgf,RAZORPAY9737147082723590,954.7,22.53,932.17,2024-01-06,Payment for Smart Retail - order_JC5QPH6GB6P8,captured,wallet,clean
+pay_67rl2yj0974wxu,RAZORPAY6596089319925502,6918.95,163.29,6755.66,2024-01-01,Payment for CloudBiz - order_B0GZ1VHHGY8N,captured,upi,clean
+pay_pkxywz76dd4da7,RAZORPAY5586851276528928,224605.25,5300.68,219304.57,2024-01-07,Payment for TechSolutions Ltd - order_D0WTWS3Y4H1T,captured,netbanking,clean
+pay_fn33vm89i9gx32,RAZORPAY6053844446306000,25061.49,591.45,24470.04,2024-01-13,Payment for BlueOcean Pvt Ltd - order_UEW9G6SPD2SW,captured,card,clean
+pay_kti221xj7wwudq,RAZORPAY0920981960275233,210.25,4.96,205.29,2024-01-03,Payment for Sunrise Traders - order_VDK6DRN4ORAC,captured,wallet,clean
+pay_sjevts1hn6bedy,RAZORPAY2402990155799802,410018.06,9676.43,400341.63,2024-01-22,Payment for Fusion Foods - order_EJHDZXQ3P87J,captured,upi,clean
+pay_63q68jov58toe3,RAZORPAY7676945919663955,2016.13,47.58,1968.55,2024-01-29,Payment for CloudBiz - order_PGIHNFLAYZHU,captured,upi,clean
+pay_peglnukx496k4o,RAZORPAY8491966553307704,661.04,15.6,645.44,2024-01-16,Payment for CloudBiz - order_67BXCD20J1OU,captured,netbanking,clean
+pay_033tayb5bbkjy2,RAZORPAY1591030021563213,20130.17,475.07,19655.1,2024-01-17,Payment for DigiMart - order_NZ7VELFV46WY,captured,wallet,clean
+pay_qnrm31sl7zx4de,RAZORPAY3144158331170303,1867.53,44.07,1823.46,2024-01-29,Payment for SwiftPay Inc - order_7NQWHOCPY8UD,captured,card,clean
+pay_bjdx0pkovtrpyx,RAZORPAY8754181563268685,217.18,5.13,212.05,2024-01-27,Payment for Apex Commerce - order_8HBBJCDIWZOD,captured,card,clean
+pay_6farmgjcy4v8ur,RAZORPAY9401289743251225,826.78,19.51,807.27,2024-01-16,Payment for SwiftPay Inc - order_ID3U94SGFDK0,captured,netbanking,clean
+pay_buzphd7ndjwt69,RAZORPAY5458971480263257,2872.93,67.8,2805.13,2024-01-14,Payment for TechSolutions Ltd - order_5G6MLV8JGUZ4,captured,netbanking,clean
+pay_kvblpxajmk4x1f,RAZORPAY7284982474140703,21351.98,503.91,20848.07,2024-01-04,Payment for GreenLeaf Organics - order_DJ9HVCHRM3WP,captured,netbanking,clean
+pay_n5pepl7zqppoau,RAZORPAY9234268344149782,11368.2,268.29,11099.91,2024-01-05,Payment for PrimeServices - order_8P1WKISETUK1,captured,wallet,clean
+pay_su8e6xfwz73whc,RAZORPAY0415914975019803,3994.52,94.27,3900.25,2024-01-27,Payment for Fusion Foods - order_F5SIDASO7KRG,captured,wallet,clean
+pay_yozdppbquakx6w,RAZORPAY0223288377441975,493.68,11.65,482.03,2024-01-17,Payment for PrimeServices - order_B68Q0J9M4SMZ,captured,card,clean
+pay_vuv3cb0ixryli1,RAZORPAY2446176792988425,15135.75,357.2,14778.55,2024-01-25,Payment for SwiftPay Inc - order_72D50N97CJB0,captured,upi,clean
+pay_uwyh36motcg06x,RAZORPAY2983347743326831,1206.35,28.47,1177.88,2024-01-05,Payment for TechSolutions Ltd - order_R3URMWUECPNC,captured,upi,clean
+pay_oczdq7jbmjm1ft,RAZORPAY3446512418938984,11600.29,273.77,11326.52,2024-01-20,Payment for PrimeServices - order_07X5IC86Z1B9,captured,wallet,clean
+pay_tb1zppep69ngpc,RAZORPAY7835674300038960,5361.68,126.54,5235.14,2024-01-15,Payment for QuickShop - order_IVI052U9AZ3C,captured,upi,clean
+pay_72kxsjzsb6zwkh,RAZORPAY4296711148375374,9216.72,217.51,8999.21,2024-01-01,Payment for TechSolutions Ltd - order_E9I0HN3F9ZXQ,captured,netbanking,clean
+pay_bktmav6763v1m3,RAZORPAY0496706670336268,2417.98,57.06,2360.92,2024-01-24,Payment for NextGen Solutions - order_PP00CDNZY47Q,captured,wallet,clean
+pay_euljgqpq8r4hc7,RAZORPAY4138459609454490,185.68,4.38,181.3,2024-01-08,Payment for ACME Corp - order_JVLCG1J5EWFW,captured,card,clean
+pay_siln3ox5fl2mox,RAZORPAY3044058093511871,3653.78,86.23,3567.55,2024-01-26,Payment for DigiMart - order_Q9WFB76AV3S2,captured,wallet,clean
+pay_pj4kii1nq0ei05,RAZORPAY1139898681809788,6627.05,156.4,6470.65,2024-01-30,Payment for BlueOcean Pvt Ltd - order_NMS6XVQPU3ET,captured,card,clean
+pay_0ebpy9e576mouz,RAZORPAY6682973270216487,427.22,10.08,417.14,2024-01-14,Payment for FastTrack Logistics - order_E66VW9B0MQOQ,captured,card,clean
+pay_irbsss7kn18b85,RAZORPAY8120995765728941,460680.67,10872.06,449808.61,2024-01-20,Payment for Smart Retail - order_0PK5LMFKRIG7,captured,netbanking,clean
+pay_s3kdz4ppj590em,RAZORPAY2090883070534967,16489.2,389.15,16100.05,2024-01-04,Payment for PrimeServices - order_C20LSJWS1ZL7,captured,upi,clean
+pay_prwzbywwimt854,RAZORPAY6334727274231830,471.66,11.13,460.53,2024-01-11,Payment for SwiftPay Inc - order_5YRWVTKH861P,captured,upi,clean
+pay_jlopo6j0m3louf,RAZORPAY6277963044836085,12058.41,284.58,11773.83,2024-01-25,Payment for BlueOcean Pvt Ltd - order_HW8WLVA02DZ6,captured,card,clean
+pay_orfki1ije2xe0j,RAZORPAY6342556383000818,423930.05,10004.75,413925.3,2024-01-28,Payment for NextGen Solutions - order_DCZ1OA3VF02G,captured,wallet,clean
+pay_iarontdi9oinux,RAZORPAY1497646136847488,1228.43,28.99,1199.44,2024-01-25,Payment for NextGen Solutions - order_L39DG5RIFWR0,captured,wallet,clean
+pay_zs49cdzn1f0fp8,RAZORPAY0599604387875357,25443.89,600.48,24843.41,2024-01-09,Payment for Sunrise Traders - order_BPG2R0TOKPK7,captured,netbanking,clean
+pay_ofc9lgytlcqfmu,RAZORPAY3958947735228705,1379.64,32.56,1347.08,2024-01-07,Payment for Sunrise Traders - order_IW7J35VLWOJT,captured,card,clean
+pay_9d2ff5l6bspxls,RAZORPAY1289659994973203,767.9,18.12,749.78,2024-01-09,Payment for FastTrack Logistics - order_EUNNRLST5488,captured,wallet,clean
+pay_hmhvl66sajxxo9,RAZORPAY6520575639836520,17842.39,421.08,17421.31,2024-01-26,Payment for DigiMart - order_ZJCUBZQVQG0X,captured,netbanking,clean
+pay_6g9znaxoycg1fj,RAZORPAY2161070518439055,1880.06,44.37,1835.69,2024-01-23,Payment for FastTrack Logistics - order_GBVYOW47LUEQ,captured,wallet,clean
+pay_zgflig5gkzjrum,RAZORPAY5902035713432406,353.08,8.33,344.75,2024-01-10,Payment for BlueOcean Pvt Ltd - order_XQW3B4NTHZM3,captured,netbanking,clean
+pay_w5apmxd6lqga3q,RAZORPAY0182727955969051,1249.07,29.48,1219.59,2024-01-30,Payment for GreenLeaf Organics - order_UPO4JNMYK851,captured,wallet,clean
+pay_oqxhglg4p0ft1a,RAZORPAY8249839225014257,3285.27,77.53,3207.74,2024-01-05,Payment for GreenLeaf Organics - order_FDTOHRNQI7NL,captured,netbanking,clean
+pay_vocirbkdngflyr,RAZORPAY8157903923555809,310561.27,7329.25,303232.02,2024-01-11,Payment for QuickShop - order_J8GOSD3M0XO3,captured,wallet,clean
+pay_29tnyfm7vh30qb,RAZORPAY6604641978575851,28897.83,681.99,28215.84,2024-01-14,Payment for CloudBiz - order_KERN6YJMK3TG,captured,netbanking,clean
+pay_i340sqcnf9w5n9,RAZORPAY0863218122764579,12324.22,290.85,12033.37,2024-01-19,Payment for Fusion Foods - order_C70PA8JX54PE,captured,card,clean
+pay_xjq2wdizhw0vqp,RAZORPAY6424809624406306,15505.26,365.92,15139.34,2024-01-09,Payment for PrimeServices - order_VTRUML3F4RTG,captured,upi,clean
+pay_o11k09ntn8eohd,RAZORPAY8544577029929596,69053.24,1629.66,67423.58,2024-01-29,Payment for Sunrise Traders - order_K5199TMH6K1W,captured,wallet,clean
+pay_gbivscuoavfwy8,RAZORPAY7226408572169666,15257.63,360.08,14897.55,2024-01-11,Payment for Fusion Foods - order_AV2OSG6Q0IQZ,captured,upi,clean
+pay_595cpjze1xtar0,RAZORPAY9732781952371006,15127.81,357.02,14770.79,2024-01-19,Payment for FastTrack Logistics - order_KO31NZSXPEFJ,captured,netbanking,clean
+pay_uv1fkhnnk8fwrp,RAZORPAY7341517734547574,721.21,17.02,704.19,2024-01-17,Payment for Apex Commerce - order_K0ZFKNWBHKVJ,captured,card,clean
+pay_hfv0ehruwa0326,RAZORPAY5856728727601534,2153.63,50.83,2102.8,2024-01-19,Payment for SwiftPay Inc - order_0NBW8SJ84TC2,captured,netbanking,clean
+pay_hi1rd5b2crprdv,RAZORPAY3372094841312840,20397.2,481.37,19915.83,2024-01-25,Payment for Smart Retail - order_VKAP6ZPXVW19,captured,netbanking,clean
+pay_6srg1yd5my3gdi,RAZORPAY4448354884712705,1285.71,30.34,1255.37,2024-01-20,Payment for QuickShop - order_LK1QY7HYLGOG,captured,wallet,clean
+pay_1o8m291azhzknl,RAZORPAY4745245557469660,156610.1,3696.0,152914.1,2024-01-02,Payment for SwiftPay Inc - order_2LUHHS4DILRZ,captured,card,clean
+pay_khdiu1jtka1c2z,RAZORPAY0548574172156229,4131.21,97.5,4033.71,2024-01-30,Payment for Apex Commerce - order_L46Q5GQQLYZJ,captured,upi,clean
+pay_0u92t24d7v911p,RAZORPAY8085096085874951,15874.83,374.65,15500.18,2024-01-13,Payment for ACME Corp - order_JQ50XCXMSY3P,captured,upi,fee_adjusted
+pay_hgav42t8llihkp,RAZORPAY5624395873959232,13223.56,312.08,12911.48,2024-01-02,Payment for PrimeServices - order_J7HME6P4NP00,captured,upi,fee_adjusted
+pay_hdsrs8anp8dmlc,RAZORPAY1128981231795563,1961.81,46.3,1915.51,2024-01-08,Payment for FastTrack Logistics - order_8XIZX35A806B,captured,upi,fee_adjusted
+pay_5dfrlw6jl2l5b5,RAZORPAY0093459626228225,516.03,12.18,503.85,2024-01-28,Payment for PrimeServices - order_6BNVSFA6D9ER,captured,upi,fee_adjusted
+pay_e7icdo5digxl9y,RAZORPAY7742585917793238,410429.81,9686.14,400743.67,2024-01-26,Payment for ACME Corp - order_SU51EPXU7B6N,captured,upi,fee_adjusted
+pay_jp0xsm9gm51qd4,RAZORPAY3265097753967379,1641.38,38.74,1602.64,2024-01-10,Payment for CloudBiz - order_1J2PATD93EZE,captured,upi,fee_adjusted
+pay_btty9gfyw4i7zt,RAZORPAY8268323035892988,68994.6,1628.27,67366.33,2024-01-01,Payment for Smart Retail - order_8PHB8OOSPRLZ,captured,upi,fee_adjusted
+pay_imi8fo0vyhfjlw,RAZORPAY9910622723626693,11069.15,261.23,10807.92,2024-01-11,Payment for Apex Commerce - order_SS1VIP3TVF51,captured,upi,fee_adjusted
+pay_pw5k0jjsp49cd3,RAZORPAY7692743811995376,2119.25,50.01,2069.24,2024-01-02,Payment for PrimeServices - order_IRVXD2ZU4NS7,captured,upi,fee_adjusted
+pay_3w1yaua8d7204j,RAZORPAY1135996605779806,332058.55,7836.58,324221.97,2024-01-21,Payment for DigiMart - order_3M9IQBQ9J2H1,captured,upi,fee_adjusted
+pay_1h4rmpnfgaglsx,RAZORPAY7155983541165972,397055.07,9370.5,387684.57,2024-01-13,Payment for CloudBiz - order_KUGWCDZ6X4FM,captured,upi,fee_adjusted
+pay_iixhaiaw4otuo4,RAZORPAY4991537038240733,2396.78,56.56,2340.22,2024-01-18,Payment for CloudBiz - order_UW590Z92JN67,captured,upi,fee_adjusted
+pay_j4qpvc9aqx6rzc,RAZORPAY3892187851935837,11345.72,267.76,11077.96,2024-01-18,Payment for Smart Retail - order_M8JJ6AVP1EOX,captured,netbanking,timing_drift
+pay_00iv1ggxred8u8,RAZORPAY6289509059119186,268738.82,6342.24,262396.58,2024-01-12,Payment for Fusion Foods - order_NOZEMDMZ5RGO,captured,netbanking,timing_drift
+pay_u48gwghm56vu6z,RAZORPAY9080512080056409,755.75,17.84,737.91,2024-01-22,Payment for CloudBiz - order_5GF3BBT873LK,captured,card,timing_drift
+pay_2bc9r4x1v4dx6u,RAZORPAY9578671815352373,19096.34,450.67,18645.67,2024-01-04,Payment for SwiftPay Inc - order_ZS1XKE1KWONR,captured,netbanking,timing_drift
+pay_8nmt3yps4sybhq,RAZORPAY4080314998250800,2481.88,58.57,2423.31,2024-01-08,Payment for GreenLeaf Organics - order_GHLZRUWBN6EK,captured,card,timing_drift
+pay_3n4g2jayb1eyce,RAZORPAY6022939469434606,204738.38,4831.83,199906.55,2024-01-04,Payment for Smart Retail - order_F2CTG08ZZKK4,captured,card,timing_drift
+pay_n0p1xs910baf4j,RAZORPAY2807711306211369,16194.1,382.18,15811.92,2024-01-03,Payment for SwiftPay Inc - order_GQ6CN8SIWMZA,captured,netbanking,timing_drift
+pay_nu31eiwucx67xk,RAZORPAY0116880925502130,2415.81,57.01,2358.8,2024-01-10,Payment for QuickShop - order_WQ0YWM9Q7FTM,captured,netbanking,timing_drift
+pay_qq8qmxetizu802,RAZORPAY0642076836253666,202996.71,4790.72,198205.99,2024-01-20,Payment for FastTrack Logistics - order_NQ52NLOQTQ68,captured,card,timing_drift
+pay_fli01rv1twbdca,RAZORPAY6862703692492693,6809.78,160.71,6649.07,2024-01-15,Payment for GreenLeaf Organics - order_75LD7M08LCWL,captured,card,timing_drift
+pay_b5rr1v9npuqary,BATCH_BATCH1822261896288743_0,75622.4,1784.69,73837.71,2024-01-04,Payment for Sunrise Traders - order_MMDNGWY7D78H,captured,upi,batch
+pay_8cv2a6pg4gks6r,BATCH_BATCH1822261896288743_1,1821.81,42.99,1778.82,2024-01-04,Payment for QuickShop - order_6BILQPB01QCT,captured,upi,batch
+pay_aukhqnzjnns9pz,BATCH_BATCH1822261896288743_2,465476.22,10985.24,454490.98,2024-01-04,Payment for ACME Corp - order_EMJGKCQY2656,captured,upi,batch
+pay_q52dezh0cd8a2i,BATCH_BATCH1312512931100591_0,26462.11,624.51,25837.6,2024-01-05,Payment for ACME Corp - order_BCLTRH9VGKY5,captured,upi,batch
+pay_c9j5uge1g41io4,BATCH_BATCH1312512931100591_1,16458.57,388.42,16070.15,2024-01-05,Payment for ACME Corp - order_KOXHJMIA6YKF,captured,upi,batch
+pay_0w3c1za0dv6nyy,BATCH_BATCH1312512931100591_2,958.92,22.63,936.29,2024-01-05,Payment for ACME Corp - order_CJ4Q0RR1L9GV,captured,upi,batch
+pay_2xgvgdofmaok8t,BATCH_BATCH6775677722660256_0,2883.63,68.05,2815.58,2024-01-21,Payment for Smart Retail - order_IR0P8F8C8CLR,captured,upi,batch
+pay_rhr8wmlwwvtmny,BATCH_BATCH6775677722660256_1,1369.09,32.31,1336.78,2024-01-21,Payment for SwiftPay Inc - order_EURANI8Y66W6,captured,upi,batch
+pay_ulgelw8ivi3rqa,BATCH_BATCH6775677722660256_2,290848.0,6864.01,283983.99,2024-01-21,Payment for BlueOcean Pvt Ltd - order_SD1WCRV68JQ1,captured,upi,batch
+pay_3g7vkc5ssinz4k,BATCH_BATCH2507330559782457_0,124027.42,2927.05,121100.37,2024-01-11,Payment for CloudBiz - order_HKBXPN19QNFP,captured,upi,batch
+pay_jzqfe8e5tnlztw,BATCH_BATCH2507330559782457_1,792.85,18.71,774.14,2024-01-11,Payment for TechSolutions Ltd - order_XOL4BKUU5CZE,captured,upi,batch
+pay_dfzdmmcmcoco2z,BATCH_BATCH2507330559782457_2,95758.38,2259.9,93498.48,2024-01-11,Payment for SwiftPay Inc - order_TDHF15ICYAXZ,captured,upi,batch
+pay_hbirmc5s3ofaww,RAZORPAY2285566084706810,696.76,16.44,680.32,2024-01-22,Payment for Sunrise Traders - order_JNN41JH6OXQQ,captured,upi,missing_in_bank
+pay_u5jslhgmrzzqo1,RAZORPAY2106133943945703,13656.5,322.29,13334.21,2024-01-30,Payment for Smart Retail - order_7RV2Y7CDABBA,captured,upi,missing_in_bank
+pay_kj752h70yb7rad,RAZORPAY9210533651460401,1195.89,28.22,1167.67,2024-01-14,Payment for SwiftPay Inc - order_I5UUJZR0FCYB,captured,upi,missing_in_bank
+pay_54p8ri4bnvqrfx,RAZORPAY0901447340433700,223839.4,5282.61,218556.79,2024-01-22,Payment for SwiftPay Inc - order_NTF0MGOQMK31,captured,upi,missing_in_bank
+pay_mw04u923o359ts,RAZORPAY6194255778205829,12409.04,292.85,12116.19,2024-01-22,Payment for DigiMart - order_UJT70Y2RL4N7,captured,upi,missing_in_bank
+pay_khw8gakh3ycqe8,RAZORPAY5613723081721436,132963.57,3137.94,129825.63,2024-01-11,Payment for SwiftPay Inc - order_XAVMNKW7WVY9,captured,upi,missing_in_bank
+pay_tc0z7q0i9bl14h,RAZORPAY7681699570607174,9534.01,225.0,9309.01,2024-01-24,Payment for Sunrise Traders - order_OAE527PSQZN7,captured,card,duplicate
+pay_n0xgnki5vrz38e,RAZORPAY7420495612137730,7282.76,171.87,7110.89,2024-01-16,Payment for PrimeServices - order_FE9VAR2PZ6NT,captured,card,duplicate
+pay_njc2gouifezac2,RAZORPAY4576832102192378,4292.32,101.3,4191.02,2024-01-06,Payment for TechSolutions Ltd - order_EXVA5E742GRR,captured,card,duplicate
+pay_1blog0nq4i6r8s,RAZORPAY2821781923653460,63331.71,1494.63,61837.08,2024-01-21,Payment for BlueOcean Pvt Ltd - order_O5WISRCVPUZ1,captured,card,duplicate

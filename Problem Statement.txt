@@ -1,0 +1,78 @@
+Problem Statement :
+
+Merchants reconciling payment gateway settlements against bank statements and internal ledgers still do it by hand — three sources, three formats, three timings, no unified source of truth. This creates delayed financial close, hidden revenue leakage, and "where's my money" support tickets that eat merchant trust. We built an agent that auto-matches transactions across all three sources (including hard cases like batched settlements and timing drift), reports an honest match rate with a categorized exception list, and lets anyone ask it plain-English questions about any transaction instead of digging through spreadsheets.
+
+
+High impact, low effort (do these)
+Confidence score per match, not just matched/unmatched. Fuzzy matches get a score (e.g. 0.92) so the human knows which "matches" to double-check. Signals mature engineering, not just binary pass/fail.
+Explain-my-decision on every match, not just exceptions. Click any matched row → "matched because UTR exact + amount exact + date within 1 day." Turns your matcher into an auditable system, which is exactly the "explainable, bounded, gated" language they used for Track 1's bar — reuse it here too.
+A "confidence threshold" slider — user can tighten/loosen fuzzy-match tolerance and watch match rate + exception count change live. Cheap to build (just a parameter), very demoable, shows you understand the precision/recall tradeoff.
+
+Repo structure (scaffold this first, before any logic)
+settlement-copilot/
+├── README.md                    # problem, architecture diagram, metrics, how to run, failure story
+├── docker-compose.yml           # postgres + backend + frontend, one command to run everything
+├── .env.example
+├── .github/workflows/ci.yml     # lint + test on every push — this alone signals "not a student project"
+├── data/
+│   ├── generate_synthetic.py    # your data generator, seeded + reproducible
+│   └── samples/                 # committed example CSVs so reviewers can run it without generating first
+├── backend/
+│   ├── app/
+│   │   ├── main.py              # FastAPI entrypoint
+│   │   ├── models.py            # SQLAlchemy models: RawTransaction, MatchResult, Exception
+│   │   ├── ingest.py            # CSV → normalized schema
+│   │   ├── matcher/
+│   │   │   ├── exact.py
+│   │   │   ├── fuzzy.py
+│   │   │   ├── batch_unbundler.py
+│   │   │   └── engine.py        # orchestrates the 3 passes, assigns confidence + reason
+│   │   ├── agent/
+│   │   │   ├── nl2sql.py        # prompt template + schema grounding + validation-before-execute
+│   │   │   └── rag.py
+│   │   └── api/routes.py
+│   ├── tests/
+│   │   ├── test_matcher.py      # THIS is what separates you from 90% of applicants
+│   │   ├── test_nl2sql.py
+│   │   └── fixtures/            # known-answer test cases: this pair SHOULD match, this SHOULDN'T
+│   └── requirements.txt
+├── frontend/                    # React/Vite dashboard + chat
+└── docs/
+    └── architecture.md          # diagram + design decisions + the failure story
+Build order (this sequence matters — don't skip ahead)
+
+Day 1-2 — Data + schema first, always. Write generate_synthetic.py before any matching logic. Seed it (random.seed(42)) so results are reproducible — a reviewer re-running your repo should get the same match rate you quote in your pitch. Generate the clean cases first, then deliberately inject each failure type (fee-adjusted, timing drift, batch, missing, duplicate, amount typo) as labeled test fixtures — you'll reuse these exact rows as your test suite's "known answers."
+
+Day 3-4 — Matching engine, test-driven. Write test_matcher.py before the matcher, using your labeled fixtures: "this settlement+ledger pair should match with confidence > 0.9 and reason = fee-adjusted." Then write the matcher to pass those tests. This is the single highest-leverage thing you can do — a matcher with a real test suite reads as engineering, not a script that happened to work on your demo run.
+
+Day 5 — Batch unbundler. Your hardest, most differentiating feature. Get this working and tested before touching the LLM layer.
+
+Day 6-7 — NL2SQL agent. Reuse your FloatChat prompt-engineering approach: schema-grounded prompt, generate SQL, execute against a read-only connection first to validate it doesn't error, then answer. This validate-before-answer step is literally your failure-story fix from FloatChat — build it in from the start this time instead of discovering it live.
+
+Day 8-9 — API + frontend. FastAPI routes for: upload, get match results, get exceptions, ask question. React dashboard: match rate card, exception table (filterable by category), chat panel. Don't over-design the UI — clean and functional beats fancy.
+
+Day 10 — Docker Compose. One docker-compose up should run the whole thing. A reviewer who has to manually set up Postgres, install deps, and configure env vars in the right order will bounce off your repo in 2 minutes. This single thing matters more than almost any feature.
+
+Day 11-12 — Metrics, logging, polish. Add structured logging (not print statements) around the matcher and agent. Compute and log match rate + exception breakdown as an actual JSON report artifact (reports/run_2026-08-23.json) — something you can screenshot for the pitch and that proves the number isn't cherry-picked.
+
+Day 13 — README + architecture doc + record the pitch video.
+
+Day 14 — buffer.
+
+"Real-time" — what to actually claim
+
+Don't build literal streaming/websockets unless you have days to spare — it's not what the rubric asks for, and it's a scope trap. What you should have is: upload → results in seconds, synchronously (not "runs overnight in a batch job"). That's real enough for the demo and honest to claim. If you want one real-time touch cheaply: use FastAPI's async endpoints so the upload+match+respond flow feels snappy on camera, and stream the Q&A agent's response token-by-token (Groq supports streaming) so the chat doesn't sit on a spinner — that's a small change with high demo impact.
+
+
+Final tech stack (locked, efficient, reuses what you already know)
+Layer	Choice	Why
+Backend	FastAPI (Python 3.11+)	You already run this in production (ANPR). Async support matters for the streaming Q&A response.
+DB	PostgreSQL	Same as ANPR + FloatChat. Handles relational matching queries (joins across 3 sources) far better than Mongo/NoSQL would.
+Matching engine	Plain Python + pandas (no ML framework needed)	Deterministic rules + fuzzy scoring (rapidfuzz for string similarity on messy bank descriptions, plain arithmetic tolerance for amounts/dates). Don't reach for scikit-learn here — it's unnecessary complexity for rule-based matching and it's not what's being evaluated.
+LLM	Llama 3.3 70B via Groq	Reuse FloatChat exactly — you already have working prompt patterns and know its failure modes. Free/cheap API, fast inference (this matters for the live demo not lagging).
+RAG/embedding store	ChromaDB	Only needed if you're doing schema-context retrieval for NL2SQL grounding. If your schema is small (3-4 tables), you can skip embeddings entirely and just hardcode the schema into the prompt — simpler, and one less thing to break on demo day. Add ChromaDB only if you outgrow that.
+ORM	SQLAlchemy	Standard, works cleanly with FastAPI, makes writing test_matcher.py fixtures much easier than raw SQL.
+Frontend	React + Vite	Same as ANPR/UYIR. Nothing new to learn.
+Containerization	Docker + Docker Compose	See below — yes, needed.
+CI	GitHub Actions (free tier)	Run pytest on every push — a few lines of YAML, huge credibility signal.
+Streaming	FastAPI StreamingResponse + Groq's streaming API	For the token-by-token chat feel.

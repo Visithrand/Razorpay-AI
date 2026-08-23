@@ -1,0 +1,23 @@
+{
+  "generated_at": "2026-08-23T18:29:59.482727",
+  "seed": 42,
+  "gateway_rows": 294,
+  "bank_rows": 284,
+  "ledger_rows": 284,
+  "gateway_by_type": {
+    "clean": 250,
+    "fee_adjusted": 12,
+    "timing_drift": 10,
+    "batch": 12,
+    "missing_in_bank": 6,
+    "duplicate": 4
+  },
+  "bank_by_type": {
+    "clean": 250,
+    "fee_adjusted": 12,
+    "timing_drift": 10,
+    "batch": 4,
+    "duplicate": 4,
+    "duplicate_entry": 4
+  }
+}
