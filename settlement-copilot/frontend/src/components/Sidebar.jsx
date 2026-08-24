@@ -1,93 +1,165 @@
 import { 
   Home, ArrowLeftRight, Zap, TrendingUp, FileText, 
-  Link as LinkIcon, Layout, Share2, Repeat, Users, BarChart2, Settings 
+  Users, BarChart2, Settings, ShieldCheck, MessageSquare,
+  ChevronLeft, ChevronRight, AlertCircle
 } from 'lucide-react'
 
-const NAV_ITEMS = [
-  { id: 'home',            label: 'Home',           icon: Home,           badge: null },
-  { id: 'transactions',    label: 'Transactions',   icon: ArrowLeftRight, badge: null },
-  { id: 'reconciliation',  label: 'Reconciliation', icon: Zap,            badge: 'NEW' },
-  { id: 'settlements',     label: 'Settlements',    icon: TrendingUp,     badge: null },
-  { id: 'invoices',        label: 'Invoices',       icon: FileText,       badge: null },
-  { id: 'payment-links',   label: 'Payment Links',  icon: LinkIcon,       badge: null },
-  { id: 'payment-pages',   label: 'Payment Pages',  icon: Layout,         badge: null },
-  { id: 'route',           label: 'Route',          icon: Share2,         badge: null },
-  { id: 'subscriptions',   label: 'Subscriptions',  icon: Repeat,         badge: null },
-  { id: 'customers',       label: 'Customers',      icon: Users,          badge: null },
-  { id: 'reports',         label: 'Reports',        icon: BarChart2,      badge: null },
-  { id: 'settings',        label: 'Settings',       icon: Settings,       badge: null },
+const NAV_SECTIONS = [
+  {
+    title: null,
+    items: [
+      { id: 'overview', label: 'Overview', icon: Home, badge: null },
+    ]
+  },
+  {
+    title: 'SETTLEMENT INTELLIGENCE',
+    items: [
+      { id: 'settlements',    label: 'Settlements',    icon: TrendingUp,     badge: null },
+      { id: 'transactions',   label: 'Transactions',   icon: ArrowLeftRight, badge: null },
+      { id: 'reconciliation', label: 'Reconciliation', icon: Zap,            badge: 'LIVE' },
+      { id: 'exceptions',     label: 'Exceptions',     icon: AlertCircle,    badge: null },
+    ]
+  },
+  {
+    title: 'AUTONOMOUS AGENTS',
+    items: [
+      { id: 'investigation', label: 'AI Investigation', icon: Zap,            badge: 'AI' },
+      { id: 'ai-assistant',  label: 'AI Assistant',     icon: MessageSquare,  badge: 'NL2SQL' },
+      { id: 'audit-log',     label: 'Audit Log',        icon: ShieldCheck,    badge: null },
+    ]
+  },
+  {
+    title: 'ACCOUNT & REPORTS',
+    items: [
+      { id: 'customers', label: 'Customers', icon: Users,    badge: null },
+      { id: 'reports',   label: 'Reports',   icon: BarChart2, badge: null },
+      { id: 'settings',  label: 'Settings',  icon: Settings,  badge: null },
+    ]
+  },
 ]
 
-export default function Sidebar({ activePage, onNavigate }) {
+export default function Sidebar({ activePage, onNavigate, collapsed, onToggle, user }) {
+  const initials = user?.name 
+    ? user.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() 
+    : 'VM'
+
   return (
-    <aside className="w-[260px] flex-shrink-0 bg-[#00041a]/80 backdrop-blur-xl flex flex-col h-full border-r border-white/5 z-20 shadow-[4px_0_24px_rgba(0,0,0,0.5)]">
-      {/* Razorpay Logo Area */}
-      <div className="px-6 py-6 border-b border-white/5 relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-[#2b6aff]/10 to-transparent pointer-events-none" />
-        <div className="flex items-center gap-3 relative">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#2b6aff] to-[#0047ff] flex items-center justify-center shadow-[0_0_15px_rgba(43,106,255,0.4)]">
-            <Zap size={18} className="text-white" />
-          </div>
-          <span className="text-white font-bold text-lg tracking-tight">Razorpay<span className="text-[#00e676]">.</span></span>
-        </div>
-        <div className="mt-4 flex items-center gap-2 relative">
-          <div className="w-2 h-2 rounded-full bg-[#00e676] animate-pulse shadow-[0_0_10px_rgba(0,230,118,0.8)]" />
-          <span className="text-[11px] text-[#00e676] uppercase tracking-widest font-bold">Live System</span>
-        </div>
-      </div>
+    <>
+      {!collapsed && (
+        <div className="mobile-backdrop md:hidden" onClick={onToggle} />
+      )}
 
-      {/* Nav Items */}
-      <nav className="flex-1 py-4 overflow-y-auto custom-scrollbar px-3 space-y-1">
-        {NAV_ITEMS.map((item) => {
-          const isActive = activePage === item.id
-          const Icon = item.icon
-          return (
-            <button
-              key={item.id}
-              onClick={() => onNavigate(item.id)}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-all duration-300 group relative ${
-                isActive
-                  ? 'bg-gradient-to-r from-[#2b6aff]/20 to-transparent border border-[#2b6aff]/30 shadow-[inset_0_0_20px_rgba(43,106,255,0.15)]'
-                  : 'border border-transparent hover:bg-white/5 hover:border-white/10'
-              }`}
-            >
-              {isActive && (
-                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[#00e676] rounded-r-full shadow-[0_0_10px_rgba(0,230,118,0.5)]" />
-              )}
-              
-              <Icon 
-                size={18} 
-                className={isActive ? 'text-[#00e676] drop-shadow-[0_0_8px_rgba(0,230,118,0.5)]' : 'text-[#64748b] group-hover:text-white transition-colors'} 
+      <aside 
+        className={`sidebar-transition flex-shrink-0 flex flex-col h-full z-40 
+          fixed md:relative md:translate-x-0
+          ${collapsed ? 'w-[72px] -translate-x-full md:translate-x-0' : 'w-[250px] translate-x-0'}
+        `}
+        style={{ backgroundColor: '#040D38' }}
+      >
+        {/* Logo Area */}
+        <div className={`flex items-center flex-shrink-0 border-b border-white/10 ${collapsed ? 'px-3 py-4 justify-center' : 'px-6 py-4'}`}>
+          <div className={`flex items-center ${collapsed ? 'justify-center' : 'gap-3'}`}>
+            <div className="w-9 h-9 rounded-lg bg-white flex items-center justify-center p-1 shadow-md overflow-hidden flex-shrink-0">
+              <img 
+                src="/razorpay-logo.jpg" 
+                alt="Razorpay Logo" 
+                className="w-full h-full object-contain"
               />
-              <span className={`text-sm flex-1 ${isActive ? 'text-white font-bold tracking-wide' : 'text-[#94a3b8] font-medium group-hover:text-white transition-colors'}`}>
-                {item.label}
-              </span>
-              {item.badge && (
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                  isActive ? 'bg-[#00e676] text-[#02042b]' : 'bg-[#2b6aff]/20 text-[#2b6aff] border border-[#2b6aff]/30 group-hover:bg-[#2b6aff] group-hover:text-white transition-all'
-                }`}>
-                  {item.badge}
-                </span>
-              )}
-            </button>
-          )
-        })}
-      </nav>
-
-      {/* Profile Section */}
-      <div className="px-5 py-5 border-t border-white/5 bg-white/[0.02] cursor-pointer hover:bg-white/5 transition-all">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#2b6aff] to-[#0047ff] p-[2px] shadow-[0_0_15px_rgba(43,106,255,0.3)]">
-            <div className="w-full h-full bg-[#02042b] rounded-[10px] flex items-center justify-center text-white text-sm font-bold">
-              SC
             </div>
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-white text-sm font-semibold truncate">Settlement Copilot</p>
-            <p className="text-[#64748b] text-xs truncate font-medium">Creative Demo</p>
+            {!collapsed && (
+              <span className="text-white font-extrabold text-xl tracking-tight">
+                Razorpay
+              </span>
+            )}
           </div>
         </div>
-      </div>
-    </aside>
+
+        {/* Navigation */}
+        <nav className={`flex-1 overflow-y-auto custom-scrollbar dark-scrollbar py-4 ${collapsed ? 'px-2' : 'px-3'}`}>
+          {NAV_SECTIONS.map((section, si) => (
+            <div key={si} className={si > 0 ? 'mt-6' : ''}>
+              {section.title && !collapsed && (
+                <div className="px-3 mb-2">
+                  <span className="text-[11px] font-bold tracking-[1.8px] text-white/40 uppercase">
+                    {section.title}
+                  </span>
+                </div>
+              )}
+              {section.title && collapsed && <div className="border-t border-white/10 mx-2 mb-3" />}
+
+              <div className="space-y-1">
+                {section.items.map((item) => {
+                  const isActive = activePage === item.id || (activePage === 'home' && item.id === 'overview')
+                  const Icon = item.icon
+                  return (
+                    <div key={item.id} className="relative group">
+                      <button
+                        onClick={() => onNavigate(item.id)}
+                        className={`w-full flex items-center gap-3 rounded-lg text-left transition-all duration-150 relative
+                          ${collapsed ? 'px-0 py-2.5 justify-center' : 'px-3.5 py-2.5'}
+                          ${isActive
+                            ? 'bg-[#0065FF] text-white shadow-md font-bold'
+                            : 'text-white/70 hover:bg-white/10 hover:text-white font-semibold'
+                          }`}
+                      >
+                        <Icon size={19} className={`flex-shrink-0 ${isActive ? 'text-white' : 'text-white/70'}`} />
+                        
+                        {!collapsed && (
+                          <>
+                            <span className="text-[14px] flex-1">
+                              {item.label}
+                            </span>
+                            {item.badge && (
+                              <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-[#00E6A0] text-[#040D38] uppercase tracking-wider">
+                                {item.badge}
+                              </span>
+                            )}
+                          </>
+                        )}
+                      </button>
+
+                      {collapsed && (
+                        <div className="sidebar-tooltip">
+                          {item.label}
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          ))}
+        </nav>
+
+        {/* Collapse Toggle */}
+        <div className="border-t border-white/10 px-3 py-3 flex-shrink-0">
+          <button 
+            onClick={onToggle}
+            className={`w-full flex items-center gap-3 rounded-lg py-2.5 text-white/50 hover:text-white hover:bg-white/10 transition-all duration-150
+              ${collapsed ? 'justify-center px-0' : 'px-3.5'}
+            `}
+            title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          >
+            {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+            {!collapsed && <span className="text-[13px] font-bold">Collapse Sidebar</span>}
+          </button>
+        </div>
+
+        {/* Merchant Account */}
+        <div className={`border-t border-white/10 flex-shrink-0 ${collapsed ? 'px-2 py-3.5' : 'px-4 py-3.5'}`}>
+          <div className={`flex items-center ${collapsed ? 'justify-center' : 'gap-3'} cursor-pointer rounded-lg p-2 hover:bg-white/10 transition-all`}>
+            <div className={`rounded-full bg-[#0065FF] flex items-center justify-center text-white text-[12px] font-bold flex-shrink-0 ${collapsed ? 'w-9 h-9' : 'w-9 h-9'}`}>
+              {initials}
+            </div>
+            {!collapsed && (
+              <div className="flex-1 min-w-0">
+                <p className="text-white text-[13px] font-bold truncate">{user?.name || 'Merchant Admin'}</p>
+                <p className="text-white/40 text-[11px] font-medium truncate">MID: {user?.mid || 'mid_rzp_live'}</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </aside>
+    </>
   )
 }

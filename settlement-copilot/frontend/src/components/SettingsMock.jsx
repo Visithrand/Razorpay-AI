@@ -1,102 +1,113 @@
 import { useState } from 'react'
-import { User, Key, Bell, Shield, Smartphone, Globe, CreditCard, Settings } from 'lucide-react'
+import { Save, Key, Webhook, Users, ShieldCheck, CheckCircle2, Cpu } from 'lucide-react'
 
 export default function SettingsMock() {
-  const [activeTab, setActiveTab] = useState('api')
+  const [apiKey, setApiKey] = useState('rzp_live_9a8b7c6d5e4f3g2h1')
+  const [webhookUrl, setWebhookUrl] = useState('https://api.yourdomain.com/webhooks/razorpay')
+  const [saved, setSaved] = useState(false)
 
-  const TABS = [
-    { id: 'profile', label: 'My Profile', icon: User },
-    { id: 'webhook', label: 'Webhooks',   icon: Globe },
-    { id: 'team',    label: 'Team',       icon: Shield },
-    { id: 'billing', label: 'Billing',    icon: CreditCard },
-    { id: 'notifs',  label: 'Alerts',     icon: Bell },
-  ]
+  const handleSave = (e) => {
+    e.preventDefault()
+    setSaved(true)
+    setTimeout(() => setSaved(false), 3000)
+  }
 
   return (
-    <div className="space-y-6 pb-12 animate-in fade-in duration-500">
+    <div className="space-y-6 pb-12 max-w-5xl">
       <div>
-        <h1 className="text-2xl font-bold text-[#1a1f36]">Settings</h1>
-        <p className="text-sm text-[#697386] mt-1">Manage your account preferences, API keys, and team members.</p>
+        <h1 className="text-2xl font-extrabold text-[#0B192C]">Settings & Governance</h1>
+        <p className="text-sm text-gray-500 mt-0.5">Manage API credentials, webhooks, and AI safety controls.</p>
       </div>
 
-      <div className="bg-white rounded-xl border border-[#e3e8ef] shadow-sm flex flex-col md:flex-row min-h-[600px] overflow-hidden">
-        {/* Sidebar */}
-        <div className="w-full md:w-64 border-r border-[#e3e8ef] bg-[#fafbfc] flex-shrink-0 p-4">
-          <nav className="space-y-1">
-            {TABS.map(t => {
-              const Icon = t.icon
-              const active = activeTab === t.id
-              return (
-                <button
-                  key={t.id}
-                  onClick={() => setActiveTab(t.id)}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                    active ? 'bg-[#e8f0fe] text-[#3d8ef8]' : 'text-[#697386] hover:bg-[#f0f3f8] hover:text-[#1a1f36]'
-                  }`}
-                >
-                  <Icon size={16} className={active ? 'text-[#3d8ef8]' : 'text-[#a3acb9]'} />
-                  {t.label}
-                </button>
-              )
-            })}
-          </nav>
+      {/* AI Judgment Disclosure Table */}
+      <div className="bg-white border border-[#DCE3ED] rounded-xl p-6 shadow-sm space-y-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-[#0065FF]/10 text-[#0065FF] flex items-center justify-center">
+            <Cpu size={20} />
+          </div>
+          <div>
+            <h3 className="text-base font-extrabold text-[#0B192C]">AI Judgment Disclosure Matrix</h3>
+            <p className="text-xs text-gray-500 mt-0.5">Explicit breakdown of deterministic algorithms vs AI language reasoning.</p>
+          </div>
         </div>
 
-        {/* Content area */}
-        <div className="flex-1 p-8">
-          {activeTab === 'api' ? (
-            <div className="max-w-2xl animate-in fade-in">
-              <h2 className="text-lg font-bold text-[#1a1f36] mb-1">API Keys</h2>
-              <p className="text-sm text-[#697386] mb-8">Use these keys to authenticate API requests from your backend server.</p>
-              
-              <div className="bg-white border border-[#e3e8ef] rounded-xl overflow-hidden mb-6">
-                <div className="px-5 py-4 border-b border-[#e3e8ef] bg-[#fafbfc] flex justify-between items-center">
-                  <h3 className="font-semibold text-[#1a1f36] text-sm flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-[#2eb88a]" /> Live Keys
-                  </h3>
-                  <button className="text-xs text-[#e04d4d] font-semibold hover:underline">Roll Key</button>
-                </div>
-                <div className="p-5 space-y-4">
-                  <div>
-                    <label className="text-xs font-bold text-[#697386] uppercase tracking-wider mb-1.5 block">Key ID</label>
-                    <div className="flex items-center gap-3">
-                      <code className="bg-[#f5f7fa] border border-[#e3e8ef] px-3 py-2 rounded text-sm text-[#1a1f36] flex-1">rzp_live_8NxP9QvL0mXp2z</code>
-                      <button className="px-3 py-2 bg-white border border-[#e3e8ef] rounded hover:bg-[#f5f7fa] text-[#697386] text-sm font-medium">Copy</button>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="text-xs font-bold text-[#697386] uppercase tracking-wider mb-1.5 block">Key Secret</label>
-                    <div className="flex items-center gap-3">
-                      <code className="bg-[#f5f7fa] border border-[#e3e8ef] px-3 py-2 rounded text-sm text-[#a3acb9] flex-1">••••••••••••••••••••••••</code>
-                      <button className="px-3 py-2 bg-white border border-[#e3e8ef] rounded hover:bg-[#f5f7fa] text-[#697386] text-sm font-medium">Reveal</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+        <div className="overflow-x-auto pt-2">
+          <table className="w-full text-left text-xs">
+            <thead>
+              <tr className="border-b border-[#DCE3ED] bg-[#EFF3F8]/60 uppercase font-extrabold text-gray-500">
+                <th className="px-4 py-3">Operation</th>
+                <th className="px-4 py-3 text-center">AI Used?</th>
+                <th className="px-4 py-3">Implementation Reason</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {[
+                { op: 'Amount comparison', ai: false, reason: 'Deterministic float comparison (safety)' },
+                { op: 'Currency validation', ai: false, reason: 'Deterministic regex & numeric parsing' },
+                { op: 'Date tolerance', ai: false, reason: 'Business rule (T+0 to T+2 date drift window)' },
+                { op: 'Exact matching', ai: false, reason: 'Deterministic UTR & amount hashing' },
+                { op: 'Candidate generation', ai: false, reason: 'Algorithmic database query indexing' },
+                { op: 'Fuzzy matching', ai: false, reason: 'Similarity algorithm (Levenshtein & SequenceMatcher)' },
+                { op: 'Confidence scoring', ai: false, reason: 'Reproducible weighted score formula' },
+                { op: 'Final financial decision', ai: false, reason: 'Human-in-the-Loop safety enforcement' },
+                { op: 'Exception explanation', ai: true, reason: 'Language reasoning over evidence context' },
+                { op: 'Ambiguous-case analysis', ai: true, reason: 'Contextual root-cause reasoning' },
+                { op: 'Human investigation summary', ai: true, reason: 'Productivity & financial synthesis' },
+              ].map((row, i) => (
+                <tr key={i} className="hover:bg-gray-50/60">
+                  <td className="px-4 py-2.5 font-bold text-[#0B192C]">{row.op}</td>
+                  <td className="px-4 py-2.5 text-center font-extrabold">
+                    {row.ai ? (
+                      <span className="px-2 py-0.5 rounded bg-[#D1FAE5] text-[#10B981]">✅ YES</span>
+                    ) : (
+                      <span className="px-2 py-0.5 rounded bg-gray-100 text-gray-500">❌ NO</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-2.5 text-gray-600 font-medium">{row.reason}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-              <div className="bg-white border border-[#e3e8ef] rounded-xl overflow-hidden">
-                <div className="px-5 py-4 border-b border-[#e3e8ef] bg-[#fafbfc] flex justify-between items-center">
-                  <h3 className="font-semibold text-[#1a1f36] text-sm flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-[#e9a820]" /> Test Keys
-                  </h3>
-                  <button className="text-xs text-[#3d8ef8] font-semibold hover:underline">Regenerate</button>
-                </div>
-                <div className="p-5">
-                  <p className="text-sm text-[#697386]">Test keys allow you to test your integration without moving real money. Safe for development.</p>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center h-full text-center p-12">
-              <div className="w-16 h-16 bg-[#f5f7fa] rounded-full flex items-center justify-center mb-5 text-[#a3acb9]">
-                <Settings size={32} />
-              </div>
-              <h3 className="text-lg font-bold text-[#1a1f36] mb-2">{TABS.find(t => t.id === activeTab)?.label} Settings</h3>
-              <p className="text-sm text-[#697386] max-w-sm mx-auto">This settings panel is currently available via the main Razorpay Dashboard.</p>
-            </div>
+      {/* API Keys & Webhooks */}
+      <form onSubmit={handleSave} className="bg-white border border-[#DCE3ED] rounded-xl p-6 shadow-sm space-y-6">
+        <h3 className="text-base font-extrabold text-[#0B192C]">API Credentials</h3>
+
+        <div>
+          <label className="block text-xs font-extrabold text-gray-500 uppercase mb-2">Live API Key</label>
+          <div className="flex items-center gap-2">
+            <input
+              type="password"
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+              className="flex-1 px-4 py-2.5 bg-gray-50 border border-[#DCE3ED] rounded-lg font-mono text-sm font-bold text-[#0B192C] outline-none focus:border-[#0065FF]"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-xs font-extrabold text-gray-500 uppercase mb-2">Webhook Endpoint URL</label>
+          <input
+            type="text"
+            value={webhookUrl}
+            onChange={(e) => setWebhookUrl(e.target.value)}
+            className="w-full px-4 py-2.5 bg-gray-50 border border-[#DCE3ED] rounded-lg font-mono text-sm font-bold text-[#0B192C] outline-none focus:border-[#0065FF]"
+          />
+        </div>
+
+        <div className="pt-2 flex items-center justify-between">
+          <button type="submit" className="btn-primary">
+            <Save size={15} /> Save Configuration
+          </button>
+          {saved && (
+            <span className="text-xs font-bold text-[#10B981] flex items-center gap-1">
+              <CheckCircle2 size={16} /> Saved successfully!
+            </span>
           )}
         </div>
-      </div>
+      </form>
     </div>
   )
 }

@@ -1,0 +1,21 @@
+{
+  "run_id": "af221822-db64-472d-a3c2-8a860d1de443",
+  "run_at": "2026-08-24T08:28:44.378326",
+  "total_gateway": 294,
+  "total_bank": 284,
+  "total_ledger": 284,
+  "matched": 280,
+  "unmatched": 10,
+  "match_rate": 95.24,
+  "avg_confidence": 0.8907,
+  "threshold_used": 0.7,
+  "pass_breakdown": {
+    "exact": 254,
+    "fuzzy": 22,
+    "batch": 4
+  },
+  "exception_breakdown": {
+    "missing": 6,
+    "timing_drift": 4
+  }
+}

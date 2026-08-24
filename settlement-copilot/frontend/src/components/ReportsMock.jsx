@@ -1,5 +1,5 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
-import { Download, Calendar, Filter } from 'lucide-react'
+import { Download, Calendar } from 'lucide-react'
 
 const chartData = [
   { name: 'Jan', vol: 4000, refunds: 240 },
@@ -13,49 +13,43 @@ const chartData = [
 
 export default function ReportsMock() {
   return (
-    <div className="space-y-6 pb-12 animate-in fade-in duration-500">
+    <div className="space-y-5 pb-10">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#1a1f36]">Reports & Analytics</h1>
-          <p className="text-sm text-[#697386] mt-1">Deep dive into your payment volume, conversion rates, and refunds.</p>
+          <h1 className="text-xl font-extrabold" style={{ color: 'var(--rz-text-primary)' }}>Reports & Analytics</h1>
+          <p className="text-[13px] mt-0.5" style={{ color: 'var(--rz-text-secondary)' }}>Deep dive into your payment volume, conversion rates, and refunds.</p>
         </div>
-        <div className="flex items-center gap-3">
-          <button className="px-4 py-2 bg-white border border-[#e3e8ef] text-[#1a1f36] rounded-lg text-sm font-semibold shadow-sm hover:bg-[#f5f7fa] transition-colors flex items-center gap-2">
-            <Calendar size={16} /> Last 6 Months
-          </button>
-          <button className="px-4 py-2 bg-[#3d8ef8] hover:bg-[#2b6cdb] text-white rounded-lg text-sm font-semibold shadow-sm transition-colors flex items-center gap-2">
-            <Download size={16} /> Download Report
-          </button>
+        <div className="flex items-center gap-2">
+          <button className="btn-secondary"><Calendar size={14} /> Last 6 Months</button>
+          <button className="btn-primary"><Download size={14} /> Download Report</button>
         </div>
       </div>
 
-      {/* Main Chart area */}
-      <div className="bg-white rounded-xl border border-[#e3e8ef] p-6 shadow-sm">
-        <div className="flex items-center justify-between mb-8">
+      <div className="bg-white rounded-lg border p-5" style={{ borderColor: 'var(--rz-border)' }}>
+        <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className="text-lg font-semibold text-[#1a1f36]">Monthly Volume Breakdown</h3>
-            <p className="text-sm text-[#697386]">Gross volume and refunds by month</p>
+            <h3 className="text-[15px] font-bold" style={{ color: 'var(--rz-text-primary)' }}>Monthly Volume Breakdown</h3>
+            <p className="text-[12px] mt-0.5" style={{ color: 'var(--rz-text-muted)' }}>Gross volume and refunds by month</p>
           </div>
-          <div className="flex gap-4 items-center text-sm">
-            <div className="flex items-center gap-2"><div className="w-3 h-3 rounded bg-[#3d8ef8]" /> Gross Volume</div>
-            <div className="flex items-center gap-2"><div className="w-3 h-3 rounded bg-[#e04d4d]" /> Refunds</div>
+          <div className="flex gap-4 items-center text-[12px] font-semibold" style={{ color: 'var(--rz-text-secondary)' }}>
+            <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded" style={{ background: 'var(--rz-blue)' }} /> Gross Volume</div>
+            <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded" style={{ background: 'var(--rz-red)' }} /> Refunds</div>
           </div>
         </div>
         
-        <div className="h-[400px] w-full">
+        <div className="h-[380px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f3f8" />
-              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#8a94b2', fontSize: 12}} dy={10} />
-              <YAxis axisLine={false} tickLine={false} tick={{fill: '#8a94b2', fontSize: 12}} tickFormatter={(v) => `₹${v/1000}k`} />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F0F3F7" />
+              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#8A94A6', fontSize: 11, fontWeight: 600}} dy={8} />
+              <YAxis axisLine={false} tickLine={false} tick={{fill: '#8A94A6', fontSize: 11, fontWeight: 600}} tickFormatter={(v) => `₹${v/1000}k`} />
               <Tooltip 
-                contentStyle={{ borderRadius: '8px', border: '1px solid #e3e8ef', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
-                itemStyle={{ color: '#1a1f36', fontWeight: 600 }}
-                cursor={{ fill: '#f5f7fa' }}
+                contentStyle={{ borderRadius: '8px', border: '1px solid #E5E9F0', boxShadow: '0 4px 12px rgba(0,0,0,0.08)', fontSize: 12, fontWeight: 600 }}
+                cursor={{ fill: '#F7F8FA' }}
                 formatter={(value) => [`₹${value.toLocaleString()}`, undefined]}
               />
-              <Bar dataKey="vol" fill="#3d8ef8" radius={[4, 4, 0, 0]} maxBarSize={50} />
-              <Bar dataKey="refunds" fill="#e04d4d" radius={[4, 4, 0, 0]} maxBarSize={50} />
+              <Bar dataKey="vol" fill="#528FF0" radius={[4, 4, 0, 0]} maxBarSize={45} />
+              <Bar dataKey="refunds" fill="#E05050" radius={[4, 4, 0, 0]} maxBarSize={45} />
             </BarChart>
           </ResponsiveContainer>
         </div>

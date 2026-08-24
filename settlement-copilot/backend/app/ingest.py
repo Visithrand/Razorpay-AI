@@ -1,5 +1,5 @@
 """
-CSV → normalized RawTransaction ingestion.
+CSV → normalized RawTransaction ingestion with robust validation.
 
 Handles the three source formats:
   gateway : txn_id, utr, amount, fee, net_amount, date, description, status, payment_method
@@ -18,58 +18,25 @@ from app.models import RawTransaction
 
 logger = logging.getLogger(__name__)
 
-# ─── column aliases ──────────────────────────────────────────────────────────
-GATEWAY_ALIASES = {
-    "txn_id": ["txn_id", "transaction_id", "payment_id", "id"],
-    "utr": ["utr", "bank_utr", "rrn", "reference_number"],
-    "amount": ["amount", "gross_amount", "order_amount"],
-    "fee": ["fee", "gateway_fee", "charges"],
-    "net_amount": ["net_amount", "net", "settlement_amount"],
-    "date": ["date", "payment_date", "created_at", "timestamp"],
-    "description": ["description", "desc", "narration", "remarks"],
-    "status": ["status", "payment_status"],
-    "payment_method": ["payment_method", "method", "mode"],
-}
-
-BANK_ALIASES = {
-    "txn_id": ["bank_ref", "ref_no", "transaction_ref", "id"],
-    "utr": ["utr", "rrn", "bank_utr"],
-    "amount": ["credit_amount", "amount", "deposit_amount", "credit"],
-    "date": ["date", "value_date", "transaction_date"],
-    "description": ["description", "narration", "particulars", "remarks"],
-    "reference": ["bank_ref", "ref_no"],
-}
-
-LEDGER_ALIASES = {
-    "txn_id": ["ledger_id", "entry_id", "id"],
-    "utr": ["utr", "reference", "txn_id"],
-    "amount": ["amount", "credit_amount", "debit_amount"],
-    "date": ["date", "entry_date", "transaction_date"],
-    "description": ["description", "narration", "remarks"],
-    "reference": ["reference", "order_id", "txn_id"],
-}
-
-
-def _resolve_col(df: pd.DataFrame, aliases: list[str]) -> str | None:
-    """Return the first alias that exists as a column in the dataframe."""
-    for a in aliases:
-        if a in df.columns:
-            return a
-    return None
-
 
 def _parse_date(series: pd.Series) -> pd.Series:
     return pd.to_datetime(series, infer_datetime_format=True, errors="coerce")
 
 
 def _normalize_gateway(df: pd.DataFrame) -> pd.DataFrame:
-    df.columns = [c.strip().lower().replace(" ", "_") for c in df.columns]
+    df.columns = [str(c).strip().lower().replace(" ", "_") for c in df.columns]
     out = pd.DataFrame()
 
     out["txn_id"] = df.get("txn_id", df.get("transaction_id", df.get("payment_id", "")))
     out["utr"] = df.get("utr", df.get("bank_utr", df.get("rrn", ""))).fillna("").astype(str).str.strip()
-    out["amount"] = pd.to_numeric(df.get("amount", df.get("gross_amount", 0)), errors="coerce").fillna(0)
-    out["fee"] = pd.to_numeric(df.get("fee", df.get("gateway_fee", 0)), errors="coerce").fillna(0)
+    
+    # Robust numeric parsing: converts "hello" -> NaN -> fillna(0.0) -> abs()
+    raw_amt = pd.to_numeric(df.get("amount", df.get("gross_amount", 0)), errors="coerce").fillna(0.0)
+    out["amount"] = raw_amt.abs()
+    
+    raw_fee = pd.to_numeric(df.get("fee", df.get("gateway_fee", 0)), errors="coerce").fillna(0.0)
+    out["fee"] = raw_fee.abs()
+    
     out["net_amount"] = pd.to_numeric(df.get("net_amount", df.get("settlement_amount", out["amount"] - out["fee"])), errors="coerce").fillna(out["amount"] - out["fee"])
     out["date"] = _parse_date(df.get("date", df.get("payment_date", df.get("created_at"))))
     out["description"] = df.get("description", df.get("narration", "")).fillna("").astype(str)
@@ -80,12 +47,14 @@ def _normalize_gateway(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def _normalize_bank(df: pd.DataFrame) -> pd.DataFrame:
-    df.columns = [c.strip().lower().replace(" ", "_") for c in df.columns]
+    df.columns = [str(c).strip().lower().replace(" ", "_") for c in df.columns]
     out = pd.DataFrame()
 
     out["txn_id"] = df.get("bank_ref", df.get("ref_no", df.get("id", "")))
     out["utr"] = df.get("utr", df.get("rrn", df.get("bank_utr", ""))).fillna("").astype(str).str.strip()
-    out["amount"] = pd.to_numeric(df.get("credit_amount", df.get("amount", df.get("deposit_amount", 0))), errors="coerce").fillna(0)
+    
+    raw_amt = pd.to_numeric(df.get("credit_amount", df.get("amount", df.get("deposit_amount", 0))), errors="coerce").fillna(0.0)
+    out["amount"] = raw_amt.abs()
     out["fee"] = 0.0
     out["net_amount"] = out["amount"]
     out["date"] = _parse_date(df.get("date", df.get("value_date", df.get("transaction_date"))))
@@ -97,13 +66,15 @@ def _normalize_bank(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def _normalize_ledger(df: pd.DataFrame) -> pd.DataFrame:
-    df.columns = [c.strip().lower().replace(" ", "_") for c in df.columns]
+    df.columns = [str(c).strip().lower().replace(" ", "_") for c in df.columns]
     out = pd.DataFrame()
 
     out["txn_id"] = df.get("ledger_id", df.get("entry_id", df.get("id", "")))
     ref_col = df.get("reference", df.get("order_id", df.get("txn_id", "")))
     out["utr"] = ref_col.fillna("").astype(str).str.strip()
-    out["amount"] = pd.to_numeric(df.get("amount", df.get("credit_amount", 0)), errors="coerce").fillna(0)
+    
+    raw_amt = pd.to_numeric(df.get("amount", df.get("credit_amount", 0)), errors="coerce").fillna(0.0)
+    out["amount"] = raw_amt.abs()
     out["fee"] = 0.0
     out["net_amount"] = out["amount"]
     out["date"] = _parse_date(df.get("date", df.get("entry_date")))
@@ -122,17 +93,23 @@ def ingest_csv(
 ) -> list[RawTransaction]:
     """
     Parse a CSV from `content`, normalize it for `source`, and persist to DB.
-
-    Returns the list of created RawTransaction objects.
+    Enforces strict input validation to prevent crashes on invalid CSV data.
     """
     if isinstance(content, bytes):
         content = content.decode("utf-8", errors="replace")
 
+    clean_content = content.strip()
+    if not clean_content:
+        raise ValueError("Uploaded CSV file is empty. Please provide a valid file.")
+
     try:
-        df = pd.read_csv(StringIO(content))
+        df = pd.read_csv(StringIO(clean_content))
     except Exception as exc:
         logger.error("Failed to parse CSV for source=%s: %s", source, exc)
-        raise ValueError(f"Could not parse CSV: {exc}") from exc
+        raise ValueError(f"Could not parse CSV file: {exc}") from exc
+
+    if df.empty:
+        raise ValueError("Uploaded CSV contains 0 rows of data.")
 
     if source == "gateway":
         norm = _normalize_gateway(df)
@@ -141,7 +118,7 @@ def ingest_csv(
     elif source == "ledger":
         norm = _normalize_ledger(df)
     else:
-        raise ValueError(f"Unknown source: {source!r}")
+        raise ValueError(f"Unknown reconciliation source: {source!r}")
 
     records: list[RawTransaction] = []
     for _, row in norm.iterrows():

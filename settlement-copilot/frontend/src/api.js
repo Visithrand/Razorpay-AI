@@ -11,13 +11,22 @@ async function request(path, opts = {}) {
   return res.json()
 }
 
-/**
- * Upload CSV files and run the matching engine.
- * @param {File|null} gateway
- * @param {File|null} bank
- * @param {File|null} ledger
- * @param {number} threshold  0.0 – 1.0
- */
+/** Send OTP to Email (@gmail.com) or Phone Number. */
+export async function sendOtp(identifier) {
+  const fd = new FormData()
+  fd.append('identifier', identifier)
+  return request('/auth/send-otp', { method: 'POST', body: fd })
+}
+
+/** Verify OTP and authenticate. */
+export async function verifyOtp(identifier, otp) {
+  const fd = new FormData()
+  fd.append('identifier', identifier)
+  fd.append('otp', otp)
+  return request('/auth/verify-otp', { method: 'POST', body: fd })
+}
+
+/** Upload CSV files and run the matching engine. */
 export async function uploadAndMatch(gateway, bank, ledger, threshold = 0.70) {
   const fd = new FormData()
   if (gateway) fd.append('gateway', gateway)
@@ -25,6 +34,11 @@ export async function uploadAndMatch(gateway, bank, ledger, threshold = 0.70) {
   if (ledger) fd.append('ledger', ledger)
   fd.append('threshold', String(threshold))
   return request('/upload', { method: 'POST', body: fd })
+}
+
+/** 1-click demo run using pre-loaded synthetic dataset. */
+export async function runDemoReconciliation(threshold = 0.70) {
+  return request(`/run-demo?threshold=${threshold}`, { method: 'POST' })
 }
 
 /** Get match results for a run. */
@@ -51,18 +65,12 @@ export async function listReports() {
   return request('/reports')
 }
 
-/**
- * Re-run matching with a new threshold (for the slider).
- */
+/** Re-run matching with a new threshold (for the slider). */
 export async function rematch(runId, threshold) {
   return request(`/rematch?run_id=${runId}&threshold=${threshold}`, { method: 'POST' })
 }
 
-/**
- * Stream an AI answer for a question.
- * Calls `onChunk(text)` for each streamed token.
- * Returns when the stream ends.
- */
+/** Stream an AI answer for a question. */
 export async function askQuestion(question, runId, onChunk) {
   const fd = new FormData()
   fd.append('question', question)
@@ -78,7 +86,6 @@ export async function askQuestion(question, runId, onChunk) {
     const { done, value } = await reader.read()
     if (done) break
     const text = decoder.decode(value, { stream: true })
-    // Parse SSE lines
     const lines = text.split('\n')
     for (const line of lines) {
       if (line.startsWith('data: ')) {
@@ -93,4 +100,23 @@ export async function askQuestion(question, runId, onChunk) {
 /** Check backend health. */
 export async function checkHealth() {
   return request('/health')
+}
+
+/** Utility: Real CSV Export Download for any dataset. */
+export function exportToCSV(filename, rows) {
+  if (!rows || !rows.length) return
+  const headers = Object.keys(rows[0])
+  const csvContent = [
+    headers.join(','),
+    ...rows.map(row => headers.map(h => JSON.stringify(row[h] ?? '')).join(','))
+  ].join('\n')
+
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.setAttribute('href', url)
+  link.setAttribute('download', `${filename}.csv`)
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
 }

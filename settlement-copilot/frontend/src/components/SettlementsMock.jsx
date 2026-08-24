@@ -1,94 +1,202 @@
-import { Download, Filter, TrendingUp, AlertCircle, CheckCircle2, IndianRupee } from 'lucide-react'
+import { useState, useMemo } from 'react'
+import { Download, Filter, TrendingUp, AlertCircle, CheckCircle2, IndianRupee, Search, X } from 'lucide-react'
+import { exportToCSV } from '../api'
 
 const MOCK_SETTLEMENTS = [
-  { id: 'setl_OkL8Nj23nJ1x', utr: 'SBIN0001234567', amount: 1245000.50, status: 'processed', date: 'Jan 24, 2024', fees: 2450.00, count: 1450 },
-  { id: 'setl_OjK2Mn99xK4p', utr: 'HDFC0009876543', amount: 845000.00,  status: 'processed', date: 'Jan 23, 2024', fees: 1845.50, count: 980 },
-  { id: 'setl_Oi9HbC88vM2a', utr: '—',              amount: 154000.00,  status: 'pending',   date: 'Jan 23, 2024', fees: 450.00,  count: 210 },
-  { id: 'setl_Oh8VnX77zL1w', utr: 'ICIC0005554443', amount: 2145000.75, status: 'processed', date: 'Jan 22, 2024', fees: 4210.25, count: 2450 },
-  { id: 'setl_Og7ZmA66bY9q', utr: 'UTIB0001112223', amount: 45000.00,   status: 'failed',    date: 'Jan 21, 2024', fees: 120.00,  count: 45 },
+  { id: 'setl_OkL8Nj23nJ1x', utr: 'SBIN0001234567', amount: 1245000.50, status: 'processed', date: 'Jan 24, 2024', fees: 2450.00, count: 1450, bank: 'State Bank of India (••4819)' },
+  { id: 'setl_OjK2Mn99xK4p', utr: 'HDFC0009876543', amount: 845000.00,  status: 'processed', date: 'Jan 23, 2024', fees: 1845.50, count: 980,  bank: 'HDFC Bank (••9201)' },
+  { id: 'setl_Oi9HbC88vM2a', utr: '—',              amount: 154000.00,  status: 'pending',   date: 'Jan 23, 2024', fees: 450.00,  count: 210,  bank: 'ICICI Bank (••1102)' },
+  { id: 'setl_Oh8VnX77zL1w', utr: 'ICIC0005554443', amount: 2145000.75, status: 'processed', date: 'Jan 22, 2024', fees: 4210.25, count: 2450, bank: 'ICICI Bank (••1102)' },
+  { id: 'setl_Og7ZmA66bY9q', utr: 'UTIB0001112223', amount: 45000.00,   status: 'failed',    date: 'Jan 21, 2024', fees: 120.00,  count: 45,   bank: 'Axis Bank (••3918)' },
 ]
 
 export default function SettlementsMock() {
+  const [activeTab, setActiveTab] = useState('all')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedSetl, setSelectedSetl] = useState(null)
+
+  const filteredSetls = useMemo(() => {
+    return MOCK_SETTLEMENTS.filter(s => {
+      if (activeTab !== 'all' && s.status !== activeTab) return false
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase().trim()
+        const matchId = s.id.toLowerCase().includes(q)
+        const matchUtr = s.utr.toLowerCase().includes(q)
+        if (!matchId && !matchUtr) return false
+      }
+      return true
+    })
+  }, [activeTab, searchQuery])
+
+  const handleExport = () => {
+    exportToCSV('Razorpay_Settlements_Export', filteredSetls)
+  }
+
   return (
-    <div className="space-y-6 pb-12 animate-in fade-in duration-500">
+    <div className="space-y-6 pb-12">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#1a1f36]">Settlements</h1>
-          <p className="text-sm text-[#697386] mt-1">View the funds transferred to your bank account.</p>
+          <h1 className="text-2xl font-bold text-[#0B192C]">Settlements</h1>
+          <p className="text-[14px] text-[#4A5568] mt-0.5">View the funds transferred to your bank account.</p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="px-4 py-2 bg-white border border-[#e3e8ef] text-[#1a1f36] rounded-lg text-sm font-semibold shadow-sm hover:bg-[#f5f7fa] transition-colors flex items-center gap-2">
-            <Filter size={16} /> Filter
-          </button>
-          <button className="px-4 py-2 bg-[#3d8ef8] hover:bg-[#2b6cdb] text-white rounded-lg text-sm font-semibold shadow-sm transition-colors flex items-center gap-2">
-            <Download size={16} /> Export CSV
+          <button onClick={handleExport} className="btn-primary">
+            <Download size={15} /> Export CSV
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-xl border border-[#e3e8ef] p-5 shadow-sm">
-          <div className="flex items-center gap-2 text-sm font-semibold text-[#697386] mb-2">
-            <div className="w-8 h-8 rounded-full bg-[#e8f7f1] text-[#2eb88a] flex items-center justify-center"><CheckCircle2 size={16} /></div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div className="bg-white rounded-xl border border-[#DCE3ED] p-6 shadow-sm">
+          <div className="flex items-center gap-2.5 text-[14px] font-semibold text-[#4A5568] mb-3">
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-[#D1FAE5] text-[#10B981]">
+              <CheckCircle2 size={18} />
+            </div>
             Next Settlement
           </div>
-          <p className="text-3xl font-bold text-[#1a1f36]">₹154,000.00</p>
-          <p className="text-xs text-[#a3acb9] mt-1">Expected today by 6:00 PM</p>
+          <p className="text-3xl font-bold text-[#0B192C]">₹154,000.00</p>
+          <p className="text-[12px] text-[#718096] mt-1">Expected today by 6:00 PM</p>
         </div>
-        <div className="bg-white rounded-xl border border-[#e3e8ef] p-5 shadow-sm">
-          <div className="flex items-center gap-2 text-sm font-semibold text-[#697386] mb-2">
-            <div className="w-8 h-8 rounded-full bg-[#f3f0ff] text-[#7c3aed] flex items-center justify-center"><TrendingUp size={16} /></div>
+        <div className="bg-white rounded-xl border border-[#DCE3ED] p-6 shadow-sm">
+          <div className="flex items-center gap-2.5 text-[14px] font-semibold text-[#4A5568] mb-3">
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-[#EDE9FE] text-[#8B5CF6]">
+              <TrendingUp size={18} />
+            </div>
             Total Settled (Jan)
           </div>
-          <p className="text-3xl font-bold text-[#1a1f36]">₹4.2M</p>
-          <p className="text-xs text-[#a3acb9] mt-1">Across 12 batches</p>
+          <p className="text-3xl font-bold text-[#0B192C]">₹4.2M</p>
+          <p className="text-[12px] text-[#718096] mt-1">Across 12 batches</p>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-[#e3e8ef] shadow-sm overflow-hidden">
-        <div className="px-5 py-4 border-b border-[#e3e8ef] bg-[#fafbfc]">
-          <h3 className="text-sm font-semibold text-[#1a1f36]">Recent Settlements</h3>
+      <div className="bg-white rounded-xl border border-[#DCE3ED] overflow-hidden shadow-sm">
+        {/* Header Tabs + Search */}
+        <div className="px-6 py-3 border-b border-[#DCE3ED] flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#EFF3F8]/30">
+          <div className="flex items-center gap-6 text-[14px] font-semibold text-[#4A5568]">
+            {[
+              { id: 'all', label: `All (${MOCK_SETTLEMENTS.length})` },
+              { id: 'processed', label: `Processed (${MOCK_SETTLEMENTS.filter(s => s.status === 'processed').length})` },
+              { id: 'pending', label: `Pending (${MOCK_SETTLEMENTS.filter(s => s.status === 'pending').length})` },
+              { id: 'failed', label: `Failed (${MOCK_SETTLEMENTS.filter(s => s.status === 'failed').length})` },
+            ].map(t => (
+              <button
+                key={t.id}
+                onClick={() => setActiveTab(t.id)}
+                className={`py-2 border-b-2 transition-all ${
+                  activeTab === t.id ? 'border-[#0065FF] text-[#0065FF]' : 'border-transparent hover:text-[#0B192C]'
+                }`}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-white border border-[#DCE3ED] rounded-lg w-64 focus-within:ring-1 focus-within:ring-[#0065FF]">
+            <Search size={14} className="text-[#718096]" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              placeholder="Search ID, Bank UTR..."
+              className="bg-transparent border-none outline-none text-[13px] w-full text-[#0B192C]"
+            />
+          </div>
         </div>
+
+        {/* Table */}
         <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left">
-            <thead>
-              <tr className="border-b border-[#e3e8ef] bg-[#f5f7fa]">
-                {['Settlement ID', 'Bank UTR', 'Amount', 'Fees & Taxes', 'Txn Count', 'Date', 'Status'].map(h => (
-                  <th key={h} className="px-5 py-3 text-xs font-semibold text-[#697386] uppercase tracking-wider">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {MOCK_SETTLEMENTS.map((s, i) => (
-                <tr key={s.id} className={`border-b border-[#f0f3f8] hover:bg-[#f8f9ff] transition-colors ${i % 2 === 0 ? 'bg-white' : 'bg-[#fafbfc]'}`}>
-                  <td className="px-5 py-4 font-mono font-medium text-[#3d8ef8]">{s.id}</td>
-                  <td className="px-5 py-4">
-                    {s.utr === '—' ? (
-                      <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-[#f5f7fa] text-[#a3acb9] border border-[#e3e8ef]">N/A</span>
-                    ) : (
-                      <span className="font-mono text-[#697386]">{s.utr}</span>
-                    )}
-                  </td>
-                  <td className="px-5 py-4 font-bold text-[#1a1f36] flex items-center gap-1">
-                    <IndianRupee size={14} className="text-[#a3acb9]" />
-                    {s.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-                  </td>
-                  <td className="px-5 py-4 text-[#e04d4d] font-medium text-xs">
-                    -₹{s.fees.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-                  </td>
-                  <td className="px-5 py-4 text-[#697386]">{s.count}</td>
-                  <td className="px-5 py-4 text-[#697386] text-xs">{s.date}</td>
-                  <td className="px-5 py-4">
-                    {s.status === 'processed' && <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-[#e8f7f1] text-[#2eb88a]"><CheckCircle2 size={12}/> Processed</span>}
-                    {s.status === 'pending' && <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-[#fef7e6] text-[#e9a820]"><TrendingUp size={12}/> Pending</span>}
-                    {s.status === 'failed' && <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-[#fdf0f0] text-[#e04d4d]"><AlertCircle size={12}/> Failed</span>}
-                  </td>
+          {filteredSetls.length === 0 ? (
+            <div className="p-12 text-center text-[#718096]">
+              <p className="text-[15px] font-bold">No settlements match your filter</p>
+            </div>
+          ) : (
+            <table className="w-full text-[14px] text-left">
+              <thead>
+                <tr className="border-b border-[#DCE3ED] bg-[#EFF3F8]/60">
+                  {['Settlement ID', 'Bank UTR', 'Amount', 'Fees & Taxes', 'Txn Count', 'Date', 'Status'].map(h => (
+                    <th key={h} className="px-6 py-3.5 text-[11px] font-bold uppercase tracking-wider text-[#718096]">{h}</th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filteredSetls.map((s) => (
+                  <tr 
+                    key={s.id} 
+                    onClick={() => setSelectedSetl(s)}
+                    className="border-b border-[#E8EEF5] hover:bg-[#E6F0FF]/30 cursor-pointer transition-colors"
+                  >
+                    <td className="px-6 py-4 font-mono font-medium text-[13px] text-[#0065FF]">{s.id}</td>
+                    <td className="px-6 py-4">
+                      {s.utr === '—' ? (
+                        <span className="inline-block px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider border font-mono bg-[#EFF3F8] text-[#718096] border-[#DCE3ED]">N/A</span>
+                      ) : (
+                        <span className="font-mono text-[13px] font-normal text-[#4A5568]">{s.utr}</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 font-semibold text-[#0B192C] flex items-center gap-1">
+                      <IndianRupee size={14} className="text-[#718096]" />
+                      {s.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                    </td>
+                    <td className="px-6 py-4 text-[13px] font-semibold text-[#EF4444]">
+                      -₹{s.fees.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                    </td>
+                    <td className="px-6 py-4 text-[13px] text-[#4A5568]">{s.count}</td>
+                    <td className="px-6 py-4 text-[12px] text-[#718096]">{s.date}</td>
+                    <td className="px-6 py-4">
+                      {s.status === 'processed' && <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[12px] font-semibold bg-[#D1FAE5] text-[#10B981]"><CheckCircle2 size={13}/> Processed</span>}
+                      {s.status === 'pending' && <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[12px] font-semibold bg-[#FEF3C7] text-[#F59E0B]"><TrendingUp size={13}/> Pending</span>}
+                      {s.status === 'failed' && <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[12px] font-semibold bg-[#FEE2E2] text-[#EF4444]"><AlertCircle size={13}/> Failed</span>}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
+
+      {/* Modal detail */}
+      {selectedSetl && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-overlay-fadein">
+          <div className="bg-white border border-[#DCE3ED] rounded-xl shadow-2xl w-full max-w-lg overflow-hidden animate-overlay-slideup">
+            <div className="px-6 py-4 border-b border-[#DCE3ED] flex items-center justify-between bg-[#05103E] text-white">
+              <h3 className="font-bold text-[16px]">Settlement Details</h3>
+              <button onClick={() => setSelectedSetl(null)} className="p-1 rounded hover:bg-white/10 text-white/70 hover:text-white">
+                <X size={18} />
+              </button>
+            </div>
+            <div className="p-6 space-y-4 text-[14px]">
+              <div className="flex justify-between py-2 border-b border-gray-100">
+                <span className="text-gray-500 font-semibold">Settlement ID</span>
+                <span className="font-mono font-bold text-[#0065FF]">{selectedSetl.id}</span>
+              </div>
+              <div className="flex justify-between py-2 border-b border-gray-100">
+                <span className="text-gray-500 font-semibold">Bank UTR</span>
+                <span className="font-mono font-medium">{selectedSetl.utr}</span>
+              </div>
+              <div className="flex justify-between py-2 border-b border-gray-100">
+                <span className="text-gray-500 font-semibold">Net Amount</span>
+                <span className="font-bold text-[#10B981] text-lg">₹{selectedSetl.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+              </div>
+              <div className="flex justify-between py-2 border-b border-gray-100">
+                <span className="text-gray-500 font-semibold">Fees & Taxes</span>
+                <span className="font-semibold text-[#EF4444]">-₹{selectedSetl.fees.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+              </div>
+              <div className="flex justify-between py-2 border-b border-gray-100">
+                <span className="text-gray-500 font-semibold">Destination Bank</span>
+                <span className="font-semibold">{selectedSetl.bank}</span>
+              </div>
+              <div className="flex justify-between py-2 border-b border-gray-100">
+                <span className="text-gray-500 font-semibold">Transaction Count</span>
+                <span className="font-semibold">{selectedSetl.count} transactions</span>
+              </div>
+            </div>
+            <div className="px-6 py-4 border-t border-[#DCE3ED] bg-gray-50 flex justify-end">
+              <button onClick={() => setSelectedSetl(null)} className="btn-primary">Close Details</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

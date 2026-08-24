@@ -1,130 +1,288 @@
-import { useState } from 'react'
-import { AlertCircle, Clock, Layers, HelpCircle, Copy, Calculator, PartyPopper } from 'lucide-react'
+import { useState, useEffect, useMemo } from 'react'
+import { AlertCircle, AlertTriangle, ArrowRight, Zap, RefreshCw, Search, Filter, RotateCcw } from 'lucide-react'
+import InvestigationView from './InvestigationView'
 
-const CATEGORY_CONFIG = {
-  fee_adjusted: { label: 'Fee Adjusted',  color: '#f59e0b', bg: '#f59e0b/10', icon: Calculator },
-  timing_drift: { label: 'Timing Drift',  color: '#2b6aff', bg: '#2b6aff/10', icon: Clock },
-  batch:        { label: 'Batch Match',   color: '#c084fc', bg: '#c084fc/10', icon: Layers },
-  missing:      { label: 'Missing',       color: '#ff4757', bg: '#ff4757/10', icon: HelpCircle },
-  duplicate:    { label: 'Duplicate',     color: '#0ea5e9', bg: '#0ea5e9/10', icon: Copy },
-  amount_typo:  { label: 'Amount Typo',   color: '#ff6b81', bg: '#ff6b81/10', icon: AlertCircle },
+const CATEGORY_STYLES = {
+  MISSING_BANK_RECORD: { bg: '#FEE2E2', text: '#DC2626', label: 'MISSING BANK RECORD' },
+  AMOUNT_MISMATCH: { bg: '#FEE2E2', text: '#EF4444', label: 'AMOUNT MISMATCH' },
+  DUPLICATE: { bg: '#FCE7F3', text: '#DB2777', label: 'DUPLICATE' },
+  SETTLEMENT_DELAY: { bg: '#E0F2FE', text: '#0284C7', label: 'SETTLEMENT DELAY' },
+  FEE_DEDUCTION: { bg: '#FEF3C7', text: '#D97706', label: 'FEE DEDUCTION' },
+  REFERENCE_MISMATCH: { bg: '#EDE9FE', text: '#7C3AED', label: 'REFERENCE MISMATCH' },
+  AMBIGUOUS_MATCH: { bg: '#FEF3C7', text: '#B45309', label: 'AMBIGUOUS MATCH' },
 }
 
-export default function ExceptionTable({ exceptions }) {
-  const [catFilter, setCatFilter] = useState('all')
+const PRIORITY_STYLES = {
+  CRITICAL: { bg: '#FEE2E2', text: '#991B1B', border: '#EF4444', icon: '🚨' },
+  HIGH: { bg: '#FFEDD5', text: '#C2410C', border: '#F97316', icon: '🔴' },
+  MEDIUM: { bg: '#FEF3C7', text: '#D97706', border: '#F59E0B', icon: '🟡' },
+  LOW: { bg: '#D1FAE5', text: '#059669', border: '#10B981', icon: '🟢' },
+}
 
-  const filtered = (exceptions || []).filter(
-    (e) => catFilter === 'all' || e.category === catFilter
-  )
+export default function ExceptionTable({ exceptions = [], loading = false }) {
+  const [selectedInvestigateId, setSelectedInvestigateId] = useState(null)
+  const [liveData, setLiveData] = useState([])
+  const [isFetching, setIsFetching] = useState(false)
+
+  const [searchTerm, setSearchTerm] = useState('')
+  const [priorityFilter, setPriorityFilter] = useState('all')
+  const [categoryFilter, setCategoryFilter] = useState('all')
+  const [minAmount, setMinAmount] = useState('')
+  const [maxAmount, setMaxAmount] = useState('')
+
+  // Fetch live exceptions from backend API if props are empty
+  useEffect(() => {
+    if (exceptions.length > 0) {
+      setLiveData(exceptions)
+    } else {
+      fetchLiveExceptions()
+    }
+  }, [exceptions])
+
+  const fetchLiveExceptions = async () => {
+    setIsFetching(true)
+    try {
+      const res = await fetch('/api/exceptions')
+      if (res.ok) {
+        const data = await res.json()
+        setLiveData(data.exceptions || [])
+      }
+    } catch (e) {
+      console.error('Failed to fetch live exceptions', e)
+    } finally {
+      setIsFetching(false)
+    }
+  }
+
+  const items = liveData.length > 0 ? liveData : (exceptions.length > 0 ? exceptions : FALLBACK_EXCEPTIONS)
+
+  const filteredItems = useMemo(() => {
+    return items.filter((row) => {
+      // Text Search: ID, UTR, Description, Source
+      if (searchTerm.trim()) {
+        const q = searchTerm.toLowerCase().strip ? searchTerm.toLowerCase().strip() : searchTerm.toLowerCase()
+        const idStr = `ex-${row.id}`.toLowerCase()
+        const utr = String(row.utr || '').toLowerCase()
+        const desc = String(row.description || '').toLowerCase()
+        const src = String(row.source || '').toLowerCase()
+        if (!idStr.includes(q) && !utr.includes(q) && !desc.includes(q) && !src.includes(q)) {
+          return false
+        }
+      }
+
+      // Priority Filter
+      if (priorityFilter !== 'all' && (row.priority || 'MEDIUM').toUpperCase() !== priorityFilter.toUpperCase()) {
+        return false
+      }
+
+      // Category Filter
+      if (categoryFilter !== 'all' && (row.category || '').toUpperCase() !== categoryFilter.toUpperCase()) {
+        return false
+      }
+
+      // Amount Filter
+      const amt = Number(row.amount || 0)
+      if (minAmount && amt < Number(minAmount)) return false
+      if (maxAmount && amt > Number(maxAmount)) return false
+
+      return true
+    })
+  }, [items, searchTerm, priorityFilter, categoryFilter, minAmount, maxAmount])
+
+  const clearFilters = () => {
+    setSearchTerm('')
+    setPriorityFilter('all')
+    setCategoryFilter('all')
+    setMinAmount('')
+    setMaxAmount('')
+  }
+
+  const hasActiveFilters = searchTerm || priorityFilter !== 'all' || categoryFilter !== 'all' || minAmount || maxAmount
 
   return (
-    <div className="flex flex-col h-full glass-panel">
-      {/* Filter bar */}
-      <div className="flex items-center gap-3 px-5 py-4 border-b border-white/10 flex-wrap bg-black/20 backdrop-blur-md rounded-t-2xl">
-        <button
-          onClick={() => setCatFilter('all')}
-          className={`px-4 py-2 rounded-lg text-xs font-bold transition-all duration-300 ${
-            catFilter === 'all' 
-              ? 'bg-gradient-to-r from-[#2b6aff] to-[#0047ff] text-white shadow-[0_0_15px_rgba(43,106,255,0.4)]' 
-              : 'bg-white/5 border border-white/10 text-[#94a3b8] hover:bg-white/10 hover:text-white'
-          }`}
-        >
-          All Exceptions ({exceptions?.length ?? 0})
-        </button>
-        {Object.entries(CATEGORY_CONFIG).map(([key, cfg]) => {
-          const count = (exceptions || []).filter((e) => e.category === key).length
-          if (count === 0) return null
-          const Icon = cfg.icon
-          
-          const isActive = catFilter === key
-          const activeStyle = isActive 
-            ? { background: cfg.bg.replace('/10', '/30'), color: cfg.color, borderColor: cfg.color, boxShadow: `0 0 15px ${cfg.color}40` }
-            : { background: 'rgba(255,255,255,0.05)', color: '#94a3b8', borderColor: 'rgba(255,255,255,0.1)' }
+    <div className="space-y-6">
+      {selectedInvestigateId ? (
+        <InvestigationView 
+          exceptionId={selectedInvestigateId} 
+          onClose={() => {
+            setSelectedInvestigateId(null)
+            fetchLiveExceptions()
+          }} 
+        />
+      ) : (
+        <div className="bg-white rounded-xl border border-[#DCE3ED] overflow-hidden shadow-sm flex flex-col">
+          {/* Header & Filter Controls */}
+          <div className="px-6 py-4 border-b border-[#DCE3ED] bg-[#EFF3F8]/30 space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h3 className="font-extrabold text-[#0B192C] text-base">
+                  Unmatched Exceptions ({filteredItems.length} of {items.length})
+                </h3>
+                <p className="text-xs text-gray-500 mt-0.5">Filter by customer, transaction ID, priority level, or amount to resolve claims.</p>
+              </div>
 
-          return (
-            <button
-              key={key}
-              onClick={() => setCatFilter(key)}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all duration-300 border hover:-translate-y-0.5`}
-              style={activeStyle}
-            >
-              <Icon size={14} className={isActive ? '' : 'text-[#64748b]'} />
-              {cfg.label} <span className="opacity-75">({count})</span>
-            </button>
-          )
-        })}
-      </div>
-
-      {/* Table */}
-      <div className="flex-1 overflow-auto custom-scrollbar">
-        {filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="w-16 h-16 bg-[#00e676]/10 border border-[#00e676]/30 rounded-full flex items-center justify-center mb-5 text-[#00e676] shadow-[0_0_20px_rgba(0,230,118,0.2)]">
-              <PartyPopper size={32} />
+              <button 
+                onClick={fetchLiveExceptions}
+                className="px-3 py-1.5 bg-white border border-[#DCE3ED] hover:bg-gray-50 text-xs font-bold text-[#0B192C] rounded-lg transition-all flex items-center gap-1.5 shadow-2xs self-start sm:self-auto"
+              >
+                <RefreshCw size={13} className={isFetching ? 'animate-spin text-[#0065FF]' : ''} />
+                Refresh Exceptions
+              </button>
             </div>
-            <h3 className="text-xl font-bold text-white mb-2 tracking-wide">No anomalies detected</h3>
-            <p className="text-sm text-[#94a3b8]">All records align perfectly based on your current parameters.</p>
-          </div>
-        ) : (
-          <table className="w-full text-sm text-left border-collapse">
-            <thead className="sticky top-0 bg-black/40 backdrop-blur-xl z-10">
-              <tr>
-                {['Data Source', 'Exception Type', 'Reference UTR', 'Amount', 'Date', 'System Note'].map(h => (
-                  <th key={h} className="px-6 py-4 text-xs font-bold text-[#64748b] uppercase tracking-widest border-b border-white/10">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((e, i) => {
-                const cfg = CATEGORY_CONFIG[e.category] || { label: e.category, color: '#94a3b8', bg: 'rgba(255,255,255,0.1)', icon: AlertCircle }
-                const Icon = cfg.icon
-                
-                const hasUtr = e.utr && e.utr !== 'nan' && e.utr.trim() !== ''
-                const hasDesc = e.description && e.description !== 'nan' && e.description.trim() !== ''
 
-                return (
-                  <tr
-                    key={e.id}
-                    className={`border-b border-white/5 ${i % 2 === 0 ? 'bg-white/[0.02]' : 'bg-transparent'} hover:bg-white/10 transition-colors duration-300`}
-                  >
-                    <td className="px-6 py-4">
-                      <span className="px-3 py-1 rounded-sm text-[10px] font-bold uppercase tracking-widest bg-white/5 text-[#94a3b8] border border-white/10">
-                        {e.source}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="flex items-center gap-1.5 text-xs font-bold w-fit px-3 py-1 rounded-full border shadow-sm"
-                        style={{ background: cfg.bg.replace('/10', '/15'), color: cfg.color, borderColor: `${cfg.color}50` }}>
-                        <Icon size={14} /> {cfg.label}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      {hasUtr ? (
-                        <span className="font-mono text-sm font-semibold text-white truncate block max-w-[180px] hover:text-[#2b6aff] transition-colors" title={e.utr}>
-                          {e.utr}
-                        </span>
-                      ) : (
-                        <span className="inline-block px-2.5 py-1 rounded-sm text-[10px] font-bold uppercase tracking-widest bg-white/5 text-[#64748b] border border-white/10">
-                          N/A
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 font-bold tracking-wide" style={{ color: cfg.color }}>
-                      ₹{Number(e.amount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-                    </td>
-                    <td className="px-6 py-4 text-[#94a3b8] text-xs font-medium">
-                      {e.date ? new Date(e.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}
-                    </td>
-                    <td className="px-6 py-4 text-xs text-[#e2e8f0] max-w-[250px] truncate" title={e.description}>
-                      {hasDesc ? e.description : <span className="text-[#64748b] italic">No description</span>}
-                    </td>
+            {/* Filter Bar */}
+            <div className="flex flex-col md:flex-row items-center justify-between gap-3 pt-2 border-t border-[#DCE3ED]">
+              {/* Search Bar */}
+              <div className="relative flex-1 w-full">
+                <Search size={15} className="absolute left-3 top-2.5 text-gray-400" />
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Search by ID, UTR, merchant name, or reason..."
+                  className="w-full bg-white border border-[#DCE3ED] rounded-lg pl-9 pr-3 py-1.5 text-xs text-[#0B192C] outline-none focus:border-[#0065FF] font-medium"
+                />
+              </div>
+
+              {/* Priority & Classification Filters */}
+              <div className="flex items-center gap-2 w-full md:w-auto">
+                <select
+                  value={priorityFilter}
+                  onChange={(e) => setPriorityFilter(e.target.value)}
+                  className="bg-white border border-[#DCE3ED] rounded-lg px-3 py-1.5 text-xs font-extrabold text-[#0B192C] outline-none focus:border-[#0065FF]"
+                >
+                  <option value="all">All Priorities</option>
+                  <option value="CRITICAL">🚨 CRITICAL (&gt; ₹5L)</option>
+                  <option value="HIGH">🔴 HIGH (&gt; ₹50K)</option>
+                  <option value="MEDIUM">🟡 MEDIUM (&gt; ₹1K)</option>
+                  <option value="LOW">🟢 LOW (≤ ₹1K)</option>
+                </select>
+
+                <select
+                  value={categoryFilter}
+                  onChange={(e) => setCategoryFilter(e.target.value)}
+                  className="bg-white border border-[#DCE3ED] rounded-lg px-3 py-1.5 text-xs font-extrabold text-[#0B192C] outline-none focus:border-[#0065FF]"
+                >
+                  <option value="all">All Classifications</option>
+                  <option value="AMOUNT_MISMATCH">AMOUNT MISMATCH</option>
+                  <option value="SETTLEMENT_DELAY">SETTLEMENT DELAY</option>
+                  <option value="FEE_DEDUCTION">FEE DEDUCTION</option>
+                  <option value="MISSING_BANK_RECORD">MISSING BANK RECORD</option>
+                  <option value="DUPLICATE">DUPLICATE</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Amount Filters & Clear */}
+            <div className="flex items-center justify-between gap-3 text-xs pt-1">
+              <div className="flex items-center gap-2">
+                <span className="text-gray-400 font-bold uppercase text-[10px]">Amount Range:</span>
+                <input
+                  type="number"
+                  value={minAmount}
+                  onChange={(e) => setMinAmount(e.target.value)}
+                  placeholder="Min ₹"
+                  className="w-20 bg-white border border-[#DCE3ED] rounded px-2 py-1 text-xs outline-none focus:border-[#0065FF]"
+                />
+                <span className="text-gray-400 font-bold">–</span>
+                <input
+                  type="number"
+                  value={maxAmount}
+                  onChange={(e) => setMaxAmount(e.target.value)}
+                  placeholder="Max ₹"
+                  className="w-20 bg-white border border-[#DCE3ED] rounded px-2 py-1 text-xs outline-none focus:border-[#0065FF]"
+                />
+              </div>
+
+              {hasActiveFilters && (
+                <button
+                  onClick={clearFilters}
+                  className="text-xs font-extrabold text-[#EF4444] hover:underline flex items-center gap-1 bg-red-50 px-2 py-0.5 rounded border border-red-200"
+                >
+                  <RotateCcw size={12} /> Clear Filters
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Exceptions Table */}
+          <div className="overflow-x-auto">
+            {filteredItems.length === 0 ? (
+              <div className="p-12 text-center text-gray-500 text-xs">
+                <p className="font-extrabold text-sm text-[#0B192C]">No exception records match your filter criteria</p>
+                <button onClick={clearFilters} className="btn-secondary text-xs mt-3">Reset Filters</button>
+              </div>
+            ) : (
+              <table className="w-full text-left text-sm">
+                <thead>
+                  <tr className="border-b border-[#DCE3ED] bg-[#EFF3F8]/60 text-xs font-extrabold uppercase text-gray-500">
+                    <th className="px-6 py-3.5">Priority</th>
+                    <th className="px-6 py-3.5">ID / Ref</th>
+                    <th className="px-6 py-3.5">Source</th>
+                    <th className="px-6 py-3.5">Classification Code</th>
+                    <th className="px-6 py-3.5">Amount</th>
+                    <th className="px-6 py-3.5">Why Unmatched Evidence</th>
+                    <th className="px-6 py-3.5">Status</th>
+                    <th className="px-6 py-3.5 text-right">Action</th>
                   </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        )}
-      </div>
+                </thead>
+                <tbody>
+                  {filteredItems.map((row) => {
+                    const cat = CATEGORY_STYLES[row.category] || CATEGORY_STYLES.AMOUNT_MISMATCH
+                    const prio = PRIORITY_STYLES[row.priority || 'MEDIUM'] || PRIORITY_STYLES.MEDIUM
+                    return (
+                      <tr key={row.id} className="border-b border-[#E8EEF5] hover:bg-[#E6F0FF]/30 transition-colors">
+                        <td className="px-6 py-4">
+                          <span className="px-2.5 py-0.5 rounded text-[11px] font-extrabold flex items-center gap-1 w-fit border" style={{ background: prio.bg, color: prio.text, borderColor: prio.border }}>
+                            <span>{prio.icon}</span> {row.priority || 'MEDIUM'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 font-mono font-bold text-[#0065FF] text-xs">EX-{row.id}</td>
+                        <td className="px-6 py-4 font-bold text-xs uppercase text-gray-700">{row.source || 'Gateway'}</td>
+                        <td className="px-6 py-4">
+                          <span className="px-2 py-0.5 rounded text-[11px] font-mono font-extrabold tracking-tight" style={{ background: cat.bg, color: cat.text }}>
+                            {cat.label}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 font-extrabold text-[#0B192C]">
+                          ₹{Number(row.amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                        </td>
+                        <td className="px-6 py-4 text-xs text-gray-600 max-w-sm">
+                          {row.description || 'Discrepancy detected across Bank credit & ERP statement'}
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className={`px-2.5 py-0.5 rounded text-[11px] font-extrabold uppercase border ${
+                            row.status === 'RESOLVED' ? 'bg-[#D1FAE5] text-[#059669] border-[#10B981]' :
+                            row.status === 'REJECTED' ? 'bg-[#FEE2E2] text-[#DC2626] border-[#EF4444]' :
+                            'bg-yellow-50 text-yellow-700 border-yellow-200'
+                          }`}>
+                            {row.status || 'PENDING'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <button
+                            onClick={() => setSelectedInvestigateId(row.id)}
+                            className="btn-primary py-1.5 px-3 text-xs bg-[#0065FF] shadow-sm hover:shadow"
+                          >
+                            <Zap size={13} /> Investigate
+                          </button>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
+
+const FALLBACK_EXCEPTIONS = [
+  { id: 1, priority: 'CRITICAL', source: 'gateway', category: 'DUPLICATE', amount: 520000.00, description: 'Duplicate transaction record of ₹5.2 Lakhs detected in raw gateway log', utr: 'UTR98124910284' },
+  { id: 2, priority: 'HIGH', source: 'gateway', category: 'AMOUNT_MISMATCH', amount: 12450.00, description: '₹50.00 ERP ledger data-entry discrepancy vs Bank credit (₹12,450 vs ₹12,400)', utr: 'UTR98124910284' },
+  { id: 3, priority: 'MEDIUM', source: 'bank', category: 'SETTLEMENT_DELAY', amount: 20000.00, description: 'T+2 settlement delay between gateway capture and bank statement credit', utr: 'UTR81940182749' },
+  { id: 4, priority: 'LOW', source: 'gateway', category: 'FEE_DEDUCTION', amount: 450.50, description: '₹450.50 MDR processing fee deduction not entered in ledger', utr: 'UTR77301928401' },
+]

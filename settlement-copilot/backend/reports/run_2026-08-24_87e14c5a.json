@@ -1,0 +1,21 @@
+{
+  "run_id": "87e14c5a-1364-4739-8674-1c8839638f45",
+  "run_at": "2026-08-24T17:26:37.583156",
+  "total_gateway": 294,
+  "total_bank": 284,
+  "total_ledger": 284,
+  "matched": 280,
+  "unmatched": 10,
+  "match_rate": 95.24,
+  "avg_confidence": 0.8907,
+  "threshold_used": 0.7,
+  "pass_breakdown": {
+    "exact": 254,
+    "fuzzy": 22,
+    "batch": 4
+  },
+  "exception_breakdown": {
+    "missing": 6,
+    "timing_drift": 4
+  }
+}

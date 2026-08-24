@@ -85,6 +85,11 @@ def run_matching(
     Full 3-pass reconciliation for a given run_id.
     Returns summary dict (same payload as /report endpoint).
     """
+    try:
+        threshold = float(threshold.default) if hasattr(threshold, "default") else float(threshold)
+    except Exception:
+        threshold = 0.70
+
     logger.info("Starting matching run_id=%s threshold=%.2f", run_id, threshold)
 
     gw_df = _load_df(db, run_id, "gateway")

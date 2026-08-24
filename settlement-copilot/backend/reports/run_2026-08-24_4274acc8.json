@@ -1,0 +1,23 @@
+{
+  "run_id": "4274acc8-a275-4660-a125-32db1d335a76",
+  "run_at": "2026-08-24T16:46:39.346072",
+  "total_gateway": 294,
+  "total_bank": 284,
+  "total_ledger": 284,
+  "matched": 0,
+  "unmatched": 578,
+  "match_rate": 0.0,
+  "avg_confidence": 0.0,
+  "threshold_used": 1.0,
+  "pass_breakdown": {
+    "exact": 0,
+    "fuzzy": 0,
+    "batch": 0
+  },
+  "exception_breakdown": {
+    "fee_adjusted": 276,
+    "missing": 18,
+    "timing_drift": 280,
+    "batch": 4
+  }
+}

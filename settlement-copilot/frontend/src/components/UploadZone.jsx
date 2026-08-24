@@ -1,7 +1,7 @@
-import { UploadCloud, CheckCircle2, FileText, AlertTriangle } from 'lucide-react'
+import { UploadCloud, CheckCircle2, FileText, AlertTriangle, Play, Sparkles } from 'lucide-react'
 import { useState } from 'react'
 
-export default function UploadZone({ onUpload }) {
+export default function UploadZone({ onResults, onRunDemo, loading }) {
   const [files, setFiles] = useState({ gateway: null, bank: null, ledger: null })
   
   const handleFileChange = (type) => (e) => {
@@ -12,51 +12,72 @@ export default function UploadZone({ onUpload }) {
 
   const allPresent = files.gateway && files.bank
 
+  const handleStartReconciliation = () => {
+    if (allPresent) {
+      onResults(files.gateway, files.bank, files.ledger, 0.7)
+    } else {
+      onRunDemo()
+    }
+  }
+
   return (
-    <div className="glass-panel p-8 animate-in fade-in duration-500 mb-8 relative overflow-hidden group">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r from-[#2b6aff]/5 to-[#00e676]/5 blur-3xl pointer-events-none rounded-full" />
-      
-      <div className="flex items-center gap-4 mb-8 relative z-10">
-        <div className="w-12 h-12 bg-gradient-to-br from-[#2b6aff] to-[#0047ff] rounded-2xl flex items-center justify-center shadow-[0_0_20px_rgba(43,106,255,0.4)]">
-          <FileText size={22} className="text-white" />
+    <div className="bg-white border border-[#DCE3ED] rounded-xl p-7 mb-6 shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div className="flex items-center gap-3.5">
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-[#E6F0FF] shadow-sm">
+            <FileText size={24} className="text-[#0065FF]" />
+          </div>
+          <div>
+            <h2 className="text-xl font-extrabold text-[#0B192C]">Data Ingestion Engine</h2>
+            <p className="text-[14px] text-[#4A5568] mt-0.5">Upload your transaction files or run the instant AI reconciliation demo.</p>
+          </div>
         </div>
-        <div>
-          <h2 className="text-2xl font-bold text-white tracking-wide">Data Ingestion Engine</h2>
-          <p className="text-[#94a3b8] mt-1">Upload your transaction files to ignite the reconciliation process.</p>
-        </div>
+
+        {/* 1-Click Demo Trigger */}
+        <button
+          onClick={onRunDemo}
+          disabled={loading}
+          className="px-5 py-2.5 bg-gradient-to-r from-[#0065FF] to-[#00C2FF] hover:from-[#0052CC] hover:to-[#00B0E6] text-white font-bold text-sm rounded-lg transition-all shadow-md hover:shadow-lg flex items-center gap-2 flex-shrink-0 disabled:opacity-50"
+        >
+          <Sparkles size={16} className="text-[#00E6A0]" />
+          {loading ? 'Running AI Engine...' : '⚡ Run 1-Click AI Demo'}
+        </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         {[
           { id: 'gateway', label: 'Payment Gateway Report', required: true, accept: '.csv', desc: 'Standard Razorpay format' },
           { id: 'bank',    label: 'Bank Account Statement', required: true, accept: '.csv,.xlsx', desc: 'Official bank export' },
           { id: 'ledger',  label: 'Internal ERP Ledger',    required: false, accept: '.csv', desc: 'Optional for 3-way match' },
         ].map((block) => (
-          <div key={block.id} className="flex flex-col border border-white/10 rounded-2xl bg-white/[0.02] p-5 hover:border-[#2b6aff]/50 transition-all duration-300 relative group/card shadow-[inset_0_0_20px_rgba(255,255,255,0.02)] hover:shadow-[0_0_25px_rgba(43,106,255,0.15)] hover:-translate-y-1">
+          <div key={block.id} className="flex flex-col border border-[#DCE3ED] rounded-xl p-5 bg-[#EFF3F8]/40 hover:bg-white hover:border-[#0065FF] transition-all duration-200 relative">
             {block.required && (
-              <span className="absolute top-4 right-4 text-[9px] font-bold uppercase tracking-widest text-[#ff4757] bg-[#ff4757]/10 border border-[#ff4757]/20 px-2 py-0.5 rounded-full shadow-[0_0_10px_rgba(255,71,87,0.2)]">
+              <span className="absolute top-4 right-4 text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#FEE2E2] text-[#EF4444]">
                 Required
               </span>
             )}
-            <h3 className="text-sm font-bold text-white mb-1.5">{block.label}</h3>
-            <p className="text-xs text-[#64748b] mb-5">{block.desc}</p>
+            <h3 className="text-[15px] font-extrabold text-[#0B192C] mb-1">{block.label}</h3>
+            <p className="text-[13px] text-[#718096] mb-4">{block.desc}</p>
             
-            <div className="flex-1 flex flex-col items-center justify-center border-2 border-dashed border-white/10 bg-black/20 rounded-xl p-5 transition-all duration-300 group-hover/card:border-[#2b6aff]/50 group-hover/card:bg-[#2b6aff]/5 cursor-pointer min-h-[160px]"
-                 onClick={() => document.getElementById(`upload-${block.id}`).click()}>
+            <div 
+              className="flex-1 flex flex-col items-center justify-center border-2 border-dashed border-[#DCE3ED] rounded-xl p-5 bg-white cursor-pointer min-h-[150px] hover:border-[#0065FF] transition-colors"
+              style={{ borderColor: files[block.id] ? '#10B981' : undefined }}
+              onClick={() => document.getElementById(`upload-${block.id}`).click()}
+            >
               {files[block.id] ? (
-                <div className="flex flex-col items-center animate-in zoom-in duration-300">
-                  <div className="w-12 h-12 bg-[#00e676]/10 border border-[#00e676]/30 rounded-full flex items-center justify-center text-[#00e676] mb-3 shadow-[0_0_20px_rgba(0,230,118,0.3)]">
-                    <CheckCircle2 size={24} />
+                <div className="flex flex-col items-center">
+                  <div className="w-11 h-11 rounded-full flex items-center justify-center mb-2.5 bg-[#D1FAE5] text-[#10B981]">
+                    <CheckCircle2 size={22} />
                   </div>
-                  <p className="text-white font-semibold text-sm text-center break-all line-clamp-2">{files[block.id].name}</p>
+                  <p className="font-extrabold text-[13px] text-[#0B192C] text-center break-all line-clamp-2">{files[block.id].name}</p>
                 </div>
               ) : (
-                <div className="flex flex-col items-center">
-                  <div className="w-12 h-12 bg-white/5 border border-white/10 rounded-full flex items-center justify-center text-[#64748b] mb-4 group-hover/card:text-[#2b6aff] group-hover/card:scale-110 group-hover/card:shadow-[0_0_15px_rgba(43,106,255,0.5)] transition-all duration-300">
-                    <UploadCloud size={24} />
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-11 h-11 rounded-full flex items-center justify-center mb-2 bg-[#EFF3F8] text-[#718096]">
+                    <UploadCloud size={22} />
                   </div>
-                  <p className="text-[#94a3b8] font-medium text-sm group-hover/card:text-white transition-colors">Click to select</p>
-                  <p className="text-xs text-[#475569] mt-2 font-mono">Accepts {block.accept}</p>
+                  <p className="font-extrabold text-[13px] text-[#0065FF]">Click to select file</p>
+                  <p className="text-[11px] text-[#718096] mt-1 font-mono">{block.accept}</p>
                 </div>
               )}
               <input
@@ -71,20 +92,20 @@ export default function UploadZone({ onUpload }) {
         ))}
       </div>
 
-      <div className="mt-8 pt-6 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-5 relative z-10">
-        <div className="flex items-center gap-3 text-sm">
-          <AlertTriangle size={20} className={allPresent ? 'text-[#00e676]' : 'text-[#f59e0b]'} />
-          <span className={allPresent ? 'text-white font-medium' : 'text-[#94a3b8]'}>
-            {allPresent ? 'All required systems are locked in and ready.' : 'Awaiting mandatory data inputs to commence.'}
+      <div className="mt-7 pt-5 border-t border-[#E8EEF5] flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-2.5 text-[13px] font-bold">
+          <AlertTriangle size={18} className={allPresent ? 'text-[#10B981]' : 'text-[#0065FF]'} />
+          <span className="text-[#0B192C]">
+            {allPresent ? 'Custom files attached and ready.' : 'Click button to run 3-pass reconciliation engine on demo or uploaded data.'}
           </span>
         </div>
         
         <button
-          disabled={!allPresent}
-          onClick={() => onUpload(files.gateway, files.bank, files.ledger, 0.7)}
-          className={`btn-primary px-10 py-3 text-base ${!allPresent && 'opacity-50 grayscale cursor-not-allowed hover:scale-100'}`}
+          disabled={loading}
+          onClick={handleStartReconciliation}
+          className="btn-primary px-7 py-3 text-[14px] disabled:opacity-50 shadow-md"
         >
-          Initialize Reconciliation Engine
+          {loading ? 'Running 3-Pass Matcher...' : 'Initialize Reconciliation Engine'}
         </button>
       </div>
     </div>
