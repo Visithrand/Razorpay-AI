@@ -66,7 +66,7 @@ def send_otp(
 ):
     clean_id = identifier.strip().lower()
     if not clean_id:
-        raise HTTPException(400, "Please enter a valid email address or phone number.")
+        raise HTTPException(400, "Please enter a valid mobile number.")
 
     generated_otp = str(random.randint(100000, 999999))
     user = db.query(User).filter(User.identifier == clean_id).first()
@@ -93,10 +93,15 @@ def send_otp(
     db.commit()
     db.refresh(user)
 
-    logger.info(f"[SECURE OTP SERVICE] Sent 6-digit OTP '{generated_otp}' to email/phone: {clean_id}")
+    # Dispatch OTP via Twilio SMS (falls back gracefully if credentials are not configured)
+    from app.services.sms_service import send_otp_sms
+    send_otp_sms(clean_id, generated_otp)
+
+    logger.info(f"[SECURE OTP SERVICE] Sent 6-digit OTP '{generated_otp}' to phone: {clean_id}")
     return {
         "status": "otp_sent",
         "identifier": clean_id,
+        "otp": generated_otp,  # Returned to allow frontend simulation
         "message": f"Verification code sent successfully to {clean_id}. Please check your inbox or device SMS."
     }
 
@@ -110,31 +115,23 @@ def verify_otp(
     clean_id = identifier.strip().lower()
     clean_otp = otp.strip()
 
-    if not clean_otp or len(clean_otp) < 4:
+    if not clean_otp:
         raise HTTPException(400, "Please enter a valid OTP code.")
 
     user = db.query(User).filter(User.identifier == clean_id).first()
     if not user:
-        if "@" in clean_id:
-            name_part = clean_id.split("@")[0].replace(".", " ").title()
-        else:
-            name_part = f"User {clean_id[-4:]}"
+        raise HTTPException(404, "User session not found. Please request a new OTP.")
 
-        mid_suffix = str(random.randint(1000, 9999))
-        user = User(
-            identifier=clean_id,
-            name=name_part,
-            role="Merchant Admin",
-            mid=f"mid_rzp_{mid_suffix}",
-            otp=clean_otp,
-            is_verified=1
-        )
-        db.add(user)
-        db.commit()
-        db.refresh(user)
-    else:
-        user.is_verified = 1
-        db.commit()
+    # Validate OTP matching
+    if user.otp != clean_otp:
+        raise HTTPException(400, "Invalid verification code. Please try again.")
+
+    # Check expiration
+    if user.otp_expires_at and datetime.utcnow() > user.otp_expires_at:
+        raise HTTPException(400, "OTP has expired. Please request a new code.")
+
+    user.is_verified = 1
+    db.commit()
 
     return {
         "status": "authenticated",
