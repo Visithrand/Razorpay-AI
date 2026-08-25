@@ -162,11 +162,55 @@ class InvestigationRecord(Base):
     date_status = Column(String, default="Matched")
     
     root_cause = Column(String, nullable=False)
-    confidence = Column(Float, default=0.95)
+    overall_confidence = Column(Float, default=0.95)
     business_impact = Column(Text, nullable=False)
     recommended_action = Column(Text, nullable=False)
     evidence_json = Column(JSON, default=dict)
     
+    requires_human_review = Column(Integer, default=1) # 1 for True, 0 for False (sqlite boolean)
+    final_decision = Column(String)
+    final_reasoning = Column(Text)
+    
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class AgentFindingRecord(Base):
+    """Stores individual AI agent findings."""
+    __tablename__ = "agent_findings"
+
+    id = Column(Integer, primary_key=True, index=True)
+    investigation_id = Column(Integer, ForeignKey("investigations.id"), nullable=False)
+    agent_type = Column(String, nullable=False)
+    finding = Column(JSON, default=dict)
+    confidence = Column(Float, default=0.0)
+    evidence = Column(JSON, default=dict)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class JudgeDecisionRecord(Base):
+    """Stores the final Judge agent decision."""
+    __tablename__ = "judge_decisions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    investigation_id = Column(Integer, ForeignKey("investigations.id"), nullable=False)
+    decision = Column(String, nullable=False)
+    recommendation = Column(Text)
+    confidence = Column(Float, default=0.0)
+    reasoning = Column(Text)
+    agent_agreement = Column(Float, default=0.0)
+    requires_human_review = Column(Integer, default=1)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class AuditRecord(Base):
+    """Stores immutable, persistent audit log entries for key actions."""
+    __tablename__ = "audit_records"
+
+    id = Column(Integer, primary_key=True, index=True)
+    investigation_id = Column(Integer, ForeignKey("investigations.id"), nullable=True)
+    actor = Column(String, nullable=False)
+    action = Column(String, nullable=False)
+    details = Column(JSON, default=dict)
     created_at = Column(DateTime, default=datetime.utcnow)
 
 

@@ -189,8 +189,6 @@ async def ask_stream(
     End-to-end NL → SQL → Answer streaming generator.
     Yields SSE-compatible text chunks.
     """
-    yield "🔍 Analyzing database schema & tracing transactions...\n\n"
-
     try:
         sql = await generate_sql(question)
     except Exception as exc:
@@ -199,8 +197,6 @@ async def ask_stream(
     if sql.upper() == "UNSUPPORTED":
         yield "I'm sorry, I can't answer that question with the available database tables. Try asking about transaction amounts, match rates, or specific UTR numbers."
         return
-
-    yield f"📊 Executing SQL Query: `{sql}`...\n\n"
 
     is_valid, err = validate_sql(sql, db)
     if not is_valid:
@@ -274,7 +270,6 @@ async def ask_stream(
         if not rows:
             yield "No matching records found in the database for your query criteria."
         else:
-            yield f"Ran SQL: `{sql}`\n\n"
             for i, r in enumerate(rows[:10], 1):
                 amt = f"₹{r.get('amount', 0):,.2f}" if 'amount' in r else "—"
                 cat = r.get('category', r.get('status', 'Record'))

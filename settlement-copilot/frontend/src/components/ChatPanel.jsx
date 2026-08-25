@@ -33,7 +33,7 @@ export default function ChatPanel({ runId, embedded = false }) {
     const q = queryText || inp
     if (!q.trim() || loading) return
     setInp('')
-    setMsgs(p => [...p, { role: 'user', text: q }, { role: 'bot', text: '🔍 Analyzing database schema & tracing transactions...' }])
+    setMsgs(p => [...p, { role: 'user', text: q }, { role: 'bot', text: 'Thinking...' }])
     setLoading(true)
 
     try {

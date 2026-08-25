@@ -1,22 +1,30 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { Download, Filter, TrendingUp, AlertCircle, CheckCircle2, IndianRupee, Search, X } from 'lucide-react'
-import { exportToCSV } from '../api'
-
-const MOCK_SETTLEMENTS = [
-  { id: 'setl_OkL8Nj23nJ1x', utr: 'SBIN0001234567', amount: 1245000.50, status: 'processed', date: 'Jan 24, 2024', fees: 2450.00, count: 1450, bank: 'State Bank of India (••4819)' },
-  { id: 'setl_OjK2Mn99xK4p', utr: 'HDFC0009876543', amount: 845000.00,  status: 'processed', date: 'Jan 23, 2024', fees: 1845.50, count: 980,  bank: 'HDFC Bank (••9201)' },
-  { id: 'setl_Oi9HbC88vM2a', utr: '—',              amount: 154000.00,  status: 'pending',   date: 'Jan 23, 2024', fees: 450.00,  count: 210,  bank: 'ICICI Bank (••1102)' },
-  { id: 'setl_Oh8VnX77zL1w', utr: 'ICIC0005554443', amount: 2145000.75, status: 'processed', date: 'Jan 22, 2024', fees: 4210.25, count: 2450, bank: 'ICICI Bank (••1102)' },
-  { id: 'setl_Og7ZmA66bY9q', utr: 'UTIB0001112223', amount: 45000.00,   status: 'failed',    date: 'Jan 21, 2024', fees: 120.00,  count: 45,   bank: 'Axis Bank (••3918)' },
-]
+import { exportToCSV, getSettlements } from '../api'
 
 export default function SettlementsMock() {
+  const [settlements, setSettlements] = useState([])
   const [activeTab, setActiveTab] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedSetl, setSelectedSetl] = useState(null)
 
+  useEffect(() => {
+    fetchData()
+  }, [])
+
+  const fetchData = async () => {
+    try {
+      const data = await getSettlements()
+      if (data && data.settlements) {
+        setSettlements(data.settlements)
+      }
+    } catch (err) {
+      console.error("Failed to fetch settlements", err)
+    }
+  }
+
   const filteredSetls = useMemo(() => {
-    return MOCK_SETTLEMENTS.filter(s => {
+    return settlements.filter(s => {
       if (activeTab !== 'all' && s.status !== activeTab) return false
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase().trim()
@@ -74,10 +82,10 @@ export default function SettlementsMock() {
         <div className="px-6 py-3 border-b border-[#DCE3ED] flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#EFF3F8]/30">
           <div className="flex items-center gap-6 text-[14px] font-semibold text-[#4A5568]">
             {[
-              { id: 'all', label: `All (${MOCK_SETTLEMENTS.length})` },
-              { id: 'processed', label: `Processed (${MOCK_SETTLEMENTS.filter(s => s.status === 'processed').length})` },
-              { id: 'pending', label: `Pending (${MOCK_SETTLEMENTS.filter(s => s.status === 'pending').length})` },
-              { id: 'failed', label: `Failed (${MOCK_SETTLEMENTS.filter(s => s.status === 'failed').length})` },
+              { id: 'all', label: `All (${settlements.length})` },
+              { id: 'processed', label: `Processed (${settlements.filter(s => s.status === 'processed').length})` },
+              { id: 'pending', label: `Pending (${settlements.filter(s => s.status === 'pending').length})` },
+              { id: 'failed', label: `Failed (${settlements.filter(s => s.status === 'failed').length})` },
             ].map(t => (
               <button
                 key={t.id}
@@ -190,6 +198,12 @@ export default function SettlementsMock() {
                 <span className="text-gray-500 font-semibold">Transaction Count</span>
                 <span className="font-semibold">{selectedSetl.count} transactions</span>
               </div>
+              {selectedSetl.type === 'exception' && (
+                <div className="flex justify-between py-2 border-b border-gray-100">
+                  <span className="text-gray-500 font-semibold">Exception Details</span>
+                  <span className="font-semibold text-right max-w-[250px]">{selectedSetl.description}</span>
+                </div>
+              )}
             </div>
             <div className="px-6 py-4 border-t border-[#DCE3ED] bg-gray-50 flex justify-end">
               <button onClick={() => setSelectedSetl(null)} className="btn-primary">Close Details</button>

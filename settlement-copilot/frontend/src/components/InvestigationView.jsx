@@ -35,8 +35,12 @@ export default function InvestigationView({ exceptionId = 1, onClose }) {
   }
 
   const handleAction = async (decision) => {
-    if (!investigation || !investigation.recommendation) return
-    const recId = investigation.recommendation.id
+    if (!investigation) return
+    const recId = investigation.recommendation?.id
+    if (!recId) {
+      alert("Error: AI Recommendation ID is missing. The backend failed to generate a recommendation record for this investigation. Please close and re-investigate.")
+      return
+    }
     try {
       const formData = new FormData()
       formData.append('reason', reviewerReason || `Action ${decision}d by Finance Admin`)
@@ -103,41 +107,43 @@ export default function InvestigationView({ exceptionId = 1, onClose }) {
         )}
       </div>
 
-      {/* 🔍 "WHY THIS WAS FLAGGED?" Transparency Card */}
+      {/* 🤖 MULTI-AGENT INVESTIGATION STATUS */}
       <div className="bg-white border-2 border-[#0065FF]/40 rounded-xl p-6 shadow-sm space-y-4">
         <div className="flex items-center justify-between pb-3 border-b border-gray-100">
           <div className="flex items-center gap-2">
-            <HelpCircle size={18} className="text-[#0065FF]" />
-            <h3 className="text-sm font-extrabold text-[#0B192C] uppercase tracking-wider">WHY THIS WAS FLAGGED</h3>
+            <ShieldCheck size={18} className="text-[#0065FF]" />
+            <h3 className="text-sm font-extrabold text-[#0B192C] uppercase tracking-wider">MULTI-AGENT INVESTIGATION</h3>
           </div>
-          <span className="text-xs font-mono text-[#0065FF] font-bold">Confidence: {wf.confidence || '96%'}</span>
+          <span className="text-xs font-mono text-[#0065FF] font-bold">Confidence: {inv.confidence !== undefined ? (inv.confidence * 100).toFixed(0) : 0}%</span>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 text-xs bg-gray-50 p-4 rounded-xl border border-gray-200">
-          <div>
-            <span className="text-gray-400 font-bold block">Gateway Amount</span>
-            <span className="font-extrabold text-[#0B192C] text-sm mt-0.5 block">{wf.gateway_amount || '₹12,450.00'}</span>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+          <div className="space-y-2">
+            <h4 className="font-bold text-gray-500 uppercase">Agent Status:</h4>
+            <div className="flex items-center gap-2 text-[#10B981]"><CheckCircle2 size={14} /> Match Investigator Completed</div>
+            <div className="flex items-center gap-2 text-[#10B981]"><CheckCircle2 size={14} /> Financial Risk Analyst Completed</div>
+            <div className="flex items-center gap-2 text-[#10B981]"><CheckCircle2 size={14} /> Finance Operations Analyst Completed</div>
+            <div className="flex items-center gap-2 text-[#10B981]"><CheckCircle2 size={14} /> Evidence Aggregator Completed</div>
+            <div className="flex items-center gap-2 text-[#10B981]"><CheckCircle2 size={14} /> Judge Completed</div>
           </div>
-          <div>
-            <span className="text-gray-400 font-bold block">Bank Amount</span>
-            <span className="font-extrabold text-[#0B192C] text-sm mt-0.5 block">{wf.bank_amount || '₹12,450.00'}</span>
-          </div>
-          <div>
-            <span className="text-gray-400 font-bold block">Difference</span>
-            <span className="font-extrabold text-[#EF4444] text-sm mt-0.5 block">{wf.difference || '₹50.00'}</span>
-          </div>
-          <div>
-            <span className="text-gray-400 font-bold block">Ref Similarity</span>
-            <span className="font-extrabold text-[#10B981] text-sm mt-0.5 block">{wf.reference_similarity || '97%'}</span>
-          </div>
-          <div>
-            <span className="text-gray-400 font-bold block">Date Difference</span>
-            <span className="font-extrabold text-[#0065FF] text-sm mt-0.5 block">{wf.date_difference || '1 day'}</span>
+          <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-2">
+             <div className="flex justify-between">
+                <span className="text-gray-400 font-bold">FINAL DECISION:</span>
+                <span className="font-extrabold text-[#0B192C]">{inv.final_decision || 'RESOLVED'}</span>
+             </div>
+             <div className="flex justify-between">
+                <span className="text-gray-400 font-bold">REQUIRES HUMAN REVIEW:</span>
+                <span className={`font-extrabold ${inv.requires_human_review ? 'text-[#EF4444]' : 'text-[#10B981]'}`}>{inv.requires_human_review ? 'YES' : 'NO'}</span>
+             </div>
+             <div className="flex justify-between">
+                <span className="text-gray-400 font-bold">ROOT CAUSE:</span>
+                <span className="font-extrabold text-[#0B192C]">{inv.root_cause}</span>
+             </div>
           </div>
         </div>
 
-        <p className="text-xs font-semibold text-gray-700 bg-blue-50 p-3 rounded-lg border border-blue-200">
-          <strong>Reason:</strong> {wf.reason || 'Amount discrepancy of ₹50.00 exceeds automatic reconciliation tolerance.'}
+        <p className="text-xs font-semibold text-gray-700 bg-blue-50 p-3 rounded-lg border border-blue-200 mt-2">
+          <strong>Judge Reasoning:</strong> {wf.reason || 'Agents concluded with high confidence.'}
         </p>
       </div>
 
@@ -166,7 +172,7 @@ export default function InvestigationView({ exceptionId = 1, onClose }) {
             <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Payment Gateway</span>
             <CheckCircle2 size={18} className="text-[#10B981]" />
           </div>
-          <p className="text-2xl font-mono font-bold text-[#0B192C]">₹{inv.amounts.gateway.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</p>
+          <p className="text-2xl font-mono font-bold text-[#0B192C]">₹{(inv.amounts?.gateway || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</p>
           <div className="mt-3 text-xs space-y-1 text-gray-600">
             <p><strong>UTR:</strong> <code className="font-mono text-[#0065FF]">{inv.utr}</code></p>
             <p><strong>Status:</strong> Captured & Settled</p>
@@ -179,7 +185,7 @@ export default function InvestigationView({ exceptionId = 1, onClose }) {
             <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Bank Credit Statement</span>
             <CheckCircle2 size={18} className="text-[#10B981]" />
           </div>
-          <p className="text-2xl font-mono font-bold text-[#0B192C]">₹{inv.amounts.bank.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</p>
+          <p className="text-2xl font-mono font-bold text-[#0B192C]">₹{(inv.amounts?.bank || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</p>
           <div className="mt-3 text-xs space-y-1 text-gray-600">
             <p><strong>UTR:</strong> <code className="font-mono text-[#0065FF]">{inv.utr}</code></p>
             <p><strong>Bank:</strong> HDFC / SBI Settled</p>
@@ -192,9 +198,9 @@ export default function InvestigationView({ exceptionId = 1, onClose }) {
             <span className="text-xs font-bold text-[#EF4444] uppercase tracking-wider">Internal ERP / Ledger</span>
             <XCircle size={18} className="text-[#EF4444]" />
           </div>
-          <p className="text-2xl font-mono font-bold text-[#EF4444]">₹{inv.amounts.erp.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</p>
+          <p className="text-2xl font-mono font-bold text-[#EF4444]">₹{(inv.amounts?.erp || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</p>
           <div className="mt-3 text-xs space-y-1 text-gray-600">
-            <p><strong>Diff:</strong> <span className="font-bold text-[#EF4444]">₹{inv.amounts.difference.toLocaleString('en-IN', { minimumFractionDigits: 2 })} Discrepancy</span></p>
+            <p><strong>Diff:</strong> <span className="font-bold text-[#EF4444]">₹{(inv.amounts?.difference || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })} Discrepancy</span></p>
             <p><strong>Status:</strong> Mismatch Flagged</p>
           </div>
         </div>

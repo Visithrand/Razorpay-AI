@@ -203,133 +203,62 @@ def get_what_changed(db: Session = Depends(get_db)):
 # ─── AI Investigation Agent ───────────────────────────────────────────────────
 
 @router.post("/investigate/{exception_id}")
-def investigate_exception(
+async def investigate_exception(
     exception_id: int,
+    force: bool = Query(False),
     db: Session = Depends(get_db),
 ):
     """
-    Executes AI Investigation agent for an exception.
-    Guaranteed fail-safe execution that never throws a 500 error.
+    Executes Evidence-First Multi-Agent Investigation for an exception.
     """
+    from app.agent.multi_agent.orchestrator import InvestigationOrchestrator
+    
     try:
+        # Check if we should force re-investigation due to missing recommendation
+        inv_check = db.query(InvestigationRecord).filter(InvestigationRecord.exception_id == exception_id).order_by(InvestigationRecord.id.desc()).first()
+        if not force and inv_check:
+            rec_check = db.query(RecommendationRecord).filter(RecommendationRecord.investigation_id == inv_check.id).first()
+            if not rec_check:
+                logger.info(f"Cached investigation {inv_check.id} has no recommendation. Forcing re-investigation.")
+                force = True
+
+        # Trigger Multi-Agent Investigation
+        judge_result = await InvestigationOrchestrator.investigate(db, exception_id, force=force)
+        
         exc = db.query(ExceptionRecord).filter(ExceptionRecord.id == exception_id).first()
-        if not exc:
-            exc = db.query(ExceptionRecord).order_by(ExceptionRecord.id.asc()).first()
-
-        if exc:
-            exc_id = exc.id
-            category = exc.category or "AMOUNT_MISMATCH"
-            prio = getattr(exc, 'priority', 'MEDIUM') or "MEDIUM"
-            utr_val = exc.utr if exc.utr and exc.utr != "—" else "UTR98124910284"
-            gw_amt = exc.amount or 12450.0
-            bank_amt = gw_amt
-            erp_amt = gw_amt - 50.0 if ("AMOUNT" in category or "mismatch" in category.lower()) else gw_amt
-            amount_diff = abs(gw_amt - erp_amt)
-        else:
-            exc_id = exception_id
-            category = "AMOUNT_MISMATCH"
-            prio = "HIGH"
-            utr_val = "UTR98124910284"
-            gw_amt = 12450.0
-            bank_amt = 12450.0
-            erp_amt = 12400.0
-            amount_diff = 50.0
-
-        # Check if an InvestigationRecord already exists
-        inv_rec = None
-        if exc:
-            inv_rec = db.query(InvestigationRecord).filter(InvestigationRecord.exception_id == exc.id).first()
-
-        if not inv_rec:
-            # Determine root cause and recommendations
-            if "AMOUNT" in category or "mismatch" in category.lower() or amount_diff > 0:
-                root_cause = "erp_amount_error"
-                confidence = 0.96
-                business_impact = f"₹{amount_diff:,.2f} discrepancies between ERP ledger and Bank statement."
-                recommended_action = f"Review ERP ledger entry and update value from ₹{erp_amt:,.2f} to ₹{gw_amt:,.2f}."
-                action_type = "ERP_CORRECTION"
-                proposed_val = f"₹{gw_amt:,.2f}"
-                original_val = f"₹{erp_amt:,.2f}"
-            elif "DELAY" in category or "TIMING" in category or "drift" in category.lower():
-                root_cause = "timing_drift"
-                confidence = 0.94
-                business_impact = f"₹{gw_amt:,.2f} funds in transit (T+2 settlement delay between gateway and bank credit)."
-                recommended_action = "Acknowledge timing drift and flag transaction for auto-clearance upon bank batch processing."
-                action_type = "RE_RECONCILE"
-                proposed_val = "Pending T+2 Credit"
-                original_val = "In Transit"
-            elif "FEE" in category or "deduction" in category.lower():
-                root_cause = "gateway_fee"
-                confidence = 0.98
-                business_impact = f"₹{gw_amt:,.2f} gateway MDR fee deduction not accounted in raw ledger."
-                recommended_action = f"Record ₹{gw_amt:,.2f} under Gateway Commission Expense ledger account."
-                action_type = "FEE_ADJUSTMENT"
-                proposed_val = f"Expense: ₹{gw_amt:,.2f}"
-                original_val = "Unallocated"
-            else:
-                root_cause = "missing_bank_credit"
-                confidence = 0.91
-                business_impact = f"₹{gw_amt:,.2f} un-credited payment awaiting bank UTR confirmation."
-                recommended_action = f"Issue UTR status inquiry to partner bank for reference {utr_val}."
-                action_type = "MANUAL_REVIEW"
-                proposed_val = "Bank Inquiry Raised"
-                original_val = "Unmatched"
-
-            # Create new database records
-            inv_rec = InvestigationRecord(
-                exception_id=exc.id if exc else None,
-                run_id=exc.run_id if exc else "demo-run",
-                gateway_amount=gw_amt,
-                bank_amount=bank_amt,
-                erp_amount=erp_amt,
-                amount_diff=amount_diff,
-                utr_status="Matched",
-                date_status="Matched",
-                root_cause=root_cause,
-                confidence=confidence,
-                business_impact=business_impact,
-                recommended_action=recommended_action,
-                evidence_json={
-                    "gateway_amount": f"₹{gw_amt:,.2f}",
-                    "bank_amount": f"₹{bank_amt:,.2f}",
-                    "difference": f"₹{amount_diff:,.2f}",
-                    "reference_similarity": "97%",
-                    "date_difference": "1 day",
-                    "confidence": f"{int(confidence * 100)}%",
-                    "reason": f"Amount discrepancy of ₹{amount_diff:,.2f} exceeds automatic reconciliation tolerance."
-                }
-            )
-            db.add(inv_rec)
-            db.flush()
-
-            rec_rec = RecommendationRecord(
-                investigation_id=inv_rec.id,
-                action_type=action_type,
-                description=recommended_action,
-                original_val=original_val,
-                proposed_val=proposed_val,
-                reason=recommended_action,
-                confidence=confidence,
-                status="PENDING"
-            )
-            db.add(rec_rec)
-            db.commit()
-        else:
-            # Query the existing RecommendationRecord
+        inv_rec = db.query(InvestigationRecord).filter(InvestigationRecord.exception_id == exception_id).order_by(InvestigationRecord.id.desc()).first()
+        
+        # Determine values for the response
+        utr_val = exc.utr if exc and exc.utr and exc.utr != "—" else "N/A"
+        
+        gw_amt = (inv_rec.gateway_amount if inv_rec and inv_rec.gateway_amount is not None else (exc.amount if exc and exc.amount is not None else 0.0)) or 0.0
+        bank_amt = (inv_rec.bank_amount if inv_rec and inv_rec.bank_amount is not None else (exc.amount if exc and exc.amount is not None else 0.0)) or 0.0
+        erp_amt = (inv_rec.erp_amount if inv_rec and inv_rec.erp_amount is not None else (exc.amount if exc and exc.amount is not None else 0.0)) or 0.0
+        amount_diff = (inv_rec.amount_diff if inv_rec and inv_rec.amount_diff is not None else 0.0) or 0.0
+        prio = exc.priority if exc else "MEDIUM"
+        
+        rec_rec = None
+        if inv_rec:
             rec_rec = db.query(RecommendationRecord).filter(RecommendationRecord.investigation_id == inv_rec.id).first()
             if not rec_rec:
-                rec_rec = RecommendationRecord(
-                    investigation_id=inv_rec.id,
-                    action_type="ERP_CORRECTION",
-                    description=inv_rec.recommended_action,
-                    original_val=f"₹{inv_rec.erp_amount:,.2f}",
-                    proposed_val=f"₹{inv_rec.gateway_amount:,.2f}",
-                    reason=inv_rec.recommended_action,
-                    confidence=inv_rec.confidence,
-                    status="PENDING"
-                )
-                db.add(rec_rec)
-                db.commit()
+                # Emergency fallback if orchestrator failed to create it
+                try:
+                    rec_rec = RecommendationRecord(
+                        investigation_id=inv_rec.id,
+                        action_type="MANUAL_REVIEW",
+                        description="Manual Review Required",
+                        original_val="N/A",
+                        proposed_val="Manual resolution needed",
+                        reason="Fallback recommendation generated due to missing AI record",
+                        confidence=0.0,
+                        status="PENDING"
+                    )
+                    db.add(rec_rec)
+                    db.commit()
+                    db.refresh(rec_rec)
+                except Exception as e:
+                    logger.error(f"Failed to create emergency recommendation: {e}")
+                    db.rollback()
 
         # Load feedback if any exists
         has_fb = False
@@ -341,44 +270,38 @@ def investigate_exception(
                 has_fb = True
                 fb_decision = fb.human_decision
                 fb_notes = fb.feedback_notes
-
+        
         return {
-            "investigation_id": inv_rec.id,
-            "exception_id": exc_id,
+            "investigation_id": inv_rec.id if inv_rec else None,
+            "exception_id": exception_id,
             "utr": utr_val,
             "why_flagged": {
-                "gateway_amount": f"₹{inv_rec.gateway_amount:,.2f}",
-                "bank_amount": f"₹{inv_rec.bank_amount:,.2f}",
-                "difference": f"₹{inv_rec.amount_diff:,.2f}",
-                "reference_similarity": inv_rec.evidence_json.get("reference_similarity", "97%"),
-                "date_difference": inv_rec.evidence_json.get("date_difference", "1 day"),
-                "confidence": f"{int(inv_rec.confidence * 100)}%",
-                "reason": inv_rec.evidence_json.get("reason", f"Amount discrepancy of ₹{inv_rec.amount_diff:,.2f} exceeds automatic reconciliation tolerance.")
+                "gateway_amount": f"₹{gw_amt:,.2f}",
+                "bank_amount": f"₹{bank_amt:,.2f}",
+                "difference": f"₹{amount_diff:,.2f}",
+                "reason": inv_rec.evidence_json.get("reason", "Amount discrepancy") if inv_rec and inv_rec.evidence_json else "Pending"
             },
-            "what_should_i_do": [
-                f"1. Review settlement fee configuration for {utr_val}.",
-                "2. Compare bank settlement credit statement.",
-                "3. Confirm transaction ledger entry."
-            ],
             "amounts": {
-                "gateway": inv_rec.gateway_amount,
-                "bank": inv_rec.bank_amount,
-                "erp": inv_rec.erp_amount,
-                "difference": inv_rec.amount_diff
+                "gateway": gw_amt,
+                "bank": bank_amt,
+                "erp": erp_amt,
+                "difference": amount_diff
             },
-            "root_cause": inv_rec.root_cause,
-            "confidence": inv_rec.confidence,
-            "business_impact": inv_rec.business_impact,
-            "recommended_action": inv_rec.recommended_action,
+            "root_cause": inv_rec.root_cause if inv_rec else "Unknown",
+            "confidence": inv_rec.overall_confidence if inv_rec else 0.0,
+            "business_impact": inv_rec.business_impact if inv_rec else "Unknown",
+            "recommended_action": inv_rec.recommended_action if inv_rec else "Manual Review",
             "priority": prio,
+            "final_decision": inv_rec.final_decision if inv_rec else "INSUFFICIENT_EVIDENCE",
+            "requires_human_review": bool(inv_rec.requires_human_review) if inv_rec else True,
             "recommendation": {
-                "id": rec_rec.id,
-                "action_type": rec_rec.action_type,
-                "description": rec_rec.description,
-                "original_val": rec_rec.original_val,
-                "proposed_val": rec_rec.proposed_val,
-                "status": rec_rec.status
-            },
+                "id": rec_rec.id if rec_rec else None,
+                "action_type": rec_rec.action_type if rec_rec else "MANUAL_REVIEW",
+                "description": rec_rec.description if rec_rec else "Review manually",
+                "original_val": rec_rec.original_val if rec_rec else "",
+                "proposed_val": rec_rec.proposed_val if rec_rec else "",
+                "status": rec_rec.status if rec_rec else "PENDING"
+            } if rec_rec else None,
             "past_human_feedback": {
                 "has_feedback": has_fb,
                 "decision": fb_decision,
@@ -386,41 +309,19 @@ def investigate_exception(
             }
         }
     except Exception as exc_err:
+        import traceback
         logger.error(f"Error in investigate_exception: {exc_err}")
+        logger.error(traceback.format_exc())
         return {
-            "investigation_id": 101,
             "exception_id": exception_id,
-            "utr": "UTR98124910284",
-            "why_flagged": {
-                "gateway_amount": "₹12,450.00",
-                "bank_amount": "₹12,450.00",
-                "difference": "₹50.00",
-                "reference_similarity": "97%",
-                "date_difference": "1 day",
-                "confidence": "96%",
-                "reason": "Amount discrepancy of ₹50.00 exceeds automatic reconciliation tolerance."
-            },
-            "what_should_i_do": [
-                "1. Review settlement fee configuration for UTR98124910284.",
-                "2. Compare bank settlement credit statement.",
-                "3. Confirm transaction ledger entry."
-            ],
-            "amounts": { "gateway": 12450.0, "bank": 12450.0, "erp": 12400.0, "difference": 50.0 },
-            "root_cause": "erp_amount_error",
-            "confidence": 0.96,
-            "business_impact": "₹50.00 accounting discrepancy between ERP ledger and Bank settlement.",
-            "recommended_action": "Update ERP ledger record value from ₹12,400.00 to verified settlement amount ₹12,450.00.",
-            "priority": "HIGH",
-            "recommendation": {
-                "id": 201,
-                "action_type": "ERP_CORRECTION",
-                "description": "Correct ERP settlement amount: ₹12,400.00 → ₹12,450.00",
-                "original_val": "₹12,400.00",
-                "proposed_val": "₹12,450.00",
-                "status": "PENDING"
-            },
-            "past_human_feedback": { "has_feedback": False, "decision": None, "notes": None }
+            "root_cause": "System Error",
+            "confidence": 0.0,
+            "business_impact": "Investigation failed to execute.",
+            "recommended_action": "Retry or investigate manually.",
+            "final_decision": "INSUFFICIENT_EVIDENCE",
+            "requires_human_review": True
         }
+
 
 
 @router.post("/exceptions/{exception_id}/feedback")
@@ -801,8 +702,9 @@ async def ask(
     db: Session = Depends(get_db),
 ):
     async def event_generator():
+        import json
         async for chunk in ask_stream(question, db):
-            yield f"data: {chunk}\n\n"
+            yield f"data: {json.dumps(chunk)}\n\n"
         yield "data: [DONE]\n\n"
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")
@@ -811,3 +713,46 @@ async def ask(
 @router.get("/health")
 def health():
     return {"status": "ok", "timestamp": datetime.utcnow().isoformat()}
+
+@router.get("/settlements")
+def get_settlements(db: Session = Depends(get_db)):
+    bank_txns = db.query(RawTransaction).filter(RawTransaction.source == 'bank').limit(100).all()
+    exceptions = db.query(ExceptionRecord).order_by(ExceptionRecord.id.desc()).limit(50).all()
+
+    settlements = []
+    
+    for t in bank_txns:
+        settlements.append({
+            "id": f"setl_{t.id}",
+            "utr": t.utr or "N/A",
+            "amount": t.amount or 0.0,
+            "status": "processed",
+            "date": t.date.strftime("%b %d, %Y") if t.date else "Jan 24, 2024",
+            "fees": t.fee or 0.0,
+            "count": 1, 
+            "bank": "Bank Account",
+            "type": "standard",
+            "description": t.description or "Standard Bank Settlement"
+        })
+
+    for e in exceptions:
+        st = "pending"
+        if e.status == "RESOLVED":
+            st = "processed"
+        elif e.status == "REJECTED":
+            st = "failed"
+            
+        settlements.append({
+            "id": f"exc_{e.id}",
+            "utr": e.utr or "N/A",
+            "amount": e.amount or 0.0,
+            "status": st,
+            "date": e.date.strftime("%b %d, %Y") if e.date else "Jan 24, 2024",
+            "fees": 0.0,
+            "count": 1,
+            "bank": "Exception System",
+            "type": "exception",
+            "description": e.description or "Exception Action"
+        })
+
+    return {"settlements": settlements}

@@ -91,7 +91,13 @@ export async function askQuestion(question, runId, onChunk) {
       if (line.startsWith('data: ')) {
         const data = line.slice(6)
         if (data === '[DONE]') return
-        onChunk(data)
+        try {
+          const parsed = JSON.parse(data)
+          onChunk(parsed)
+        } catch (e) {
+          // Fallback if not JSON
+          onChunk(data)
+        }
       }
     }
   }
@@ -119,4 +125,9 @@ export function exportToCSV(filename, rows) {
   document.body.appendChild(link)
   link.click()
   document.body.removeChild(link)
+}
+
+/** Get settlements and resolved exceptions */
+export async function getSettlements() {
+  return request('/settlements')
 }
