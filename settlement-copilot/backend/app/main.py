@@ -13,6 +13,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import LOG_LEVEL, CORS_ORIGINS
 from app.database import init_db
 from app.api.routes import router
+from app.api.scenario_routes import router as scenario_router
 
 # ─── Structured Logging ───────────────────────────────────────────────────────
 
@@ -60,6 +61,7 @@ app.add_middleware(
 )
 
 app.include_router(router)
+app.include_router(scenario_router)
 
 
 @app.on_event("startup")

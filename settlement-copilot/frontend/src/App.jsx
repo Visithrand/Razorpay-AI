@@ -10,6 +10,7 @@ import CustomersMock from './components/CustomersMock'
 import SettingsMock from './components/SettingsMock'
 import ReportsMock from './components/ReportsMock'
 import InvestigationView from './components/InvestigationView'
+import LiveMonitor from './components/LiveMonitor'
 import AuditLogView from './components/AuditLogView'
 import ExceptionTable from './components/ExceptionTable'
 import ChatPanel from './components/ChatPanel'
@@ -17,6 +18,7 @@ import GenericListView from './components/GenericListView'
 import OnboardingOverlay from './components/OnboardingOverlay'
 import HelpFAB from './components/HelpFAB'
 import AdminLogin from './components/AdminLogin'
+import ScenarioLab from './components/ScenarioLab'
 import { FileText, Link as LinkIcon, Layout, Share2, Repeat } from 'lucide-react'
 
 const USER_SESSION_KEY = 'razorpay_authenticated_user_v1'
@@ -25,6 +27,7 @@ const ONBOARDING_KEY = 'razorpay_onboarding_done_v2'
 function App() {
   const [user, setUser] = useState(null)
   const [activePage, setActivePage] = useState('overview')
+  const [activeExceptionId, setActiveExceptionId] = useState(1)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [showOnboarding, setShowOnboarding] = useState(false)
 
@@ -104,7 +107,10 @@ function App() {
           report={report} 
           sidebarCollapsed={sidebarCollapsed}
           onToggleSidebar={toggleSidebar}
-          onNavigate={setActivePage}
+          onNavigate={(page, param) => {
+            setActivePage(page)
+            if (param) setActiveExceptionId(param)
+          }}
           user={user}
           onLogout={handleLogout}
         />
@@ -112,6 +118,12 @@ function App() {
         <main className="flex-1 overflow-y-auto custom-scrollbar p-6">
           {(activePage === 'overview' || activePage === 'home') && (
             <ExecutiveDashboard onNavigate={setActivePage} />
+          )}
+          {activePage === 'live-monitor' && (
+            <LiveMonitor onNavigate={(page, param) => {
+              setActivePage(page)
+              if (param) setActiveExceptionId(param)
+            }} />
           )}
           {activePage === 'transactions' && <TransactionsHistory />}
           {activePage === 'reconciliation' && (
@@ -124,7 +136,8 @@ function App() {
           )}
           {activePage === 'settlements' && <SettlementsMock />}
           {activePage === 'exceptions' && <ExceptionTable />}
-          {activePage === 'investigation' && <InvestigationView exceptionId={1} />}
+          {activePage === 'investigation' && <InvestigationView exceptionId={activeExceptionId} />}
+          {activePage === 'scenario-lab' && <ScenarioLab />}
           {activePage === 'ai-assistant' && (
             <div className="max-w-4xl mx-auto space-y-4">
               <div className="bg-[#05103E] text-white p-6 rounded-xl shadow-sm border border-white/10">

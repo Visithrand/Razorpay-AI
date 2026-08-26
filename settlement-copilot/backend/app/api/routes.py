@@ -18,9 +18,10 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.ingest import ingest_csv
 from app.matcher.engine import run_matching
-from app.models import ExceptionRecord, MatchResult, RawTransaction, Report, User, InvestigationRecord, RecommendationRecord, AuditLog, HumanFeedback
+from app.models import ExceptionRecord, MatchResult, RawTransaction, Report, User, InvestigationRecord, RecommendationRecord, AuditLog, HumanFeedback, PaymentEvent, EventRisk
 from app.agent.nl2sql import ask_stream
 from app.services.reconciliation_service import ReconciliationService
+from app.live.detector import DetectionEngine, IdempotencyException
 
 router = APIRouter(prefix="/api")
 logger = logging.getLogger("uvicorn")
@@ -228,6 +229,27 @@ async def investigate_exception(
         exc = db.query(ExceptionRecord).filter(ExceptionRecord.id == exception_id).first()
         inv_rec = db.query(InvestigationRecord).filter(InvestigationRecord.exception_id == exception_id).order_by(InvestigationRecord.id.desc()).first()
         
+        if not inv_rec and exc:
+            inv_rec = InvestigationRecord(
+                exception_id=exception_id,
+                run_id=exc.run_id,
+                gateway_amount=exc.amount or 0.0,
+                bank_amount=exc.amount or 0.0,
+                erp_amount=exc.amount or 0.0,
+                amount_diff=0.0,
+                root_cause="Deterministic Rule Match",
+                overall_confidence=1.0,
+                business_impact="Routine Exception",
+                recommended_action="Review and resolve manually based on category.",
+                evidence_json={"reason": "Matched via deterministic logic (AI skipped)."},
+                requires_human_review=1,
+                final_decision="MANUAL_REVIEW",
+                final_reasoning="Rule-based categorization."
+            )
+            db.add(inv_rec)
+            db.commit()
+            db.refresh(inv_rec)
+        
         # Determine values for the response
         utr_val = exc.utr if exc and exc.utr and exc.utr != "—" else "N/A"
         
@@ -236,6 +258,10 @@ async def investigate_exception(
         erp_amt = (inv_rec.erp_amount if inv_rec and inv_rec.erp_amount is not None else (exc.amount if exc and exc.amount is not None else 0.0)) or 0.0
         amount_diff = (inv_rec.amount_diff if inv_rec and inv_rec.amount_diff is not None else 0.0) or 0.0
         prio = exc.priority if exc else "MEDIUM"
+        
+        jd = None
+        if inv_rec:
+            jd = db.query(JudgeDecisionRecord).filter(JudgeDecisionRecord.investigation_id == inv_rec.id).first()
         
         rec_rec = None
         if inv_rec:
@@ -294,6 +320,7 @@ async def investigate_exception(
             "priority": prio,
             "final_decision": inv_rec.final_decision if inv_rec else "INSUFFICIENT_EVIDENCE",
             "requires_human_review": bool(inv_rec.requires_human_review) if inv_rec else True,
+            "agent_disagreement": bool(jd.agent_disagreement) if jd else False,
             "recommendation": {
                 "id": rec_rec.id if rec_rec else None,
                 "action_type": rec_rec.action_type if rec_rec else "MANUAL_REVIEW",
@@ -756,3 +783,128 @@ def get_settlements(db: Session = Depends(get_db)):
         })
 
     return {"settlements": settlements}
+
+# ─── Live Payment Events ──────────────────────────────────────────────────────
+
+from fastapi import Request
+
+@router.post("/events/payment")
+async def process_live_event(request: Request, db: Session = Depends(get_db)):
+    try:
+        data = await request.json()
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid JSON payload")
+
+    try:
+        event, risk_eval = DetectionEngine.process_event(db, data)
+        return {
+            "status": "success",
+            "event_id": event.id,
+            "transaction_id": event.transaction_id,
+            "risk_score": risk_eval.risk_score,
+            "risk_level": risk_eval.risk_level,
+            "classification": risk_eval.classification,
+            "signals": risk_eval.signals,
+            "exception_id": risk_eval.exception_id,
+            "related_transaction_id": getattr(risk_eval, '_extra_data', {}).get("related_transaction_id"),
+            "related_timestamp": getattr(risk_eval, '_extra_data', {}).get("related_timestamp")
+        }
+    except IdempotencyException as e:
+        return {"status": "ignored", "message": str(e), "transaction_id": data.get("transaction_id")}
+    except Exception as e:
+        logger.error(f"Live event error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/events/stream")
+def get_live_events(limit: int = Query(20), db: Session = Depends(get_db)):
+    events = db.query(PaymentEvent).order_by(PaymentEvent.timestamp.desc()).limit(limit).all()
+    results = []
+    for e in events:
+        risk = db.query(EventRisk).filter(EventRisk.event_id == e.id).first()
+        results.append({
+            "id": e.id,
+            "transaction_id": e.transaction_id,
+            "amount": e.amount,
+            "timestamp": e.timestamp.isoformat() if e.timestamp else None,
+            "merchant_id": e.merchant_id,
+            "customer_reference": e.customer_reference,
+            "risk_score": risk.risk_score if risk else 0,
+            "risk_level": risk.risk_level if risk else "NORMAL",
+            "classification": risk.classification if risk else "Normal",
+            "signals": risk.signals if risk else [],
+            "exception_id": risk.exception_id if risk else None,
+        })
+    return {"events": results}
+
+# ─── Dashboard Metrics ────────────────────────────────────────────────────────
+
+from sqlalchemy import func
+from app.models import EventRisk, ExceptionRecord, Report
+
+@router.get("/dashboard/metrics")
+def get_dashboard_metrics(db: Session = Depends(get_db)):
+    total_processed = db.query(func.count(PaymentEvent.id)).scalar() or 0
+    
+    latest_report = db.query(Report).order_by(Report.run_at.desc()).first()
+    match_rate = latest_report.match_rate if latest_report else 0.0
+
+    anomalies_count = db.query(func.count(EventRisk.id)).filter(EventRisk.risk_level != "NORMAL").scalar() or 0
+    
+    pending_exceptions = db.query(ExceptionRecord).filter(ExceptionRecord.status == "PENDING").all()
+    exceptions_count = len(pending_exceptions)
+    amount_at_risk = sum(e.amount or 0.0 for e in pending_exceptions)
+
+    last_run = None
+    if latest_report:
+        last_run = {
+            "run_at": latest_report.run_at.isoformat() if latest_report.run_at else None,
+            "transactions": latest_report.total_gateway,
+            "matched": latest_report.matched,
+            "unresolved": latest_report.unmatched,
+            "match_rate": latest_report.match_rate
+        }
+    
+    total_exceptions_ever = db.query(func.count(ExceptionRecord.id)).scalar() or 0
+    resolved_exceptions = db.query(func.count(ExceptionRecord.id)).filter(ExceptionRecord.status == "RESOLVED").scalar() or 0
+    
+    normal_count = max(0, total_processed - anomalies_count)
+
+    control_effectiveness = {
+        "monitored": total_processed,
+        "normal": normal_count,
+        "anomalies_detected": anomalies_count,
+        "exceptions_created": total_exceptions_ever,
+        "resolved": resolved_exceptions,
+        "human_review": exceptions_count
+    }
+
+    return {
+        "kpis": {
+            "transactions": total_processed,
+            "match_rate": match_rate,
+            "anomalies": anomalies_count,
+            "exceptions": exceptions_count,
+            "amount_at_risk": amount_at_risk
+        },
+        "last_run": last_run,
+        "control_effectiveness": control_effectiveness
+    }
+
+@router.get("/events/recent")
+def get_recent_events(limit: int = 50, db: Session = Depends(get_db)):
+    events = db.query(PaymentEvent).join(EventRisk).order_by(PaymentEvent.timestamp.asc()).limit(limit).all()
+    
+    if not events:
+        return {"data": []}
+
+    graph_data = []
+    
+    for ev in events:
+        graph_data.append({
+            "time": ev.timestamp.strftime("%H:%M:%S") if ev.timestamp else "",
+            "risk": ev.risk_evaluation.risk_score if ev.risk_evaluation else 0,
+            "amount": ev.amount,
+            "is_anomaly": 1 if ev.risk_evaluation and ev.risk_evaluation.risk_level != "NORMAL" else 0
+        })
+
+    return {"data": graph_data}

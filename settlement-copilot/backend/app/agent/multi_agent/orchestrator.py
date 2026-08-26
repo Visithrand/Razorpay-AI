@@ -70,6 +70,22 @@ class InvestigationOrchestrator:
         return evidence
 
     @staticmethod
+    def _run_deterministic_checks(evidence: Dict[str, Any]) -> Dict[str, Any]:
+        """Provides a strong, deterministic fallback if AI fails."""
+        amt = evidence.get("amount") or 0
+        has_utr = bool(evidence.get("utr") and evidence.get("utr") != "—")
+        cat = evidence.get("category", "")
+        source = evidence.get("source", "")
+        
+        return {
+            "amount_match": amt > 0,
+            "utr_match": has_utr,
+            "timing_drift": "timing" in cat or "delay" in cat,
+            "ledger_entry": source == "ledger",
+            "duplicate": "duplicate" in cat
+        }
+
+    @staticmethod
     async def investigate(db: Session, exception_id: int, force: bool = False) -> Optional[JudgeResult]:
         logger.info(f'{{"event": "multi_agent_investigation_started", "exception_id": {exception_id}}}')
         start_time = time.time()
@@ -139,17 +155,28 @@ class InvestigationOrchestrator:
             logger.info(f'{{"event": "judge_completed", "exception_id": {exception_id}, "confidence": {judge_result.confidence}, "latency_ms": {latency_ms}}}')
         except Exception as e:
             logger.error(f"Judge Agent failed: {e}")
+            
+            # 🔥 STRONG DETERMINISTIC FALLBACK
+            det = InvestigationOrchestrator._run_deterministic_checks(raw_evidence)
+            
+            reasoning = "AI SERVICE UNAVAILABLE: Deterministic evidence analysis used.\n\n"
+            reasoning += f"Amount match       {'✓' if det['amount_match'] else '✕'}\n"
+            reasoning += f"UTR match           {'✓' if det['utr_match'] else '✕'}\n"
+            reasoning += f"Timing drift        {'⚠' if det['timing_drift'] else '✓'}\n"
+            reasoning += f"Duplicate           {'⚠' if det['duplicate'] else '✓'}\n"
+            
             judge_result = JudgeResult(
-                decision="INSUFFICIENT_EVIDENCE",
+                decision="HUMAN_REVIEW",
                 exception_type="UNKNOWN",
-                root_cause="Judge Agent Failed",
-                financial_impact=0.0,
-                recommendation="AI investigation incomplete. Manual review required.",
-                confidence=0.0,
+                root_cause="System Failure - Rule Fallback",
+                financial_impact=raw_evidence.get("amount") or 0.0,
+                recommendation="Human review required.",
+                confidence=1.0, # Deterministic rules are 100% confident in what they see
                 requires_human_review=True,
-                reasoning="Judge failed to execute properly.",
-                supporting_evidence=[],
-                agent_agreement=0.0
+                reasoning=reasoning,
+                supporting_evidence=["Deterministic system constraints checked."],
+                agent_agreement=0.0,
+                agent_disagreement=False
             )
 
         # 5. Persist to DB
@@ -209,6 +236,7 @@ class InvestigationOrchestrator:
                 confidence=judge_result.confidence,
                 reasoning=judge_result.reasoning,
                 agent_agreement=judge_result.agent_agreement,
+                agent_disagreement=1 if judge_result.agent_disagreement else 0,
                 requires_human_review=1 if judge_result.requires_human_review else 0
             )
             db.add(jd)

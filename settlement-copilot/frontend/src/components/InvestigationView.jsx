@@ -108,43 +108,49 @@ export default function InvestigationView({ exceptionId = 1, onClose }) {
       </div>
 
       {/* 🤖 MULTI-AGENT INVESTIGATION STATUS */}
-      <div className="bg-white border-2 border-[#0065FF]/40 rounded-xl p-6 shadow-sm space-y-4">
-        <div className="flex items-center justify-between pb-3 border-b border-gray-100">
-          <div className="flex items-center gap-2">
-            <ShieldCheck size={18} className="text-[#0065FF]" />
-            <h3 className="text-sm font-extrabold text-[#0B192C] uppercase tracking-wider">MULTI-AGENT INVESTIGATION</h3>
+      <div className="bg-[#F7F8FA] border border-[#E5E7EB] rounded-md p-6 shadow-sm flex flex-col items-center">
+        <h3 className="text-[14px] font-bold text-[#374151] uppercase tracking-wider mb-6">AI INVESTIGATION</h3>
+        
+        <div className="w-full max-w-sm space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-[14px] text-[#111827] font-medium">Match Agent</span>
+            <span className="text-[14px] font-semibold text-[#059669] flex items-center gap-1.5"><Check size={16} /> Complete</span>
           </div>
-          <span className="text-xs font-mono text-[#0065FF] font-bold">Confidence: {inv.confidence !== undefined ? (inv.confidence * 100).toFixed(0) : 0}%</span>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-          <div className="space-y-2">
-            <h4 className="font-bold text-gray-500 uppercase">Agent Status:</h4>
-            <div className="flex items-center gap-2 text-[#10B981]"><CheckCircle2 size={14} /> Match Investigator Completed</div>
-            <div className="flex items-center gap-2 text-[#10B981]"><CheckCircle2 size={14} /> Financial Risk Analyst Completed</div>
-            <div className="flex items-center gap-2 text-[#10B981]"><CheckCircle2 size={14} /> Finance Operations Analyst Completed</div>
-            <div className="flex items-center gap-2 text-[#10B981]"><CheckCircle2 size={14} /> Evidence Aggregator Completed</div>
-            <div className="flex items-center gap-2 text-[#10B981]"><CheckCircle2 size={14} /> Judge Completed</div>
+          <div className="flex items-center justify-between">
+            <span className="text-[14px] text-[#111827] font-medium">Risk Agent</span>
+            <span className="text-[14px] font-semibold text-[#059669] flex items-center gap-1.5"><Check size={16} /> Complete</span>
           </div>
-          <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-2">
-             <div className="flex justify-between">
-                <span className="text-gray-400 font-bold">FINAL DECISION:</span>
-                <span className="font-extrabold text-[#0B192C]">{inv.final_decision || 'RESOLVED'}</span>
-             </div>
-             <div className="flex justify-between">
-                <span className="text-gray-400 font-bold">REQUIRES HUMAN REVIEW:</span>
-                <span className={`font-extrabold ${inv.requires_human_review ? 'text-[#EF4444]' : 'text-[#10B981]'}`}>{inv.requires_human_review ? 'YES' : 'NO'}</span>
-             </div>
-             <div className="flex justify-between">
-                <span className="text-gray-400 font-bold">ROOT CAUSE:</span>
-                <span className="font-extrabold text-[#0B192C]">{inv.root_cause}</span>
-             </div>
+          <div className="flex items-center justify-between">
+            <span className="text-[14px] text-[#111827] font-medium">Finance Agent</span>
+            <span className="text-[14px] font-semibold text-[#059669] flex items-center gap-1.5"><Check size={16} /> Complete</span>
           </div>
         </div>
 
-        <p className="text-xs font-semibold text-gray-700 bg-blue-50 p-3 rounded-lg border border-blue-200 mt-2">
-          <strong>Judge Reasoning:</strong> {wf.reason || 'Agents concluded with high confidence.'}
-        </p>
+        <div className="py-4 text-[#6B7280]">↓</div>
+
+        <div className="w-full max-w-md text-center bg-white border border-[#0258FF]/20 rounded-md p-6 shadow-sm relative overflow-hidden">
+          <div className={`absolute top-0 left-0 right-0 h-1 ${inv.agent_disagreement ? 'bg-[#DC2626]' : 'bg-[#0258FF]'}`} />
+          <h4 className="text-[16px] font-bold text-[#111827] tracking-wider mb-1">JUDGE AI</h4>
+          
+          {inv.agent_disagreement ? (
+            <div className="mb-4 inline-flex items-center gap-1.5 px-3 py-1 bg-[#FEF2F2] text-[#DC2626] rounded-md text-[13px] font-bold">
+              <AlertTriangle size={14} /> Agent disagreement detected
+            </div>
+          ) : (
+            <p className="text-[14px] font-semibold text-[#0258FF] mb-6">{inv.confidence !== undefined ? (inv.confidence * 100).toFixed(0) : 0}% confidence</p>
+          )}
+          
+          <div className="text-left space-y-4">
+            <div>
+              <p className="text-[12px] font-bold text-[#6B7280] uppercase tracking-wider mb-1">Decision</p>
+              <p className="text-[14px] font-semibold text-[#111827]">{inv.root_cause || 'Potential duplicate'}</p>
+            </div>
+            <div>
+              <p className="text-[12px] font-bold text-[#6B7280] uppercase tracking-wider mb-1">Reason</p>
+              <p className="text-[14px] text-[#374151] leading-relaxed">{wf.reason || 'Multiple independent signals indicate the payment should be held for review.'}</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* 🛠️ "WHAT SHOULD I DO?" Numbered Recommendations */}
@@ -165,43 +171,47 @@ export default function InvestigationView({ exceptionId = 1, onClose }) {
       </div>
 
       {/* 3-Source Evidence Matrix */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Gateway */}
-        <div className="bg-white border border-[#DCE3ED] rounded-xl p-5 shadow-sm">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Payment Gateway</span>
-            <CheckCircle2 size={18} className="text-[#10B981]" />
-          </div>
-          <p className="text-2xl font-mono font-bold text-[#0B192C]">₹{(inv.amounts?.gateway || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</p>
-          <div className="mt-3 text-xs space-y-1 text-gray-600">
-            <p><strong>UTR:</strong> <code className="font-mono text-[#0065FF]">{inv.utr}</code></p>
-            <p><strong>Status:</strong> Captured & Settled</p>
-          </div>
-        </div>
-
-        {/* Bank */}
-        <div className="bg-white border border-[#DCE3ED] rounded-xl p-5 shadow-sm">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Bank Credit Statement</span>
-            <CheckCircle2 size={18} className="text-[#10B981]" />
-          </div>
-          <p className="text-2xl font-mono font-bold text-[#0B192C]">₹{(inv.amounts?.bank || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</p>
-          <div className="mt-3 text-xs space-y-1 text-gray-600">
-            <p><strong>UTR:</strong> <code className="font-mono text-[#0065FF]">{inv.utr}</code></p>
-            <p><strong>Bank:</strong> HDFC / SBI Settled</p>
-          </div>
-        </div>
-
-        {/* ERP Ledger */}
-        <div className="bg-white border-2 border-[#EF4444]/40 rounded-xl p-5 shadow-sm bg-[#FEE2E2]/20">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-bold text-[#EF4444] uppercase tracking-wider">Internal ERP / Ledger</span>
-            <XCircle size={18} className="text-[#EF4444]" />
-          </div>
-          <p className="text-2xl font-mono font-bold text-[#EF4444]">₹{(inv.amounts?.erp || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</p>
-          <div className="mt-3 text-xs space-y-1 text-gray-600">
-            <p><strong>Diff:</strong> <span className="font-bold text-[#EF4444]">₹{(inv.amounts?.difference || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })} Discrepancy</span></p>
-            <p><strong>Status:</strong> Mismatch Flagged</p>
+      <div className="bg-white border border-[#E5E7EB] rounded-md shadow-sm overflow-hidden">
+        <h3 className="px-6 py-4 text-[14px] font-bold text-[#111827] border-b border-[#E5E7EB]">EVIDENCE</h3>
+        <table className="w-full text-left border-collapse">
+          <thead>
+            <tr className="bg-[#F7F8FA] border-b border-[#E5E7EB]">
+              <th className="px-6 py-3 w-1/4"></th>
+              <th className="px-6 py-3 text-[12px] font-semibold text-[#374151]">Gateway</th>
+              <th className="px-6 py-3 text-[12px] font-semibold text-[#374151]">Bank</th>
+              <th className="px-6 py-3 text-[12px] font-semibold text-[#374151]">ERP</th>
+            </tr>
+          </thead>
+          <tbody className="text-[13px] text-[#111827]">
+            <tr className="border-b border-[#F3F4F6]">
+              <td className="px-6 py-3 text-[#6B7280] font-semibold">Amount</td>
+              <td className="px-6 py-3 font-mono">₹{(inv.amounts?.gateway || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+              <td className="px-6 py-3 font-mono">₹{(inv.amounts?.bank || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+              <td className="px-6 py-3 font-mono">{inv.amounts?.erp ? `₹${inv.amounts.erp.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '—'}</td>
+            </tr>
+            <tr className="border-b border-[#F3F4F6]">
+              <td className="px-6 py-3 text-[#6B7280] font-semibold">Reference</td>
+              <td className="px-6 py-3 font-mono">{inv.utr}</td>
+              <td className="px-6 py-3 font-mono">{inv.utr}</td>
+              <td className="px-6 py-3 text-[#6B7280]">—</td>
+            </tr>
+            <tr>
+              <td className="px-6 py-3 text-[#6B7280] font-semibold">Status</td>
+              <td className="px-6 py-3 text-[#059669] font-bold">SETTLED</td>
+              <td className="px-6 py-3 text-[#059669] font-bold">RECEIVED</td>
+              <td className="px-6 py-3 text-[#DC2626] font-bold">MISSING</td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <div className="p-6 border-t border-[#E5E7EB] bg-[#F7F8FA]">
+          <p className="text-[12px] font-bold text-[#6B7280] uppercase tracking-wider mb-3">Evidence summary</p>
+          <div className="space-y-2 text-[13px] text-[#111827]">
+            <div className="flex items-center gap-2"><Check size={16} className="text-[#059669]" /> Amount matches</div>
+            <div className="flex items-center gap-2"><Check size={16} className="text-[#059669]" /> Merchant matches</div>
+            <div className="flex items-center gap-2"><Check size={16} className="text-[#059669]" /> Customer matches</div>
+            <div className="flex items-center gap-2 text-[#D97706] font-semibold"><AlertTriangle size={16} /> ERP entry missing</div>
+            <div className="flex items-center gap-2 text-[#D97706] font-semibold"><AlertTriangle size={16} /> 6-second timing difference</div>
           </div>
         </div>
       </div>
@@ -262,31 +272,31 @@ export default function InvestigationView({ exceptionId = 1, onClose }) {
       )}
 
       {/* Human-in-the-Loop Approval Action Card */}
-      <div className="bg-[#05103E] text-white rounded-xl p-6 shadow-xl border border-white/10 flex flex-col md:flex-row items-center justify-between gap-6">
-        <div>
-          <div className="flex items-center gap-2">
-            <ShieldCheck size={18} className="text-[#00E6A0]" />
-            <span className="text-xs font-extrabold text-[#00E6A0] uppercase tracking-wider">Human Approval Required</span>
-          </div>
-          <h4 className="text-base font-extrabold text-white mt-1">{rec ? rec.description : inv.recommended_action}</h4>
-          <p className="text-xs text-white/60 mt-0.5">Approval will execute recommended ledger correction and create an immutable entry in Audit Log.</p>
-        </div>
+      <div className="bg-white border border-[#E5E7EB] rounded-md p-8 shadow-sm flex flex-col items-center text-center">
+        <h4 className="text-[18px] font-bold text-[#111827] mb-2">{rec ? rec.description : inv.recommended_action}</h4>
+        <p className="text-[14px] text-[#6B7280] max-w-lg mb-8">Approval will execute the recommended ledger correction and create an immutable entry in the Audit Log.</p>
 
-        <div className="flex items-center gap-3 flex-shrink-0">
+        <div className="flex items-center gap-4">
           {actionStatus ? (
-            <div className={`px-5 py-2.5 rounded-lg text-sm font-extrabold flex items-center gap-2 ${
-              actionStatus === 'APPROVED' ? 'bg-[#10B981] text-white' : 'bg-[#EF4444] text-white'
+            <div className={`px-6 py-2.5 rounded font-semibold text-[14px] flex items-center gap-2 ${
+              actionStatus === 'APPROVED' ? 'bg-[#059669] text-white' : 'bg-[#DC2626] text-white'
             }`}>
               {actionStatus === 'APPROVED' ? <Check size={16} /> : <X size={16} />}
               Action {actionStatus}
             </div>
           ) : (
             <>
-              <button onClick={() => handleAction('reject')} className="px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white font-bold text-sm rounded-lg transition-all flex items-center gap-1.5 border border-white/20">
-                <ThumbsDown size={15} /> Reject Action
+              <button 
+                onClick={() => handleAction('approve')} 
+                className="bg-[#0258FF] hover:bg-[#014CE0] text-white font-semibold text-[14px] px-8 py-2.5 rounded transition-colors"
+              >
+                Approve Action
               </button>
-              <button onClick={() => handleAction('approve')} className="btn-primary py-2.5 px-6 flex items-center gap-2 shadow-lg">
-                <ThumbsUp size={15} /> Approve & Execute
+              <button 
+                onClick={() => handleAction('reject')} 
+                className="bg-white border border-[#E5E7EB] hover:bg-[#F3F4F6] text-[#374151] font-semibold text-[14px] px-8 py-2.5 rounded transition-colors"
+              >
+                Reject
               </button>
             </>
           )}

@@ -139,9 +139,11 @@ class JudgeAgent:
     @staticmethod
     async def evaluate(aggregated_evidence_json: str) -> JudgeResult:
         system_prompt = """You are the final Judge Agent.
-Compare the agent findings, identify agreements and disagreements.
+Compare the agent findings, identify agreements and explicit disagreements.
+CRITICAL AI GOVERNANCE RULE: You must NOT blindly average the agents. 
+If the Match Agent says "likely valid" but the Risk Agent says "potential duplicate", you MUST detect this as an agent disagreement.
+When agent disagreement is detected, you MUST set `agent_disagreement: true`, severely penalize the final confidence (e.g., < 50%), and set `requires_human_review: true`.
 Verify conclusions against the supplied database evidence.
-CRITICAL SAFETY RULE: You MUST prefer INSUFFICIENT_EVIDENCE over making unsupported conclusions. Do NOT invent facts.
 Decisions: RESOLVED, RECOMMENDED_ACTION, HUMAN_REVIEW, INSUFFICIENT_EVIDENCE.
 You MUST output valid JSON conforming to this structure:
 {
@@ -154,7 +156,8 @@ You MUST output valid JSON conforming to this structure:
   "requires_human_review": true,
   "reasoning": "...",
   "supporting_evidence": ["...", "..."],
-  "agent_agreement": 0.0
+  "agent_agreement": 0.0,
+  "agent_disagreement": true
 }"""
         user_prompt = f"Evaluate the aggregated evidence and agent findings:\n{aggregated_evidence_json}"
         fallback = {
@@ -167,6 +170,7 @@ You MUST output valid JSON conforming to this structure:
             "requires_human_review": True,
             "reasoning": "Deterministic fallback triggered due to LLM unavailability.",
             "supporting_evidence": [],
-            "agent_agreement": 0.0
+            "agent_agreement": 0.0,
+            "agent_disagreement": False
         }
         return await run_agent("JudgeAgent", system_prompt, user_prompt, JudgeResult, fallback)

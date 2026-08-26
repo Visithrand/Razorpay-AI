@@ -198,6 +198,7 @@ class JudgeDecisionRecord(Base):
     confidence = Column(Float, default=0.0)
     reasoning = Column(Text)
     agent_agreement = Column(Float, default=0.0)
+    agent_disagreement = Column(Integer, default=0) # 1 for True, 0 for False
     requires_human_review = Column(Integer, default=1)
     created_at = Column(DateTime, default=datetime.utcnow)
 
@@ -259,3 +260,36 @@ class AuditLog(Base):
     new_state = Column(String, nullable=True)
     reason = Column(Text, nullable=True)
     investigation_ref = Column(String, nullable=True)
+
+class PaymentEvent(Base):
+    """Persistent storage for incoming payment events."""
+    __tablename__ = "payment_events"
+
+    id = Column(Integer, primary_key=True, index=True)
+    transaction_id = Column(String, unique=True, index=True, nullable=False)
+    merchant_id = Column(String, index=True, nullable=False)
+    customer_reference = Column(String, index=True)
+    amount = Column(Float, nullable=False)
+    currency = Column(String, default="INR")
+    timestamp = Column(DateTime, nullable=False)
+    payment_status = Column(String)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    # Relationships
+    risk_evaluation = relationship("EventRisk", back_populates="event", uselist=False)
+
+
+class EventRisk(Base):
+    """Persistent storage for risk signals and scores evaluated upon event ingestion."""
+    __tablename__ = "event_risks"
+
+    id = Column(Integer, primary_key=True, index=True)
+    event_id = Column(Integer, ForeignKey("payment_events.id"), nullable=False, unique=True)
+    risk_score = Column(Integer, nullable=False)
+    risk_level = Column(String, nullable=False) # NORMAL, MEDIUM, HIGH
+    signals = Column(JSON, default=list) # e.g. [{"description": "Same amount", "score": 20}]
+    classification = Column(String) # e.g., "Potential duplicate", "Amount anomaly"
+    exception_id = Column(Integer, ForeignKey("exceptions.id"), nullable=True) # If escalated
+    evaluated_at = Column(DateTime, default=datetime.utcnow)
+
+    event = relationship("PaymentEvent", back_populates="risk_evaluation")

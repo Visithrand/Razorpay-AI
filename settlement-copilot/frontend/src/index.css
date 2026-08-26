@@ -4,32 +4,32 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ─── Razorpay Design System Typography & Theme ─── */
+/* ─── Operations Console Theme ─── */
 :root {
-  --rz-blue: #0065FF;
-  --rz-blue-hover: #0052CC;
-  --rz-blue-light: #E6F0FF;
-  --rz-navy-dark: #040D38;
-  --rz-navy-header: #05103E;
-  --rz-text-primary: #0B192C;
-  --rz-text-secondary: #4A5568;
-  --rz-text-muted: #718096;
-  --rz-border: #DCE3ED;
-  --rz-border-light: #E8EEF5;
-  --rz-bg-page: #EFF3F8;
+  --rz-blue: #0258FF;
+  --rz-blue-hover: #014CE0;
+  --rz-blue-light: #EFF6FF;
+  --rz-navy-dark: #0B1221;
+  --rz-navy-header: #0B1221;
+  --rz-text-primary: #111827;
+  --rz-text-secondary: #374151;
+  --rz-text-muted: #6B7280;
+  --rz-border: #E5E7EB;
+  --rz-border-light: #F3F4F6;
+  --rz-bg-page: #F7F8FA;
   --rz-bg-card: #FFFFFF;
-  --rz-bg-sidebar: #040D38;
-  --rz-bg-sidebar-hover: #0D1C59;
-  --rz-bg-sidebar-active: #0065FF;
-  --rz-teal: #00E6A0;
-  --rz-cyan: #00C2FF;
-  --rz-green: #10B981;
+  --rz-bg-sidebar: #0B1221;
+  --rz-bg-sidebar-hover: #1F2937;
+  --rz-bg-sidebar-active: #0258FF;
+  --rz-teal: #059669;
+  --rz-cyan: #0284C7;
+  --rz-green: #059669;
   --rz-green-light: #D1FAE5;
-  --rz-red: #EF4444;
+  --rz-red: #DC2626;
   --rz-red-light: #FEE2E2;
-  --rz-amber: #F59E0B;
+  --rz-amber: #D97706;
   --rz-amber-light: #FEF3C7;
-  --rz-purple: #8B5CF6;
+  --rz-purple: #7C3AED;
 }
 
 @layer base {
@@ -72,46 +72,14 @@
     background: rgba(255,255,255,0.3);
   }
 
-  /* ─── Hero Banner ─── */
+  /* ─── Removed Hero Banner ─── */
   .rz-hero-banner {
-    background: linear-gradient(135deg, #05103E 0%, #0A2175 45%, #040D34 100%);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .rz-hero-banner::before {
-    content: '';
-    position: absolute;
-    right: 12%;
-    top: 20%;
-    width: 90px;
-    height: 90px;
-    background: linear-gradient(135deg, #00E6A0 0%, #00C2FF 100%);
-    border-radius: 14px;
-    opacity: 0.85;
-    transform: rotate(6deg);
-    box-shadow: 0 10px 30px rgba(0,230,160,0.3);
-    pointer-events: none;
-  }
-
-  .rz-hero-banner::after {
-    content: '';
-    position: absolute;
-    right: 5%;
-    bottom: -10%;
-    width: 120px;
-    height: 120px;
-    background: linear-gradient(135deg, #0065FF 0%, #00C2FF 100%);
-    border-radius: 18px;
-    opacity: 0.75;
-    transform: rotate(-12deg);
-    box-shadow: 0 15px 40px rgba(0,101,255,0.4);
-    pointer-events: none;
+    display: none;
   }
 
   /* ─── Buttons (Inter 500–600) ─── */
   .btn-primary {
-    @apply px-5 py-2.5 text-white font-semibold text-sm rounded-md transition-all duration-200 flex items-center gap-2 shadow-sm hover:shadow-md active:scale-95;
+    @apply px-4 py-2 text-white text-xs rounded transition-all duration-200 flex items-center gap-2 shadow-sm;
     font-family: 'Inter', sans-serif;
     font-weight: 600;
     background-color: var(--rz-blue);

@@ -71,7 +71,7 @@ export default function TopBar({ activePage, runId, report, sidebarCollapsed, on
   }, [searchQuery])
 
   return (
-    <header className="bg-[#05103E] text-white border-b border-white/10 flex items-center justify-between px-5 md:px-7 h-16 flex-shrink-0 z-20 sticky top-0 shadow-md">
+    <header className="bg-[var(--rz-bg-sidebar)] text-white border-b border-white/10 flex items-center justify-between px-5 md:px-7 h-16 flex-shrink-0 z-20 sticky top-0 shadow-md">
       {/* Left */}
       <div className="flex items-center gap-4">
         <button
@@ -82,14 +82,8 @@ export default function TopBar({ activePage, runId, report, sidebarCollapsed, on
           {sidebarCollapsed ? <Menu size={20} /> : <PanelLeftClose size={20} />}
         </button>
 
-        {sidebarCollapsed && (
-          <div className="w-8 h-8 rounded bg-white flex items-center justify-center p-1 shadow-sm overflow-hidden">
-            <img src="/razorpay-logo.jpg" alt="Razorpay" className="w-full h-full object-contain" />
-          </div>
-        )}
-
         <div className="hidden sm:flex items-center gap-2 text-[14px]">
-          <span className="text-white/40 font-semibold">Razorpay</span>
+          <img src="/razorpay-full-logo.jpg" alt="Razorpay" className="h-5 object-contain opacity-80" />
           <span className="text-white/30">/</span>
           <span className="font-extrabold text-white text-[15px]">
             {pageTitles[activePage] || 'Home'}

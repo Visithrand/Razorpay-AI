@@ -51,3 +51,4 @@ class JudgeResult(BaseModel):
     reasoning: str = Field(description="Explanation of the final decision")
     supporting_evidence: List[str] = Field(description="Evidence supporting the final decision")
     agent_agreement: float = Field(description="Score representing agreement between agents (0.0 to 1.0)")
+    agent_disagreement: bool = Field(default=False, description="Explicit flag if there is significant conflicting evidence between agents")

@@ -65,90 +65,85 @@ export default function ChatPanel({ runId, embedded = false }) {
   // Full-page Embedded View for Navigation Page
   if (embedded) {
     return (
-      <div className="bg-white border border-[#DCE3ED] rounded-xl shadow-sm flex flex-col h-[650px] overflow-hidden">
+      <div className="bg-white border border-[#DCE3ED] rounded-xl shadow-sm flex flex-col h-[700px] max-w-5xl mx-auto mt-4 overflow-hidden">
         {/* Header */}
-        <div className="bg-[#05103E] px-6 py-4 flex items-center justify-between text-white border-b border-white/10">
+        <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-[#E5E7EB]">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-[#0065FF] text-white flex items-center justify-center shadow-md">
-              <Sparkles size={18} />
+            <div className="w-8 h-8 rounded-full bg-[#10A37F] text-white flex items-center justify-center">
+              <Sparkles size={16} />
             </div>
             <div>
-              <h3 className="font-extrabold text-base text-white">Settlement Copilot AI Assistant</h3>
-              <p className="text-xs text-white/60 font-medium">Schema-grounded NL2SQL Financial Intelligence</p>
+              <h3 className="font-bold text-[16px] text-[#111827]">Finance Copilot</h3>
+              <p className="text-[12px] text-[#6B7280]">Powered by AI</p>
             </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="px-2.5 py-1 rounded-full bg-[#00E6A0]/20 text-[#00E6A0] text-xs font-extrabold flex items-center gap-1.5 border border-[#00E6A0]/30">
-              <span className="w-2 h-2 rounded-full bg-[#00E6A0] animate-pulse" /> Live Engine
-            </span>
           </div>
         </div>
 
         {/* Message History */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-[#EFF3F8]/40 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-white custom-scrollbar">
           {msgs.map((m, i) => (
-            <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              {m.role === 'bot' && (
-                <div className="w-8 h-8 rounded-xl bg-[#0065FF] text-white flex items-center justify-center mr-3 mt-1 flex-shrink-0 shadow-sm">
-                  <Bot size={16} />
+            <div key={i} className={`flex w-full ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+              <div className={`flex gap-4 max-w-[80%] ${m.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                  m.role === 'user' ? 'bg-[#F3F4F6] text-[#374151]' : 'bg-[#10A37F] text-white'
+                }`}>
+                  {m.role === 'user' ? <User size={16} /> : <Bot size={16} />}
                 </div>
-              )}
-              <div
-                className={`max-w-[85%] rounded-xl p-4 text-sm leading-relaxed shadow-sm ${
-                  m.role === 'user'
-                    ? 'bg-[#0065FF] text-white font-semibold rounded-tr-none'
-                    : 'bg-white text-[#0B192C] border border-[#DCE3ED] rounded-tl-none font-medium whitespace-pre-wrap'
-                }`}
-              >
-                {m.text}
+                <div
+                  className={`px-5 py-3.5 text-[15px] leading-relaxed rounded-2xl ${
+                    m.role === 'user'
+                      ? 'bg-[#F3F4F6] text-[#111827]'
+                      : 'bg-transparent text-[#374151] whitespace-pre-wrap'
+                  }`}
+                >
+                  {m.text}
+                </div>
               </div>
-              {m.role === 'user' && (
-                <div className="w-8 h-8 rounded-xl bg-[#05103E] text-white flex items-center justify-center ml-3 mt-1 flex-shrink-0 shadow-sm">
-                  <User size={16} />
-                </div>
-              )}
             </div>
           ))}
           <div ref={endRef} />
         </div>
 
         {/* Quick Suggestion Chips */}
-        <div className="px-6 py-2 bg-gray-50 border-t border-[#E8EEF5] flex items-center gap-2 overflow-x-auto custom-scrollbar">
-          <span className="text-[11px] font-extrabold text-gray-400 uppercase tracking-wider flex-shrink-0 flex items-center gap-1">
-            <Zap size={12} className="text-[#0065FF]" /> Suggested Questions:
-          </span>
-          {QUICK_SUGGESTIONS.map((txt) => (
-            <button
-              key={txt}
-              onClick={() => send(txt)}
-              disabled={loading}
-              className="px-3 py-1 rounded-full border border-[#DCE3ED] bg-white text-xs font-semibold text-[#0065FF] hover:bg-[#E6F0FF] transition-colors whitespace-nowrap flex-shrink-0 shadow-2xs disabled:opacity-50"
-            >
-              {txt}
-            </button>
-          ))}
-        </div>
+        {msgs.length <= 1 && (
+          <div className="px-6 py-4 flex flex-wrap gap-2 justify-center">
+            {QUICK_SUGGESTIONS.map((txt) => (
+              <button
+                key={txt}
+                onClick={() => send(txt)}
+                disabled={loading}
+                className="px-4 py-2 rounded-xl border border-[#E5E7EB] bg-white text-[13px] font-medium text-[#374151] hover:bg-[#F9FAFB] transition-colors shadow-sm disabled:opacity-50"
+              >
+                {txt}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Chat Input */}
-        <form onSubmit={handleSubmit} className="p-4 bg-white border-t border-[#DCE3ED]">
-          <div className="relative flex items-center">
-            <input
-              type="text"
-              value={inp}
-              onChange={e => setInp(e.target.value)}
-              placeholder="Ask 'Where is my 25 lakh settlement?' or search unmatched exceptions..."
-              className="w-full bg-[#EFF3F8]/60 border border-[#DCE3ED] rounded-xl px-4 py-3 text-sm text-[#0B192C] outline-none focus:border-[#0065FF] focus:bg-white font-medium transition-all placeholder:text-gray-400"
-            />
-            <button
-              type="submit"
-              disabled={!inp.trim() || loading}
-              className="absolute right-2 btn-primary py-2 px-4 text-xs shadow-md disabled:opacity-40"
-            >
-              {loading ? <RefreshCw size={14} className="animate-spin" /> : <Send size={14} />}
-              Send
-            </button>
-          </div>
-        </form>
+        <div className="p-4 bg-white border-t border-[#E5E7EB]">
+          <form onSubmit={handleSubmit} className="relative max-w-4xl mx-auto">
+            <div className="relative flex items-center bg-white border border-[#DCE3ED] rounded-2xl shadow-sm focus-within:ring-1 focus-within:ring-[#10A37F] focus-within:border-[#10A37F] transition-all overflow-hidden">
+              <input
+                type="text"
+                value={inp}
+                onChange={e => setInp(e.target.value)}
+                placeholder="Message Finance Copilot..."
+                className="w-full bg-transparent px-4 py-4 text-[15px] text-[#111827] outline-none placeholder:text-[#9CA3AF]"
+              />
+              <button
+                type="submit"
+                disabled={!inp.trim() || loading}
+                className={`absolute right-2 w-9 h-9 flex items-center justify-center rounded-xl transition-colors ${
+                  !inp.trim() || loading ? 'bg-[#F3F4F6] text-[#D1D5DB]' : 'bg-[#10A37F] text-white hover:bg-[#0E906F]'
+                }`}
+              >
+                {loading ? <RefreshCw size={16} className="animate-spin" /> : <Send size={16} className="ml-0.5" />}
+              </button>
+            </div>
+            <p className="text-center text-[11px] text-[#9CA3AF] mt-2">Finance Copilot can make mistakes. Verify important financial data.</p>
+          </form>
+        </div>
       </div>
     )
   }
