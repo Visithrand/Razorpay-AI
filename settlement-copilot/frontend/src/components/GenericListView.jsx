@@ -52,7 +52,7 @@ export default function GenericListView({ title, subtitle, itemName, columns, em
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-extrabold capitalize text-[#0B192C]">{title}</h1>
-          <p className="text-[14px] text-[#4A5568] mt-0.5">{subtitle}</p>
+          <p className="text-base text-[#4A5568] mt-0.5">{subtitle}</p>
         </div>
         <div className="flex items-center gap-3">
           {items.length > 0 && (
@@ -76,19 +76,19 @@ export default function GenericListView({ title, subtitle, itemName, columns, em
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               placeholder={`Search ${title.toLowerCase()}...`}
-              className="bg-transparent border-none outline-none text-[13px] w-full text-[#0B192C]"
+              className="bg-transparent border-none outline-none text-[15px] w-full text-[#0B192C]"
             />
           </div>
-          <span className="text-[13px] font-bold text-[#718096]">{filteredItems.length} records</span>
+          <span className="text-[15px] font-bold text-[#718096]">{filteredItems.length} records</span>
         </div>
 
         {filteredItems && filteredItems.length > 0 ? (
           <div className="flex-1 overflow-x-auto">
-            <table className="w-full text-[14px] text-left">
+            <table className="w-full text-base text-left">
               <thead>
                 <tr className="border-b border-[#DCE3ED] bg-[#EFF3F8]/60">
                   {columns.map(h => (
-                    <th key={h} className="px-6 py-3.5 text-[11px] font-extrabold uppercase tracking-wider text-[#718096]">{h}</th>
+                    <th key={h} className="px-6 py-3.5 text-[13px] font-extrabold uppercase tracking-wider text-[#718096]">{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -115,7 +115,7 @@ export default function GenericListView({ title, subtitle, itemName, columns, em
               <Icon size={28} />
             </div>
             <h3 className="text-[17px] font-extrabold text-[#0B192C] mb-1">No {title.toLowerCase()} found</h3>
-            <p className="text-[14px] text-[#718096] max-w-sm mx-auto mb-6">
+            <p className="text-base text-[#718096] max-w-sm mx-auto mb-6">
               Create your first {itemName.toLowerCase()} using the button below.
             </p>
             <button onClick={() => setShowCreateModal(true)} className="btn-primary">
@@ -135,10 +135,10 @@ export default function GenericListView({ title, subtitle, itemName, columns, em
                 <X size={18} />
               </button>
             </div>
-            <div className="p-6 space-y-4 text-[14px]">
+            <div className="p-6 space-y-4 text-base">
               {columns.map(col => (
                 <div key={col}>
-                  <label className="block text-[12px] font-bold text-[#718096] uppercase mb-1">{col} *</label>
+                  <label className="block text-sm font-bold text-[#718096] uppercase mb-1">{col} *</label>
                   <input
                     type="text"
                     required

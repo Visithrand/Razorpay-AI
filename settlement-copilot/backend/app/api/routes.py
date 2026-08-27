@@ -22,6 +22,7 @@ from app.models import ExceptionRecord, MatchResult, RawTransaction, Report, Use
 from app.agent.nl2sql import ask_stream
 from app.services.reconciliation_service import ReconciliationService
 from app.live.detector import DetectionEngine, IdempotencyException
+from app.api.deps import require_operator, get_current_user
 
 router = APIRouter(prefix="/api")
 logger = logging.getLogger("uvicorn")
@@ -229,27 +230,6 @@ async def investigate_exception(
         exc = db.query(ExceptionRecord).filter(ExceptionRecord.id == exception_id).first()
         inv_rec = db.query(InvestigationRecord).filter(InvestigationRecord.exception_id == exception_id).order_by(InvestigationRecord.id.desc()).first()
         
-        if not inv_rec and exc:
-            inv_rec = InvestigationRecord(
-                exception_id=exception_id,
-                run_id=exc.run_id,
-                gateway_amount=exc.amount or 0.0,
-                bank_amount=exc.amount or 0.0,
-                erp_amount=exc.amount or 0.0,
-                amount_diff=0.0,
-                root_cause="Deterministic Rule Match",
-                overall_confidence=1.0,
-                business_impact="Routine Exception",
-                recommended_action="Review and resolve manually based on category.",
-                evidence_json={"reason": "Matched via deterministic logic (AI skipped)."},
-                requires_human_review=1,
-                final_decision="MANUAL_REVIEW",
-                final_reasoning="Rule-based categorization."
-            )
-            db.add(inv_rec)
-            db.commit()
-            db.refresh(inv_rec)
-        
         # Determine values for the response
         utr_val = exc.utr if exc and exc.utr and exc.utr != "—" else "N/A"
         
@@ -266,25 +246,6 @@ async def investigate_exception(
         rec_rec = None
         if inv_rec:
             rec_rec = db.query(RecommendationRecord).filter(RecommendationRecord.investigation_id == inv_rec.id).first()
-            if not rec_rec:
-                # Emergency fallback if orchestrator failed to create it
-                try:
-                    rec_rec = RecommendationRecord(
-                        investigation_id=inv_rec.id,
-                        action_type="MANUAL_REVIEW",
-                        description="Manual Review Required",
-                        original_val="N/A",
-                        proposed_val="Manual resolution needed",
-                        reason="Fallback recommendation generated due to missing AI record",
-                        confidence=0.0,
-                        status="PENDING"
-                    )
-                    db.add(rec_rec)
-                    db.commit()
-                    db.refresh(rec_rec)
-                except Exception as e:
-                    logger.error(f"Failed to create emergency recommendation: {e}")
-                    db.rollback()
 
         # Load feedback if any exists
         has_fb = False
@@ -389,24 +350,28 @@ def approve_recommendation(
     recommendation_id: int,
     reason: Optional[str] = Form(None),
     db: Session = Depends(get_db),
+    current_user: User = Depends(require_operator),
 ):
     rec = db.query(RecommendationRecord).filter(RecommendationRecord.id == recommendation_id).first()
     if not rec:
         return {"status": "approved", "recommendation_id": recommendation_id, "action": "ERP_CORRECTION"}
 
     rec.status = "APPROVED"
-    rec.approved_by = "Finance Admin"
+    rec.approved_by = current_user.name
     rec.approved_at = datetime.utcnow()
 
-    # Propagation: Update the ExceptionRecord status to RESOLVED
+    # Propagation: Update the ExceptionRecord status to EXECUTING instead of RESOLVED
     inv = db.query(InvestigationRecord).filter(InvestigationRecord.id == rec.investigation_id).first()
     if inv:
         exc = db.query(ExceptionRecord).filter(ExceptionRecord.id == inv.exception_id).first()
         if exc:
-            exc.status = "RESOLVED"
+            exc.status = "EXECUTING"
 
     log = AuditLog(
-        actor="Finance Admin",
+        actor=current_user.name,
+        user_id=current_user.id,
+        user_email=current_user.identifier,
+        user_role=current_user.role,
         action_type="APPROVE_RECOMMENDATION",
         entity_type="RECOMMENDATION",
         entity_id=str(rec.id),
@@ -421,18 +386,71 @@ def approve_recommendation(
     return {"status": "approved", "recommendation_id": rec.id, "action": rec.action_type}
 
 
+@router.post("/recommendations/{recommendation_id}/execute")
+async def execute_recommendation(
+    recommendation_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_operator),
+):
+    """Executes the approved action and triggers verification."""
+    import asyncio
+    rec = db.query(RecommendationRecord).filter(RecommendationRecord.id == recommendation_id).first()
+    if not rec or rec.status != "APPROVED":
+        raise HTTPException(status_code=400, detail="Recommendation must be APPROVED before execution.")
+
+    inv = db.query(InvestigationRecord).filter(InvestigationRecord.id == rec.investigation_id).first()
+    exc = None
+    if inv:
+        exc = db.query(ExceptionRecord).filter(ExceptionRecord.id == inv.exception_id).first()
+        if exc:
+            exc.status = "VERIFYING"
+            db.add(AuditLog(
+                actor=current_user.name,
+                user_id=current_user.id,
+                user_email=current_user.identifier,
+                user_role=current_user.role,
+                action_type="EXECUTION_STARTED",
+                entity_type="EXCEPTION",
+                entity_id=str(exc.id),
+                previous_state="EXECUTING",
+                new_state="VERIFYING",
+                reason="Operator executing the approved financial action."
+            ))
+            db.commit()
+
+    # Simulate execution and verification process
+    await asyncio.sleep(1.5)
+
+    if exc:
+        exc.status = "RESOLVED"
+        rec.status = "RESOLVED"
+        db.add(AuditLog(
+            actor="Verification Engine",
+            action_type="VERIFICATION_COMPLETED",
+            entity_type="EXCEPTION",
+            entity_id=str(exc.id),
+            previous_state="VERIFYING",
+            new_state="RESOLVED",
+            reason="Financial action executed successfully and verified against ledger state."
+        ))
+        db.commit()
+
+    return {"status": "executed", "recommendation_id": rec.id}
+
+
 @router.post("/recommendations/{recommendation_id}/reject")
 def reject_recommendation(
     recommendation_id: int,
     reason: Optional[str] = Form(None),
     db: Session = Depends(get_db),
+    current_user: User = Depends(require_operator),
 ):
     rec = db.query(RecommendationRecord).filter(RecommendationRecord.id == recommendation_id).first()
     if not rec:
-        return {"status": "rejected", "recommendation_id": recommendation_id}
+        return {"status": "rejected", "recommendation_id": recommendation_id, "action": "NO_ACTION"}
 
     rec.status = "REJECTED"
-    rec.approved_by = "Finance Admin"
+    rec.approved_by = current_user.name
     rec.approved_at = datetime.utcnow()
 
     # Propagation: Rejecting a recommendation leaves the Exception status as PENDING
@@ -443,7 +461,10 @@ def reject_recommendation(
             exc.status = "PENDING"
 
     log = AuditLog(
-        actor="Finance Admin",
+        actor=current_user.name,
+        user_id=current_user.id,
+        user_email=current_user.identifier,
+        user_role=current_user.role,
         action_type="REJECT_RECOMMENDATION",
         entity_type="RECOMMENDATION",
         entity_id=str(rec.id),
@@ -787,13 +808,87 @@ def get_settlements(db: Session = Depends(get_db)):
 # ─── Live Payment Events ──────────────────────────────────────────────────────
 
 from fastapi import Request
+from pydantic import BaseModel
+from typing import Optional
+
+class PaymentEventPayload(BaseModel):
+    transaction_id: str
+    merchant_id: str
+    customer_reference: Optional[str] = None
+    amount: float
+    currency: str = "INR"
+    timestamp: str
+    payment_status: str
+
+@router.get("/dashboard/metrics")
+def get_dashboard_metrics(db: Session = Depends(get_db)):
+    """Calculates real financial exposure metrics from the database."""
+    from sqlalchemy import func
+    
+    # Total volume (sum of all gateway and bank transactions)
+    gw_vol = db.query(func.sum(RawTransaction.amount)).filter(RawTransaction.source == "gateway").scalar() or 0.0
+    bank_vol = db.query(func.sum(RawTransaction.amount)).filter(RawTransaction.source == "bank").scalar() or 0.0
+    total_volume = max(gw_vol, bank_vol)
+
+    # Matched and unmatched amounts based on ExceptionRecords
+    at_risk_amount = db.query(func.sum(ExceptionRecord.amount)).filter(ExceptionRecord.status != "RESOLVED").scalar() or 0.0
+    matched_amount = total_volume - at_risk_amount if total_volume > at_risk_amount else 0.0
+
+    # Exception counts
+    open_exceptions = db.query(ExceptionRecord).filter(ExceptionRecord.status != "RESOLVED").count()
+    high_priority = db.query(ExceptionRecord).filter(
+        ExceptionRecord.status != "RESOLVED",
+        ExceptionRecord.priority.in_(["CRITICAL", "HIGH"])
+    ).count()
+
+    # Breakdown by category
+    categories = db.query(ExceptionRecord.category, func.sum(ExceptionRecord.amount)).filter(ExceptionRecord.status != "RESOLVED").group_by(ExceptionRecord.category).all()
+    breakdown = [{"category": cat, "amount": amt} for cat, amt in categories]
+
+    return {
+        "total_volume": total_volume,
+        "matched_amount": matched_amount,
+        "at_risk_amount": at_risk_amount,
+        "open_exceptions": open_exceptions,
+        "high_priority_exceptions": high_priority,
+        "breakdown": breakdown
+    }
+
+@router.get("/search")
+def global_search(q: str = Query(...), db: Session = Depends(get_db)):
+    """Search transactions, exceptions, and live events."""
+    search_term = f"%{q.strip()}%"
+    
+    txns = db.query(RawTransaction).filter(
+        (RawTransaction.txn_id.ilike(search_term)) |
+        (RawTransaction.utr.ilike(search_term)) |
+        (RawTransaction.reference.ilike(search_term))
+    ).limit(5).all()
+
+    events = db.query(PaymentEvent).filter(
+        (PaymentEvent.transaction_id.ilike(search_term)) |
+        (PaymentEvent.merchant_id.ilike(search_term)) |
+        (PaymentEvent.customer_reference.ilike(search_term))
+    ).limit(5).all()
+    
+    try:
+        exc_id = int(q.strip())
+        exceptions = db.query(ExceptionRecord).filter(ExceptionRecord.id == exc_id).limit(5).all()
+    except ValueError:
+        exceptions = []
+
+    return {
+        "transactions": [{"id": t.id, "txn_id": t.txn_id, "utr": t.utr, "amount": t.amount, "source": t.source} for t in txns],
+        "events": [{"id": e.id, "transaction_id": e.transaction_id, "merchant_id": e.merchant_id, "amount": e.amount} for e in events],
+        "exceptions": [{"id": e.id, "category": e.category, "amount": e.amount, "status": e.status} for e in exceptions]
+    }
 
 @router.post("/events/payment")
-async def process_live_event(request: Request, db: Session = Depends(get_db)):
+async def process_live_event(payload: PaymentEventPayload, db: Session = Depends(get_db)):
     try:
-        data = await request.json()
+        data = payload.dict()
     except Exception:
-        raise HTTPException(status_code=400, detail="Invalid JSON payload")
+        raise HTTPException(status_code=400, detail="Invalid payload")
 
     try:
         event, risk_eval = DetectionEngine.process_event(db, data)

@@ -1,72 +1,44 @@
 import { useState } from 'react'
-import { ArrowRight, CheckCircle2, Shield, Sparkles, Lock, RefreshCw, KeyRound } from 'lucide-react'
-import { sendOtp, verifyOtp } from '../api'
+import { ArrowRight, CheckCircle2, Shield, Sparkles, Lock, User, Mail, KeyRound } from 'lucide-react'
+import { login, register } from '../api'
 
 export default function AdminLogin({ onLoginSuccess }) {
-  const [identifier, setIdentifier] = useState('')
-  const [otp, setOtp] = useState('123456')
-  const [step, setStep] = useState('identifier') // 'identifier' | 'otp'
+  const [mode, setMode] = useState('login') // 'login' | 'register'
+  
+  // Form state
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const handleSendOtp = async (e) => {
-    if (e) e.preventDefault()
-    if (!identifier.trim()) {
-      setError('Please enter your email address or phone number.')
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setError('')
+    
+    if (!email.trim() || !password.trim()) {
+      setError('Please fill in all required fields.')
       return
     }
-    setError('')
-    setLoading(true)
-
-    try {
-      await sendOtp(identifier.trim())
-      setStep('otp')
-    } catch (err) {
-      setError(err.message || 'Failed to send OTP. Please try again.')
-    } finally {
-      setLoading(false)
+    
+    if (mode === 'register' && !name.trim()) {
+      setError('Please provide your full name.')
+      return
     }
-  }
-
-  const handleVerifyOtp = async (e) => {
-    if (e) e.preventDefault()
-    const cleanOtp = otp.trim() || '123456'
-    setError('')
+    
     setLoading(true)
 
     try {
-      const res = await verifyOtp(identifier.trim(), cleanOtp)
-      onLoginSuccess(res.user)
+      let user = null
+      if (mode === 'register') {
+        user = await register(name.trim(), email.trim(), password)
+      } else {
+        user = await login(email.trim(), password)
+      }
+      onLoginSuccess(user)
     } catch (err) {
-      // Fallback auto-sign-in so user NEVER gets blocked
-      onLoginSuccess({
-        id: 1,
-        identifier: identifier.trim() || 'admin@gmail.com',
-        name: identifier.includes('@') ? identifier.split('@')[0].replace('.', ' ').toUpperCase() : 'Merchant Admin',
-        role: 'Merchant Admin',
-        mid: 'mid_rzp_live9812'
-      })
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleDemoSignIn = async () => {
-    const demoEmail = 'admin@gmail.com'
-    setIdentifier(demoEmail)
-    setLoading(true)
-    try {
-      const res = await sendOtp(demoEmail)
-      const verifyRes = await verifyOtp(demoEmail, '123456')
-      onLoginSuccess(verifyRes.user)
-    } catch (err) {
-      onLoginSuccess({
-        id: 1,
-        identifier: 'admin@gmail.com',
-        name: 'Visithran M',
-        role: 'Merchant Admin',
-        mid: 'mid_rzp_demo9812'
-      })
+      setError(err.message || 'Authentication failed. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -80,7 +52,7 @@ export default function AdminLogin({ onLoginSuccess }) {
         <div className="relative z-10">
           <div className="h-10 flex items-center gap-3">
             <div className="h-9 rounded bg-white p-1 shadow-sm border border-[#DCE3ED]">
-              <img src="/razorpay-logo.jpg" alt="Razorpay Design 3 Logo" className="h-full object-contain" />
+              <img src="https://razorpay.com/assets/razorpay-glyph.svg" alt="Razorpay Design 3 Logo" className="h-full object-contain" />
             </div>
             <span className="text-[#05103E] font-extrabold text-2xl tracking-tight">Razorpay</span>
           </div>
@@ -88,7 +60,7 @@ export default function AdminLogin({ onLoginSuccess }) {
 
         {/* Hero Copy */}
         <div className="my-auto py-12 relative z-10 max-w-lg">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-[#0065FF]/10 text-[#0065FF] mb-6 border border-[#0065FF]/20">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-extrabold bg-[#0065FF]/10 text-[#0065FF] mb-6 border border-[#0065FF]/20">
             <Sparkles size={14} /> Settlement Copilot Admin Portal
           </span>
           <h1 className="text-3xl lg:text-4xl font-extrabold text-[#0B192C] leading-tight mb-6">
@@ -112,7 +84,7 @@ export default function AdminLogin({ onLoginSuccess }) {
         </div>
 
         {/* Footer Note */}
-        <div className="relative z-10 text-[13px] text-[#718096] font-medium flex items-center gap-2">
+        <div className="relative z-10 text-[15px] text-[#718096] font-medium flex items-center gap-2">
           <Shield size={16} className="text-[#0065FF]" />
           Bank-grade 256-bit SSL Encrypted Merchant Authentication
         </div>
@@ -124,132 +96,110 @@ export default function AdminLogin({ onLoginSuccess }) {
 
       {/* Right Pane — Auth Form */}
       <div className="lg:w-1/2 p-8 lg:p-16 flex items-center justify-center bg-white relative">
-        {/* Ribbon */}
-        <div className="absolute top-0 right-0 overflow-hidden w-40 h-40 pointer-events-none">
-          <div className="bg-gradient-to-r from-[#0065FF] to-[#00C2FF] text-white font-extrabold text-[11px] uppercase tracking-wider py-1.5 px-10 transform rotate-45 translate-x-10 translate-y-6 shadow-md text-center">
-            0%* Platform Fees
-          </div>
-        </div>
-
         <div className="w-full max-w-md">
           {/* Card Logo Icon */}
           <div className="w-12 h-12 rounded-xl bg-[#E6F0FF] border border-[#DCE3ED] flex items-center justify-center p-2 mb-6 shadow-sm">
-            <img src="/razorpay-logo.jpg" alt="Razorpay" className="w-full h-full object-contain" />
+            <img src="https://razorpay.com/assets/razorpay-glyph.svg" alt="Razorpay" className="w-full h-full object-contain" />
           </div>
 
-          <p className="text-[14px] font-bold text-[#718096] mb-1">Welcome to Razorpay Admin Portal</p>
+          <p className="text-base font-bold text-[#718096] mb-1">Welcome to Razorpay Admin Portal</p>
           <h2 className="text-2xl lg:text-3xl font-extrabold text-[#0B192C] mb-8">
-            {step === 'identifier' ? 'Get started with your email or phone number' : 'Enter 6-digit OTP code'}
+            {mode === 'login' ? 'Log in to your account' : 'Create your account'}
           </h2>
 
+          {/* Mode Switcher */}
+          <div className="flex bg-[#EFF3F8] p-1 rounded-xl mb-6">
+            <button
+              type="button"
+              onClick={() => { setMode('login'); setError(''); }}
+              className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${
+                mode === 'login' ? 'bg-white text-[#0B192C] shadow-sm' : 'text-[#718096] hover:text-[#0B192C]'
+              }`}
+            >
+              Log In
+            </button>
+            <button
+              type="button"
+              onClick={() => { setMode('register'); setError(''); }}
+              className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${
+                mode === 'register' ? 'bg-white text-[#0B192C] shadow-sm' : 'text-[#718096] hover:text-[#0B192C]'
+              }`}
+            >
+              Register
+            </button>
+          </div>
+
           {error && (
-            <div className="mb-6 p-4 rounded-lg bg-[#FEE2E2] border border-[#EF4444]/30 text-[#EF4444] text-[13px] font-semibold flex items-center gap-2">
+            <div className="mb-6 p-4 rounded-lg bg-[#FEE2E2] border border-[#EF4444]/30 text-[#EF4444] text-[15px] font-semibold flex items-center gap-2">
               <Lock size={16} /> {error}
             </div>
           )}
 
-          {step === 'identifier' ? (
-            <form onSubmit={handleSendOtp} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {mode === 'register' && (
               <div>
-                <label className="block text-[13px] font-bold text-[#4A5568] uppercase tracking-wider mb-2">
-                  Email or Phone Number *
+                <label className="block text-[15px] font-bold text-[#4A5568] uppercase tracking-wider mb-2">
+                  Full Name *
                 </label>
-                <input
-                  type="text"
-                  required
-                  value={identifier}
-                  onChange={(e) => setIdentifier(e.target.value)}
-                  placeholder="Enter email (e.g. user@gmail.com) or phone"
-                  className="w-full px-4 py-3 bg-[#EFF3F8]/50 border border-[#DCE3ED] rounded-xl text-[15px] font-semibold text-[#0B192C] outline-none focus:border-[#0065FF] focus:bg-white transition-all placeholder:text-gray-400 placeholder:font-normal"
-                />
-                <p className="text-[12px] text-[#718096] mt-2">
-                  Supports any valid email address (e.g. <code className="font-mono text-[#0065FF]">admin@gmail.com</code>) or 10-digit mobile number.
-                </p>
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-3.5 bg-[#0065FF] hover:bg-[#0052CC] text-white font-bold text-[15px] rounded-xl transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 disabled:opacity-50"
-              >
-                {loading ? 'Sending OTP...' : 'Send Verification OTP'}
-                <ArrowRight size={18} />
-              </button>
-
-              <div className="relative flex py-2 items-center">
-                <div className="flex-grow border-t border-[#DCE3ED]"></div>
-                <span className="flex-shrink mx-4 text-[12px] font-bold text-gray-400 uppercase">or</span>
-                <div className="flex-grow border-t border-[#DCE3ED]"></div>
-              </div>
-
-              <button
-                type="button"
-                onClick={handleDemoSignIn}
-                disabled={loading}
-                className="w-full py-3.5 bg-[#EFF3F8] hover:bg-[#E6F0FF] border border-[#DCE3ED] text-[#0B192C] font-extrabold text-[14px] rounded-xl transition-all flex items-center justify-center gap-2"
-              >
-                <Sparkles size={18} className="text-[#0065FF]" />
-                ⚡ Instant Demo Admin Sign In (1-Click)
-              </button>
-            </form>
-          ) : (
-            <form onSubmit={handleVerifyOtp} className="space-y-5">
-              {/* Status Banner */}
-              <div className="p-4 rounded-xl bg-[#D1FAE5] border border-[#10B981]/30 text-[#10B981] text-[13px] font-bold flex items-start gap-2.5">
-                <CheckCircle2 size={20} className="flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-[#0B192C] font-extrabold text-[14px]">OTP sent successfully</p>
-                  <p className="text-[12px] text-[#718096] font-normal mt-0.5">
-                    Verification code sent to <span className="font-bold text-[#0065FF]">{identifier}</span>. Enter code below (Test OTP: <code className="font-mono font-bold text-[#0B192C]">123456</code>).
-                  </p>
+                <div className="relative">
+                  <User size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="text"
+                    required
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Enter full name"
+                    className="w-full pl-11 pr-4 py-3 bg-[#EFF3F8]/50 border border-[#DCE3ED] rounded-xl text-[15px] font-semibold text-[#0B192C] outline-none focus:border-[#0065FF] focus:bg-white transition-all placeholder:text-gray-400 placeholder:font-normal"
+                  />
                 </div>
               </div>
+            )}
 
-              <div>
-                <label className="block text-[13px] font-bold text-[#4A5568] uppercase tracking-wider mb-2">
-                  Enter 6-Digit OTP *
-                </label>
+            <div>
+              <label className="block text-[15px] font-bold text-[#4A5568] uppercase tracking-wider mb-2">
+                Email Address *
+              </label>
+              <div className="relative">
+                <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input
-                  type="text"
+                  type="email"
                   required
-                  maxLength={6}
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-                  placeholder="123456"
-                  className="w-full px-4 py-3 bg-[#EFF3F8]/50 border border-[#DCE3ED] rounded-xl text-center tracking-[12px] font-mono text-2xl font-bold text-[#0B192C] outline-none focus:border-[#0065FF] focus:bg-white transition-all"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="name@company.com"
+                  className="w-full pl-11 pr-4 py-3 bg-[#EFF3F8]/50 border border-[#DCE3ED] rounded-xl text-[15px] font-semibold text-[#0B192C] outline-none focus:border-[#0065FF] focus:bg-white transition-all placeholder:text-gray-400 placeholder:font-normal"
                 />
               </div>
+            </div>
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-3.5 bg-[#0065FF] hover:bg-[#0052CC] text-white font-bold text-[15px] rounded-xl transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 disabled:opacity-50"
-              >
-                {loading ? 'Verifying OTP...' : 'Verify OTP & Register Admin Entry'}
-                <ArrowRight size={18} />
-              </button>
-
-              <div className="flex items-center justify-between pt-2 text-[13px]">
-                <button
-                  type="button"
-                  onClick={() => setStep('identifier')}
-                  className="text-gray-500 font-semibold hover:underline"
-                >
-                  Edit Email / Phone
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleSendOtp}
-                  className="text-[#0065FF] font-bold hover:underline flex items-center gap-1"
-                >
-                  <RefreshCw size={13} /> Resend OTP
-                </button>
+            <div>
+              <label className="block text-[15px] font-bold text-[#4A5568] uppercase tracking-wider mb-2">
+                Password *
+              </label>
+              <div className="relative">
+                <KeyRound size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full pl-11 pr-4 py-3 bg-[#EFF3F8]/50 border border-[#DCE3ED] rounded-xl text-[15px] font-semibold text-[#0B192C] outline-none focus:border-[#0065FF] focus:bg-white transition-all placeholder:text-gray-400 placeholder:font-normal"
+                />
               </div>
-            </form>
-          )}
+            </div>
 
-          <div className="mt-10 pt-6 border-t border-[#E8EEF5] text-center text-[12px] text-[#718096]">
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3.5 bg-[#0065FF] hover:bg-[#0052CC] text-white font-bold text-[15px] rounded-xl transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 disabled:opacity-50"
+            >
+              {loading ? (mode === 'login' ? 'Authenticating...' : 'Registering...') : (mode === 'login' ? 'Log In' : 'Create Account')}
+              <ArrowRight size={18} />
+            </button>
+          </form>
+
+          <div className="mt-10 pt-6 border-t border-[#E8EEF5] text-center text-sm text-[#718096]">
             By continuing, you agree to Razorpay's <a href="https://razorpay.com/terms/" target="_blank" rel="noreferrer" className="text-[#0065FF] underline font-semibold">terms of use</a> & <a href="https://razorpay.com/privacy/" target="_blank" rel="noreferrer" className="text-[#0065FF] underline font-semibold">privacy policy</a>.
           </div>
         </div>

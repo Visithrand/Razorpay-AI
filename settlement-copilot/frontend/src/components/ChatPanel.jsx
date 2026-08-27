@@ -74,7 +74,7 @@ export default function ChatPanel({ runId, embedded = false }) {
             </div>
             <div>
               <h3 className="font-bold text-[16px] text-[#111827]">Finance Copilot</h3>
-              <p className="text-[12px] text-[#6B7280]">Powered by AI</p>
+              <p className="text-sm text-[#6B7280]">Powered by AI</p>
             </div>
           </div>
         </div>
@@ -112,7 +112,7 @@ export default function ChatPanel({ runId, embedded = false }) {
                 key={txt}
                 onClick={() => send(txt)}
                 disabled={loading}
-                className="px-4 py-2 rounded-xl border border-[#E5E7EB] bg-white text-[13px] font-medium text-[#374151] hover:bg-[#F9FAFB] transition-colors shadow-sm disabled:opacity-50"
+                className="px-4 py-2 rounded-xl border border-[#E5E7EB] bg-white text-[15px] font-medium text-[#374151] hover:bg-[#F9FAFB] transition-colors shadow-sm disabled:opacity-50"
               >
                 {txt}
               </button>
@@ -141,7 +141,7 @@ export default function ChatPanel({ runId, embedded = false }) {
                 {loading ? <RefreshCw size={16} className="animate-spin" /> : <Send size={16} className="ml-0.5" />}
               </button>
             </div>
-            <p className="text-center text-[11px] text-[#9CA3AF] mt-2">Finance Copilot can make mistakes. Verify important financial data.</p>
+            <p className="text-center text-[13px] text-[#9CA3AF] mt-2">Finance Copilot can make mistakes. Verify important financial data.</p>
           </form>
         </div>
       </div>
@@ -170,8 +170,8 @@ export default function ChatPanel({ runId, embedded = false }) {
                 <Sparkles size={16} className="text-white" />
               </div>
               <div>
-                <h3 className="font-bold text-sm text-white">Copilot AI Assistant</h3>
-                <p className="text-[10px] text-[#00E6A0] uppercase tracking-widest font-extrabold flex items-center gap-1.5">
+                <h3 className="font-bold text-base text-white">Copilot AI Assistant</h3>
+                <p className="text-xs text-[#00E6A0] uppercase tracking-widest font-extrabold flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#00E6A0] animate-pulse"></span>
                   Online
                 </p>
@@ -182,7 +182,7 @@ export default function ChatPanel({ runId, embedded = false }) {
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-[#EFF3F8]/50 custom-scrollbar text-xs">
+          <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-[#EFF3F8]/50 custom-scrollbar text-sm">
             {msgs.map((m, i) => (
               <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 {m.role === 'bot' && (
@@ -211,7 +211,7 @@ export default function ChatPanel({ runId, embedded = false }) {
                 value={inp}
                 onChange={e => setInp(e.target.value)}
                 placeholder="Ask about settlements..."
-                className="w-full bg-gray-50 border border-[#DCE3ED] rounded-lg pl-3 pr-10 py-2 text-xs outline-none focus:border-[#0065FF] font-medium"
+                className="w-full bg-gray-50 border border-[#DCE3ED] rounded-lg pl-3 pr-10 py-2 text-sm outline-none focus:border-[#0065FF] font-medium"
               />
               <button
                 type="submit"

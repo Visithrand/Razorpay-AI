@@ -11,19 +11,32 @@ async function request(path, opts = {}) {
   return res.json()
 }
 
-/** Send OTP to Email (@gmail.com) or Phone Number. */
-export async function sendOtp(identifier) {
-  const fd = new FormData()
-  fd.append('identifier', identifier)
-  return request('/auth/send-otp', { method: 'POST', body: fd })
+/** Register a new user */
+export async function register(name, email, password) {
+  return request('/auth/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, email, password })
+  })
 }
 
-/** Verify OTP and authenticate. */
-export async function verifyOtp(identifier, otp) {
-  const fd = new FormData()
-  fd.append('identifier', identifier)
-  fd.append('otp', otp)
-  return request('/auth/verify-otp', { method: 'POST', body: fd })
+/** Login */
+export async function login(email, password) {
+  return request('/auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password })
+  })
+}
+
+/** Logout */
+export async function logout() {
+  return request('/auth/logout', { method: 'POST' })
+}
+
+/** Get current user session */
+export async function getMe() {
+  return request('/auth/me')
 }
 
 /** Upload CSV files and run the matching engine. */

@@ -129,86 +129,92 @@ export default function LiveMonitor({ onNavigate }) {
           <div>
             <h1 className="text-[24px] font-semibold text-[#111827] flex items-center gap-3">
               Live Payment Monitor 
-              <span className="flex items-center gap-1.5 text-[11px] font-bold px-2 py-0.5 rounded bg-[#DC2626] text-white uppercase tracking-wider animate-pulse">
+              <span className="flex items-center gap-1.5 text-[13px] font-bold px-2 py-0.5 rounded bg-[#DC2626] text-white uppercase tracking-wider animate-pulse">
                 <span className="w-1.5 h-1.5 rounded-full bg-white" /> LIVE
               </span>
             </h1>
-            <p className="text-[14px] text-[#6B7280] mt-1">Monitoring payment events stream in real-time.</p>
+            <p className="text-base text-[#6B7280] mt-1">Monitoring payment events stream in real-time.</p>
           </div>
         </div>
 
-        <div className="flex-1 bg-white border border-[#E5E7EB] rounded-md shadow-sm overflow-hidden flex flex-col">
-          <table className="w-full text-left border-collapse flex-1 flex flex-col">
-            <thead className="block w-full">
-              <tr className="bg-[#F7F8FA] border-b border-[#E5E7EB] w-full flex">
-                <th className="px-6 py-3 text-[12px] font-semibold text-[#374151] uppercase w-1/6">Time</th>
-                <th className="px-6 py-3 text-[12px] font-semibold text-[#374151] uppercase w-2/6">Transaction</th>
-                <th className="px-6 py-3 text-[12px] font-semibold text-[#374151] uppercase w-1/6 text-right">Amount</th>
-                <th className="px-6 py-3 text-[12px] font-semibold text-[#374151] uppercase w-1/6 text-center">Risk</th>
-                <th className="px-6 py-3 text-[12px] font-semibold text-[#374151] uppercase w-1/6">Status</th>
-                <th className="px-6 py-3 text-[12px] font-semibold text-[#374151] uppercase w-1/6 text-center">Action</th>
-              </tr>
-            </thead>
-            <tbody className="block w-full flex-1 overflow-y-auto">
-              {events.map((evt) => {
-                const isHighRisk = evt.risk_level === 'HIGH'
-                const isIgnored = evt.risk_level === 'IGNORED'
-                const isSelected = selectedEvent?.id === evt.id
-                return (
-                  <tr 
-                    key={evt.id}
-                    className={`
-                      w-full flex border-b border-[#F3F4F6] transition-colors
-                      ${isSelected ? 'bg-[#EFF6FF]' : 'hover:bg-[#F7F8FA]'}
-                    `}
-                  >
-                    <td className="px-6 py-3 text-[13px] text-[#6B7280] w-1/6 flex items-center">
+        <div className="flex-1 min-h-0 bg-white border border-[#E5E7EB] rounded-md shadow-sm flex flex-col overflow-hidden">
+          <div className="flex-1 overflow-auto custom-scrollbar">
+            <table className="w-full text-left border-collapse">
+              <thead className="sticky top-0 bg-[#F7F8FA] border-b border-[#E5E7EB] z-10 shadow-sm">
+                <tr>
+                  <th className="px-6 py-3 text-sm font-semibold text-[#374151] uppercase w-[12%]">Time</th>
+                  <th className="px-6 py-3 text-sm font-semibold text-[#374151] uppercase w-[22%]">Transaction</th>
+                  <th className="px-6 py-3 text-sm font-semibold text-[#374151] uppercase w-[22%]">Merchant</th>
+                  <th className="px-6 py-3 text-sm font-semibold text-[#374151] uppercase w-[12%] text-right">Amount</th>
+                  <th className="px-6 py-3 text-sm font-semibold text-[#374151] uppercase w-[10%] text-center">Risk</th>
+                  <th className="px-6 py-3 text-sm font-semibold text-[#374151] uppercase w-[12%]">Status</th>
+                  <th className="px-6 py-3 text-sm font-semibold text-[#374151] uppercase w-[10%] text-center">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {events.map((evt) => {
+                  const isHighRisk = evt.risk_level === 'HIGH'
+                  const isIgnored = evt.risk_level === 'IGNORED'
+                  const isSelected = selectedEvent?.id === evt.id
+                  return (
+                    <tr 
+                      key={evt.id}
+                      className={`
+                        border-b border-[#F3F4F6] transition-colors
+                        ${isSelected ? 'bg-[#EFF6FF]' : 'hover:bg-[#F7F8FA]'}
+                      `}
+                    >
+                    <td className="px-6 py-3 text-[15px] text-[#6B7280] w-[12%] whitespace-nowrap">
                       {new Date(evt.timestamp).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                     </td>
-                    <td className="px-6 py-3 text-[13px] text-[#111827] w-2/6 flex items-center">
+                    <td className="px-6 py-3 text-[15px] text-[#111827] w-[22%]">
                       <span className="font-mono font-medium">{evt.transaction_id}</span>
                     </td>
-                    <td className="px-6 py-3 text-[13px] text-[#111827] font-semibold w-1/6 text-right flex justify-end items-center">
+                    <td className="px-6 py-3 text-[15px] text-[#111827] w-[22%] truncate max-w-[200px]">
+                      <span className="truncate">{evt.merchant_id}</span>
+                    </td>
+                    <td className="px-6 py-3 text-[15px] text-[#111827] font-semibold w-[12%] text-right">
                       ₹{evt.amount.toLocaleString()}
                     </td>
-                    <td className="px-6 py-3 text-[13px] font-semibold w-1/6 text-center flex justify-center items-center">
+                    <td className="px-6 py-3 text-[15px] font-semibold w-[10%] text-center">
                       <span className={isHighRisk ? 'text-[#DC2626]' : 'text-[#374151]'}>{evt.risk_score}</span>
                     </td>
-                    <td className="px-6 py-3 w-1/6 flex items-center">
+                    <td className="px-6 py-3 w-[12%]">
                       {isIgnored ? (
-                        <span className="text-[13px] font-semibold text-[#059669] flex items-center gap-1.5">
-                          <CheckCircle2 size={14} /> Webhook Retry
+                        <span className="text-[15px] font-semibold text-[#059669] flex items-center gap-1.5">
+                          <CheckCircle2 size={14} /> Retry
                         </span>
                       ) : isHighRisk ? (
-                        <span className="text-[13px] font-semibold text-[#D97706] flex items-center gap-1.5">
+                        <span className="text-[15px] font-semibold text-[#D97706] flex items-center gap-1.5">
                           <AlertTriangle size={14} /> ⚠ Review
                         </span>
                       ) : (
-                        <span className="text-[13px] text-[#6B7280]">Normal</span>
+                        <span className="text-[15px] text-[#6B7280]">Normal</span>
                       )}
                     </td>
-                    <td className="px-6 py-3 w-1/6 flex justify-center items-center">
+                    <td className="px-6 py-3 w-[10%] text-center">
                       {isHighRisk || isIgnored ? (
                         <button 
                           onClick={() => setSelectedEvent(evt)}
-                          className={`text-[12px] font-semibold hover:underline ${isIgnored ? 'text-[#059669]' : 'text-[#0258FF]'}`}
+                          className={`text-sm font-semibold hover:underline ${isIgnored ? 'text-[#059669]' : 'text-[#0258FF]'}`}
                         >
                           View
                         </button>
                       ) : (
-                        <span className="text-[12px] text-[#E5E7EB]">—</span>
+                        <span className="text-sm text-[#E5E7EB]">—</span>
                       )}
                     </td>
                   </tr>
                 )
               })}
               {events.length === 0 && (
-                <tr className="w-full flex">
-                  <td className="p-8 text-center text-[#6B7280] text-[13px] w-full">Waiting for payment events...</td>
+                <tr>
+                  <td colSpan="7" className="p-8 text-center text-[#6B7280] text-[15px]">Waiting for payment events...</td>
                 </tr>
               )}
             </tbody>
           </table>
+          </div>
         </div>
       </div>
 
@@ -231,7 +237,7 @@ export default function LiveMonitor({ onNavigate }) {
             <div className="space-y-8">
               {/* Risk Score */}
               <div>
-                <p className="text-[13px] font-semibold text-[#374151] uppercase mb-2">Risk Score</p>
+                <p className="text-[15px] font-semibold text-[#374151] uppercase mb-2">Risk Score</p>
                 <div className="flex items-baseline gap-2">
                   <span className="text-[32px] font-semibold text-[#111827]">{selectedEvent.risk_score}</span>
                   <span className="text-[16px] text-[#6B7280]">/ 100</span>
@@ -241,10 +247,10 @@ export default function LiveMonitor({ onNavigate }) {
               {/* Signals */}
               {selectedEvent.signals && selectedEvent.signals.length > 0 && (
                 <div>
-                  <p className="text-[13px] font-semibold text-[#374151] uppercase mb-3">Signals</p>
+                  <p className="text-[15px] font-semibold text-[#374151] uppercase mb-3">Signals</p>
                   <div className="space-y-2">
                     {selectedEvent.signals.map((sig, i) => (
-                      <div key={i} className="flex items-center gap-2 text-[14px] text-[#111827]">
+                      <div key={i} className="flex items-center gap-2 text-base text-[#111827]">
                         <Check size={16} className="text-[#059669]" />
                         {sig.name}
                       </div>
@@ -256,8 +262,8 @@ export default function LiveMonitor({ onNavigate }) {
               {/* Related Transaction */}
               {selectedEvent.related_transaction_id && (
                 <div>
-                  <p className="text-[13px] font-semibold text-[#374151] uppercase mb-2">Related Transaction</p>
-                  <div className="text-[14px] font-mono text-[#111827]">
+                  <p className="text-[15px] font-semibold text-[#374151] uppercase mb-2">Related Transaction</p>
+                  <div className="text-base font-mono text-[#111827]">
                     {selectedEvent.related_transaction_id}
                   </div>
                 </div>
@@ -268,14 +274,14 @@ export default function LiveMonitor({ onNavigate }) {
                 <div className="pt-8">
                   <button 
                     onClick={() => handleInvestigate(selectedEvent.exception_id)}
-                    className="w-full bg-[#0258FF] hover:bg-[#014CE0] text-white py-2.5 rounded text-[14px] font-semibold transition-colors flex items-center justify-center gap-2"
+                    className="w-full bg-[#0258FF] hover:bg-[#014CE0] text-white py-2.5 rounded text-base font-semibold transition-colors flex items-center justify-center gap-2"
                   >
                     Investigate with AI
                   </button>
                 </div>
               ) : selectedEvent.risk_level === 'IGNORED' ? (
                 <div className="pt-8">
-                  <div className="w-full bg-[#ECFDF5] border border-[#A7F3D0] text-[#065F46] py-3 px-4 rounded text-[13px] font-medium flex items-center justify-center gap-2">
+                  <div className="w-full bg-[#ECFDF5] border border-[#A7F3D0] text-[#065F46] py-3 px-4 rounded text-[15px] font-medium flex items-center justify-center gap-2">
                     <CheckCircle2 size={16} /> No financial exception created
                   </div>
                 </div>

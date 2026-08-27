@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
-import { Bell, Search, Menu, PanelLeftClose, User, LogOut, ChevronDown, ExternalLink, ArrowRight, X, Trash2 } from 'lucide-react'
+import { Bell, Search, Menu, PanelLeftClose, User, LogOut, ChevronDown, ExternalLink, ArrowRight, X, Trash2, AlertTriangle } from 'lucide-react'
+import { getExceptions } from '../api'
 
 const SEARCH_INDEX = [
   { type: 'Payment', title: 'pay_Nj8Qtty5Y2Jr8 (₹2,450.00 - Captured)', page: 'transactions' },
@@ -18,6 +19,28 @@ export default function TopBar({ activePage, runId, report, sidebarCollapsed, on
   const [showProfile, setShowProfile] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [showSearchModal, setShowSearchModal] = useState(false)
+  const [searchResults, setSearchResults] = useState([])
+  const [isSearching, setIsSearching] = useState(false)
+
+  const [showNotifications, setShowNotifications] = useState(false)
+  const [notifications, setNotifications] = useState([])
+
+  // Fetch pending exceptions for notifications
+  useEffect(() => {
+    const loadNotifications = async () => {
+      try {
+        const res = await getExceptions()
+        const pending = res.filter(e => e.status === 'PENDING').slice(0, 5)
+        setNotifications(pending)
+      } catch (e) {
+        console.error("Failed to load notifications:", e)
+      }
+    }
+    loadNotifications()
+    // Poll every 30 seconds
+    const interval = setInterval(loadNotifications, 30000)
+    return () => clearInterval(interval)
+  }, [])
 
   const initials = user?.name 
     ? user.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() 
@@ -62,12 +85,34 @@ export default function TopBar({ activePage, runId, report, sidebarCollapsed, on
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
 
-  const filteredSearch = useMemo(() => {
-    if (!searchQuery.trim()) return SEARCH_INDEX
-    const q = searchQuery.toLowerCase().trim()
-    return SEARCH_INDEX.filter(item => 
-      item.title.toLowerCase().includes(q) || item.type.toLowerCase().includes(q)
-    )
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setSearchResults(SEARCH_INDEX)
+      setIsSearching(false)
+      return
+    }
+
+    const delayDebounceFn = setTimeout(async () => {
+      setIsSearching(true)
+      try {
+        const res = await fetch(`/api/search?q=${encodeURIComponent(searchQuery.trim())}`)
+        if (res.ok) {
+          const data = await res.json()
+          const combined = [
+            ...data.exceptions.map(e => ({ type: 'Exception', title: `Exception ${e.id} - ${e.category} (₹${e.amount})`, page: 'home', id: e.id })),
+            ...data.transactions.map(t => ({ type: 'Transaction', title: `${t.txn_id} / ${t.utr} (₹${t.amount})`, page: 'transactions' })),
+            ...data.events.map(e => ({ type: 'Live Event', title: `${e.transaction_id} - ${e.merchant_id} (₹${e.amount})`, page: 'home' })),
+          ]
+          setSearchResults(combined.length > 0 ? combined : [])
+        }
+      } catch (err) {
+        console.error("Search failed", err)
+      } finally {
+        setIsSearching(false)
+      }
+    }, 300)
+
+    return () => clearTimeout(delayDebounceFn)
   }, [searchQuery])
 
   return (
@@ -82,8 +127,8 @@ export default function TopBar({ activePage, runId, report, sidebarCollapsed, on
           {sidebarCollapsed ? <Menu size={20} /> : <PanelLeftClose size={20} />}
         </button>
 
-        <div className="hidden sm:flex items-center gap-2 text-[14px]">
-          <img src="/razorpay-full-logo.jpg" alt="Razorpay" className="h-5 object-contain opacity-80" />
+        <div className="hidden sm:flex items-center gap-2 text-base">
+          <img src="https://razorpay.com/assets/razorpay-glyph.svg" alt="Razorpay" className="h-5 object-contain opacity-80" />
           <span className="text-white/30">/</span>
           <span className="font-extrabold text-white text-[15px]">
             {pageTitles[activePage] || 'Home'}
@@ -97,8 +142,8 @@ export default function TopBar({ activePage, runId, report, sidebarCollapsed, on
         className="hidden md:flex items-center gap-2 px-4 py-2 bg-white/10 border border-white/15 rounded-lg w-96 cursor-pointer hover:bg-white/15 transition-all duration-200"
       >
         <Search size={16} className="text-white/60" />
-        <span className="text-[14px] text-white/50 flex-1">Search transactions, settlements, docs...</span>
-        <div className="flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded bg-white/15 text-white/80">
+        <span className="text-base text-white/50 flex-1">Search transactions, settlements, docs...</span>
+        <div className="flex items-center gap-1 text-[13px] font-bold px-2 py-0.5 rounded bg-white/15 text-white/80">
           <span>⌘</span><span>K</span>
         </div>
       </div>
@@ -106,7 +151,7 @@ export default function TopBar({ activePage, runId, report, sidebarCollapsed, on
       {/* Right */}
       <div className="flex items-center gap-4">
         {matchRate && activePage === 'reconciliation' && (
-          <div className="hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[12px] font-extrabold bg-[#00E6A0]/20 text-[#00E6A0] border border-[#00E6A0]/30">
+          <div className="hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm font-extrabold bg-[#00E6A0]/20 text-[#00E6A0] border border-[#00E6A0]/30">
             <div className="w-2 h-2 rounded-full bg-[#00E6A0] animate-pulse" />
             {matchRate}% Matched
           </div>
@@ -116,16 +161,72 @@ export default function TopBar({ activePage, runId, report, sidebarCollapsed, on
           href="https://razorpay.com/docs/" 
           target="_blank" 
           rel="noopener noreferrer"
-          className="hidden lg:flex items-center gap-1.5 px-3.5 py-1.5 text-[13px] font-bold rounded-lg hover:bg-white/10 text-white/80 hover:text-white transition-colors"
+          className="hidden lg:flex items-center gap-1.5 px-3.5 py-1.5 text-[15px] font-bold rounded-lg hover:bg-white/10 text-white/80 hover:text-white transition-colors"
         >
           <ExternalLink size={14} />
           Docs
         </a>
 
-        <button className="relative p-2 rounded-lg hover:bg-white/10 text-white/80 hover:text-white transition-colors">
-          <Bell size={19} />
-          <span className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-[#EF4444] border-2 border-[#05103E]" />
-        </button>
+        {/* Notification Dropdown */}
+        <div className="relative">
+          <button 
+            onClick={() => setShowNotifications(!showNotifications)}
+            className="relative p-2 rounded-lg hover:bg-white/10 text-white/80 hover:text-white transition-colors"
+          >
+            <Bell size={19} />
+            {notifications.length > 0 && (
+              <span className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-[#EF4444] border-2 border-[#05103E]" />
+            )}
+          </button>
+
+          {showNotifications && (
+            <>
+              <div className="fixed inset-0 z-40" onClick={() => setShowNotifications(false)} />
+              <div className="absolute right-0 top-12 w-80 bg-white border border-[#DCE3ED] rounded-xl shadow-xl z-50 overflow-hidden text-[#0B192C] animate-overlay-slideup">
+                <div className="px-5 py-3 border-b border-[#E8EEF5] bg-gray-50 flex items-center justify-between">
+                  <span className="font-extrabold text-sm text-[#0B192C]">Notifications</span>
+                  {notifications.length > 0 && (
+                    <span className="text-xs font-bold text-white bg-[#EF4444] px-2 py-0.5 rounded-full">
+                      {notifications.length} New
+                    </span>
+                  )}
+                </div>
+                <div className="max-h-72 overflow-y-auto">
+                  {notifications.length === 0 ? (
+                    <div className="p-6 text-center text-sm font-semibold text-gray-500">
+                      No new anomalies detected.
+                    </div>
+                  ) : (
+                    <div className="divide-y divide-[#E8EEF5]">
+                      {notifications.map(n => (
+                        <div key={n.id} className="p-4 hover:bg-red-50/50 transition-colors cursor-pointer" onClick={() => {
+                          setShowNotifications(false)
+                          if (onNavigate) onNavigate('home')
+                        }}>
+                          <div className="flex gap-3">
+                            <div className="mt-0.5 text-[#EF4444]">
+                              <AlertTriangle size={16} />
+                            </div>
+                            <div>
+                              <p className="text-sm font-bold text-[#0B192C]">Anomaly Detected</p>
+                              <p className="text-xs font-semibold text-gray-600 mt-0.5">{n.category} issue for ₹{n.amount}</p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                {notifications.length > 0 && (
+                  <div className="p-3 border-t border-[#E8EEF5] text-center bg-gray-50 hover:bg-gray-100 cursor-pointer transition-colors"
+                       onClick={() => { setShowNotifications(false); if (onNavigate) onNavigate('home'); }}>
+                    <span className="text-xs font-bold text-[#0065FF]">View All Exceptions</span>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+        </div>
 
         <div className="w-px h-6 bg-white/15" />
 
@@ -135,12 +236,12 @@ export default function TopBar({ activePage, runId, report, sidebarCollapsed, on
             onClick={() => setShowProfile(!showProfile)}
             className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg hover:bg-white/10 transition-colors"
           >
-            <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-[12px] font-extrabold bg-[#0065FF] shadow-sm">
+            <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-extrabold bg-[#0065FF] shadow-sm">
               {initials}
             </div>
             <div className="hidden md:flex flex-col items-start">
-              <span className="text-[13px] font-bold leading-none text-white">{user?.name || 'Merchant Admin'}</span>
-              <span className="text-[11px] leading-none mt-1 text-white/50">{user?.role || 'Admin'}</span>
+              <span className="text-[15px] font-bold leading-none text-white">{user?.name || 'Merchant Admin'}</span>
+              <span className="text-[13px] leading-none mt-1 text-white/50">{user?.role || 'Admin'}</span>
             </div>
             <ChevronDown size={14} className={`hidden md:block transition-transform duration-200 text-white/60 ${showProfile ? 'rotate-180' : ''}`} />
           </button>
@@ -148,29 +249,30 @@ export default function TopBar({ activePage, runId, report, sidebarCollapsed, on
           {showProfile && (
             <>
               <div className="fixed inset-0 z-40" onClick={() => setShowProfile(false)} />
-              <div className="absolute right-0 top-12 w-60 bg-white border border-[#DCE3ED] rounded-xl shadow-2xl z-50 overflow-hidden text-[#0B192C] animate-overlay-slideup">
-                <div className="px-5 py-4 border-b border-[#E8EEF5]">
-                  <p className="text-[14px] font-bold">{user?.name || 'Merchant Admin'}</p>
-                  <p className="text-[12px] text-gray-500 mt-0.5 truncate">{user?.identifier || 'admin@gmail.com'}</p>
-                  <p className="text-[10px] font-mono text-[#0065FF] font-bold mt-1">MID: {user?.mid || 'mid_rzp_live'}</p>
+              <div className="absolute right-0 top-14 w-64 bg-white border border-[#DCE3ED] rounded-xl shadow-xl z-50 overflow-hidden text-[#0B192C] animate-overlay-slideup">
+                <div className="px-5 py-5 border-b border-[#E8EEF5] bg-gradient-to-br from-[#F8FAFC] to-[#F1F5F9]">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center text-white text-base font-extrabold bg-[#0065FF] shadow-sm">
+                      {initials}
+                    </div>
+                    <div>
+                      <p className="text-base font-extrabold text-[#05103E]">{user?.name || 'Merchant Admin'}</p>
+                      <p className="text-sm font-semibold text-[#718096] truncate">{user?.identifier || 'admin@gmail.com'}</p>
+                    </div>
+                  </div>
+                  <div className="mt-3 flex items-center gap-2">
+                    <span className="text-[11px] uppercase tracking-wider font-extrabold text-[#0065FF] bg-[#0065FF]/10 px-2 py-0.5 rounded">ROLE: {user?.role || 'FINANCE_OPERATOR'}</span>
+                  </div>
                 </div>
-                <div className="py-1">
-                  <button 
-                    onClick={handleGlobalReset}
-                    className="w-full flex items-center gap-3 px-5 py-2.5 text-[14px] hover:bg-red-50 font-extrabold transition-colors text-[#EF4444]"
-                  >
-                    <Trash2 size={16} /> Clear All Workspace Data
-                  </button>
-                </div>
-                <div className="py-1 border-t border-[#E8EEF5]">
+                <div className="py-2">
                   <button 
                     onClick={() => {
                       setShowProfile(false)
                       if (onLogout) onLogout()
                     }}
-                    className="w-full flex items-center gap-3 px-5 py-2.5 text-[14px] hover:bg-gray-50 font-bold transition-colors text-gray-700"
+                    className="w-full flex items-center gap-3 px-5 py-2.5 text-[15px] hover:bg-gray-50 font-bold transition-colors text-gray-700"
                   >
-                    <LogOut size={16} /> Sign Out
+                    <LogOut size={18} className="text-gray-400" /> Sign Out
                   </button>
                 </div>
               </div>
@@ -199,10 +301,12 @@ export default function TopBar({ activePage, runId, report, sidebarCollapsed, on
             </div>
 
             <div className="max-h-96 overflow-y-auto p-2 divide-y divide-gray-100">
-              {filteredSearch.length === 0 ? (
-                <p className="p-8 text-center text-gray-500 text-[14px]">No matching records found.</p>
+              {isSearching ? (
+                <p className="p-8 text-center text-gray-500 text-base">Searching...</p>
+              ) : searchResults.length === 0 ? (
+                <p className="p-8 text-center text-gray-500 text-base">No matching records found.</p>
               ) : (
-                filteredSearch.map((item, i) => (
+                searchResults.map((item, i) => (
                   <button
                     key={i}
                     onClick={() => {
@@ -212,10 +316,10 @@ export default function TopBar({ activePage, runId, report, sidebarCollapsed, on
                     className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-[#E6F0FF]/50 text-left transition-colors group"
                   >
                     <div>
-                      <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-gray-100 text-[#0065FF] mr-2">
+                      <span className="text-xs font-extrabold uppercase px-2 py-0.5 rounded bg-gray-100 text-[#0065FF] mr-2">
                         {item.type}
                       </span>
-                      <span className="text-[14px] font-semibold text-[#0B192C]">{item.title}</span>
+                      <span className="text-base font-semibold text-[#0B192C]">{item.title}</span>
                     </div>
                     <ArrowRight size={15} className="text-gray-400 group-hover:text-[#0065FF] group-hover:translate-x-1 transition-all" />
                   </button>
@@ -223,8 +327,8 @@ export default function TopBar({ activePage, runId, report, sidebarCollapsed, on
               )}
             </div>
 
-            <div className="px-5 py-2.5 bg-gray-50 border-t border-[#DCE3ED] text-[12px] text-gray-500 flex justify-between font-medium">
-              <span>Press <kbd className="px-1.5 py-0.5 bg-white border border-gray-300 rounded font-mono text-[10px]">ESC</kbd> to exit</span>
+            <div className="px-5 py-2.5 bg-gray-50 border-t border-[#DCE3ED] text-sm text-gray-500 flex justify-between font-medium">
+              <span>Press <kbd className="px-1.5 py-0.5 bg-white border border-gray-300 rounded font-mono text-xs">ESC</kbd> to exit</span>
               <span>1-click jump to section</span>
             </div>
           </div>

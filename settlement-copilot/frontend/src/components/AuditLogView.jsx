@@ -44,13 +44,13 @@ export default function AuditLogView() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-extrabold text-[#0B192C]">Immutable Audit Log</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Persistent audit history of all AI investigations, recommendations, and human approvals.</p>
+          <p className="text-base text-gray-500 mt-0.5">Persistent audit history of all AI investigations, recommendations, and human approvals.</p>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={fetchLogs} className="btn-secondary text-xs">
+          <button onClick={fetchLogs} className="btn-secondary text-sm">
             <RefreshCw size={14} className={loading ? 'animate-spin' : ''} /> Refresh Log
           </button>
-          <button onClick={handleClearLogs} className="px-3 py-2 bg-red-50 hover:bg-red-100 text-[#EF4444] border border-red-200 rounded-lg text-xs font-extrabold flex items-center gap-1.5 transition-colors">
+          <button onClick={handleClearLogs} className="px-3 py-2 bg-red-50 hover:bg-red-100 text-[#EF4444] border border-red-200 rounded-lg text-sm font-extrabold flex items-center gap-1.5 transition-colors">
             <Trash2 size={14} /> Clear Audit Logs
           </button>
         </div>
@@ -59,14 +59,14 @@ export default function AuditLogView() {
       <div className="bg-white rounded-xl border border-[#DCE3ED] overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           {logs.length === 0 ? (
-            <div className="p-12 text-center text-gray-500 text-sm">
+            <div className="p-12 text-center text-gray-500 text-base">
               <p className="font-bold">No audit entries recorded yet.</p>
-              <p className="text-xs text-gray-400 mt-1">Audit logs will automatically appear when AI investigations or human approvals execute.</p>
+              <p className="text-sm text-gray-400 mt-1">Audit logs will automatically appear when AI investigations or human approvals execute.</p>
             </div>
           ) : (
-            <table className="w-full text-left text-sm">
+            <table className="w-full text-left text-base">
               <thead>
-                <tr className="border-b border-[#DCE3ED] bg-[#EFF3F8]/60 text-xs font-extrabold uppercase text-gray-500">
+                <tr className="border-b border-[#DCE3ED] bg-[#EFF3F8]/60 text-sm font-extrabold uppercase text-gray-500">
                   <th className="px-6 py-3.5">Timestamp</th>
                   <th className="px-6 py-3.5">Actor</th>
                   <th className="px-6 py-3.5">Action</th>
@@ -78,27 +78,27 @@ export default function AuditLogView() {
               <tbody>
                 {logs.map((log) => (
                   <tr key={log.id} className="border-b border-[#E8EEF5] hover:bg-[#E6F0FF]/30 transition-colors">
-                    <td className="px-6 py-4 text-xs text-gray-500 font-medium whitespace-nowrap">{log.timestamp}</td>
+                    <td className="px-6 py-4 text-sm text-gray-500 font-medium whitespace-nowrap">{log.timestamp}</td>
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-2 font-bold text-xs text-[#0B192C]">
+                      <div className="flex items-center gap-2 font-bold text-sm text-[#0B192C]">
                         <User size={13} className="text-[#0065FF]" /> {log.actor}
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-[11px] font-extrabold uppercase tracking-wider ${
+                      <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-[13px] font-extrabold uppercase tracking-wider ${
                         log.action_type.includes('APPROVE') ? 'bg-[#D1FAE5] text-[#10B981]' :
                         log.action_type.includes('REJECT') ? 'bg-[#FEE2E2] text-[#EF4444]' : 'bg-[#E6F0FF] text-[#0065FF]'
                       }`}>
                         {log.action_type}
                       </span>
                     </td>
-                    <td className="px-6 py-4 font-mono text-xs font-bold text-[#0065FF]">{log.investigation_ref || log.entity_id}</td>
-                    <td className="px-6 py-4 text-xs">
+                    <td className="px-6 py-4 font-mono text-sm font-bold text-[#0065FF]">{log.investigation_ref || log.entity_id}</td>
+                    <td className="px-6 py-4 text-sm">
                       <span className="text-gray-400 font-semibold">{log.previous_state || 'PENDING'}</span>
                       <span className="mx-1 text-gray-300">→</span>
                       <span className="font-extrabold text-[#0B192C]">{log.new_state}</span>
                     </td>
-                    <td className="px-6 py-4 text-xs text-gray-600 max-w-sm">{log.reason}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600 max-w-sm">{log.reason}</td>
                   </tr>
                 ))}
               </tbody>

@@ -78,7 +78,7 @@ export default function OnboardingOverlay({ onComplete }) {
         {/* Skip */}
         <button 
           onClick={onComplete}
-          className="absolute -top-10 right-0 text-[12px] text-white/60 hover:text-white flex items-center gap-1 transition-colors font-semibold"
+          className="absolute -top-10 right-0 text-sm text-white/60 hover:text-white flex items-center gap-1 transition-colors font-semibold"
         >
           Skip Tour <X size={13} />
         </button>
@@ -90,7 +90,7 @@ export default function OnboardingOverlay({ onComplete }) {
           <div className="p-7" key={currentStep}>
             {/* Step indicator */}
             <div className="flex items-center gap-2 mb-5">
-              <span className="text-[10px] font-extrabold tracking-[2px] uppercase" style={{ color: 'var(--rz-blue)' }}>
+              <span className="text-xs font-extrabold tracking-[2px] uppercase" style={{ color: 'var(--rz-blue)' }}>
                 Step {currentStep + 1} of {STEPS.length}
               </span>
               <div className="flex-1 h-px bg-gray-100" />
@@ -104,7 +104,7 @@ export default function OnboardingOverlay({ onComplete }) {
                 <h2 className="text-2xl font-extrabold" style={{ color: 'var(--rz-text-primary)' }}>{step.title}</h2>
               </div>
               <p className="text-[15px] font-bold mb-2" style={{ color: 'var(--rz-blue)' }}>{step.subtitle}</p>
-              <p className="text-[13px] leading-relaxed mb-6" style={{ color: 'var(--rz-text-secondary)' }}>{step.description}</p>
+              <p className="text-[15px] leading-relaxed mb-6" style={{ color: 'var(--rz-text-secondary)' }}>{step.description}</p>
 
               {/* Welcome features */}
               {step.id === 'welcome' && (
@@ -116,8 +116,8 @@ export default function OnboardingOverlay({ onComplete }) {
                         <div className="w-9 h-9 rounded-lg flex items-center justify-center mb-3" style={{ background: 'var(--rz-blue-light)' }}>
                           <Icon size={18} style={{ color: 'var(--rz-blue)' }} />
                         </div>
-                        <h4 className="text-[12px] font-bold mb-1" style={{ color: 'var(--rz-text-primary)' }}>{f.label}</h4>
-                        <p className="text-[10px] leading-relaxed" style={{ color: 'var(--rz-text-muted)' }}>{f.desc}</p>
+                        <h4 className="text-sm font-bold mb-1" style={{ color: 'var(--rz-text-primary)' }}>{f.label}</h4>
+                        <p className="text-xs leading-relaxed" style={{ color: 'var(--rz-text-muted)' }}>{f.desc}</p>
                       </div>
                     )
                   })}
@@ -131,8 +131,8 @@ export default function OnboardingOverlay({ onComplete }) {
                     <div key={s.label} className="flex items-center gap-3 p-3 rounded-lg border hover:bg-gray-50 transition-colors stagger-item" style={{ borderColor: 'var(--rz-border)', animationDelay: `${i * 0.06}s` }}>
                       <span className="text-xl">{s.emoji}</span>
                       <div className="flex-1">
-                        <h4 className="text-[12px] font-bold" style={{ color: 'var(--rz-text-primary)' }}>{s.label}</h4>
-                        <p className="text-[10px]" style={{ color: 'var(--rz-text-muted)' }}>{s.desc}</p>
+                        <h4 className="text-sm font-bold" style={{ color: 'var(--rz-text-primary)' }}>{s.label}</h4>
+                        <p className="text-xs" style={{ color: 'var(--rz-text-muted)' }}>{s.desc}</p>
                       </div>
                       <ChevronRight size={13} className="text-gray-300" />
                     </div>
@@ -145,12 +145,12 @@ export default function OnboardingOverlay({ onComplete }) {
                 <div className="space-y-4">
                   {step.steps.map((s, i) => (
                     <div key={s.num} className="flex items-start gap-4 stagger-item" style={{ animationDelay: `${i * 0.1}s` }}>
-                      <div className="w-10 h-10 rounded-lg flex items-center justify-center text-white text-sm font-extrabold flex-shrink-0" style={{ background: 'var(--rz-blue)' }}>
+                      <div className="w-10 h-10 rounded-lg flex items-center justify-center text-white text-base font-extrabold flex-shrink-0" style={{ background: 'var(--rz-blue)' }}>
                         {s.num}
                       </div>
                       <div className="pt-0.5">
-                        <h4 className="text-[13px] font-bold mb-0.5" style={{ color: 'var(--rz-text-primary)' }}>{s.label}</h4>
-                        <p className="text-[11px] leading-relaxed" style={{ color: 'var(--rz-text-muted)' }}>{s.desc}</p>
+                        <h4 className="text-[15px] font-bold mb-0.5" style={{ color: 'var(--rz-text-primary)' }}>{s.label}</h4>
+                        <p className="text-[13px] leading-relaxed" style={{ color: 'var(--rz-text-muted)' }}>{s.desc}</p>
                       </div>
                     </div>
                   ))}
@@ -163,8 +163,8 @@ export default function OnboardingOverlay({ onComplete }) {
                   {step.resources.map((r, i) => (
                     <div key={r.label} className="p-3 rounded-lg border stagger-item" style={{ borderColor: 'var(--rz-border)', animationDelay: `${i * 0.06}s` }}>
                       <span className="text-lg">{r.emoji}</span>
-                      <h4 className="text-[12px] font-bold mt-1.5 mb-0.5" style={{ color: 'var(--rz-text-primary)' }}>{r.label}</h4>
-                      <p className="text-[10px] leading-relaxed" style={{ color: 'var(--rz-text-muted)' }}>{r.desc}</p>
+                      <h4 className="text-sm font-bold mt-1.5 mb-0.5" style={{ color: 'var(--rz-text-primary)' }}>{r.label}</h4>
+                      <p className="text-xs leading-relaxed" style={{ color: 'var(--rz-text-muted)' }}>{r.desc}</p>
                     </div>
                   ))}
                 </div>
@@ -191,11 +191,11 @@ export default function OnboardingOverlay({ onComplete }) {
             {/* Buttons */}
             <div className="flex items-center gap-2">
               {currentStep > 0 && (
-                <button onClick={goPrev} className="px-4 py-2 text-[13px] font-semibold rounded-md border hover:bg-gray-50 transition-colors flex items-center gap-1.5" style={{ color: 'var(--rz-text-secondary)', borderColor: 'var(--rz-border)' }}>
+                <button onClick={goPrev} className="px-4 py-2 text-[15px] font-semibold rounded-md border hover:bg-gray-50 transition-colors flex items-center gap-1.5" style={{ color: 'var(--rz-text-secondary)', borderColor: 'var(--rz-border)' }}>
                   <ChevronLeft size={14} /> Back
                 </button>
               )}
-              <button onClick={goNext} className="px-5 py-2 text-[13px] font-bold rounded-md text-white transition-colors flex items-center gap-1.5 hover:opacity-90" style={{ background: 'var(--rz-blue)' }}>
+              <button onClick={goNext} className="px-5 py-2 text-[15px] font-bold rounded-md text-white transition-colors flex items-center gap-1.5 hover:opacity-90" style={{ background: 'var(--rz-blue)' }}>
                 {isLast ? 'Get Started' : 'Next'}
                 <ArrowRight size={14} />
               </button>

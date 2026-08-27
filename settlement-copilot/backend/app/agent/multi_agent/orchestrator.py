@@ -191,6 +191,20 @@ class InvestigationOrchestrator:
             erp_amt = txn_details.get("amount", exc_amount) if exception.source == "ledger" else exc_amount
             diff_amt = gw_amt - bank_amt if gw_amt and bank_amt else 0.0
 
+            # Phase 8: Deterministic Human-in-the-loop Policy
+            # Force human review if confidence < 95%, amount >= 5000, or agents disagree.
+            policy_auto_resolve = (
+                judge_result.confidence >= 0.95 
+                and exc_amount < 5000 
+                and not judge_result.agent_disagreement
+            )
+            
+            final_requires_human_review = not policy_auto_resolve
+            if final_requires_human_review:
+                judge_result.decision = "HUMAN_REVIEW"
+                if not judge_result.requires_human_review:
+                    judge_result.reasoning += "\n[SYSTEM POLICY OVERRIDE]: Forced to MANUAL REVIEW due to deterministic risk threshold (Amt >= 5000, Confidence < 95%, or Disagreement)."
+            
             # Create Investigation Record
             inv_record = InvestigationRecord(
                 exception_id=exception.id,
@@ -204,7 +218,7 @@ class InvestigationOrchestrator:
                 business_impact=ops_result.business_impact,
                 recommended_action=judge_result.recommendation,
                 evidence_json=aggregator.model_dump(),
-                requires_human_review=1 if judge_result.requires_human_review else 0,
+                requires_human_review=1 if final_requires_human_review else 0,
                 final_decision=judge_result.decision,
                 final_reasoning=judge_result.reasoning,
             )
@@ -237,7 +251,7 @@ class InvestigationOrchestrator:
                 reasoning=judge_result.reasoning,
                 agent_agreement=judge_result.agent_agreement,
                 agent_disagreement=1 if judge_result.agent_disagreement else 0,
-                requires_human_review=1 if judge_result.requires_human_review else 0
+                requires_human_review=1 if final_requires_human_review else 0
             )
             db.add(jd)
 
@@ -253,7 +267,7 @@ class InvestigationOrchestrator:
             # Create Recommendation Record
             rec = RecommendationRecord(
                 investigation_id=inv_record.id,
-                action_type="MANUAL_REVIEW" if judge_result.requires_human_review else "AUTO_RESOLVE",
+                action_type="MANUAL_REVIEW" if final_requires_human_review else "AUTO_RESOLVE",
                 description=judge_result.recommendation,
                 original_val="N/A",
                 proposed_val="See AI reasoning",

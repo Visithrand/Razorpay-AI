@@ -45,7 +45,7 @@ export default function SettlementsMock() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-[#0B192C]">Settlements</h1>
-          <p className="text-[14px] text-[#4A5568] mt-0.5">View the funds transferred to your bank account.</p>
+          <p className="text-base text-[#4A5568] mt-0.5">View the funds transferred to your bank account.</p>
         </div>
         <div className="flex items-center gap-3">
           <button onClick={handleExport} className="btn-primary">
@@ -56,31 +56,31 @@ export default function SettlementsMock() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         <div className="bg-white rounded-xl border border-[#DCE3ED] p-6 shadow-sm">
-          <div className="flex items-center gap-2.5 text-[14px] font-semibold text-[#4A5568] mb-3">
+          <div className="flex items-center gap-2.5 text-base font-semibold text-[#4A5568] mb-3">
             <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-[#D1FAE5] text-[#10B981]">
               <CheckCircle2 size={18} />
             </div>
             Next Settlement
           </div>
           <p className="text-3xl font-bold text-[#0B192C]">₹154,000.00</p>
-          <p className="text-[12px] text-[#718096] mt-1">Expected today by 6:00 PM</p>
+          <p className="text-sm text-[#718096] mt-1">Expected today by 6:00 PM</p>
         </div>
         <div className="bg-white rounded-xl border border-[#DCE3ED] p-6 shadow-sm">
-          <div className="flex items-center gap-2.5 text-[14px] font-semibold text-[#4A5568] mb-3">
+          <div className="flex items-center gap-2.5 text-base font-semibold text-[#4A5568] mb-3">
             <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-[#EDE9FE] text-[#8B5CF6]">
               <TrendingUp size={18} />
             </div>
             Total Settled (Jan)
           </div>
           <p className="text-3xl font-bold text-[#0B192C]">₹4.2M</p>
-          <p className="text-[12px] text-[#718096] mt-1">Across 12 batches</p>
+          <p className="text-sm text-[#718096] mt-1">Across 12 batches</p>
         </div>
       </div>
 
       <div className="bg-white rounded-xl border border-[#DCE3ED] overflow-hidden shadow-sm">
         {/* Header Tabs + Search */}
         <div className="px-6 py-3 border-b border-[#DCE3ED] flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#EFF3F8]/30">
-          <div className="flex items-center gap-6 text-[14px] font-semibold text-[#4A5568]">
+          <div className="flex items-center gap-6 text-base font-semibold text-[#4A5568]">
             {[
               { id: 'all', label: `All (${settlements.length})` },
               { id: 'processed', label: `Processed (${settlements.filter(s => s.status === 'processed').length})` },
@@ -106,7 +106,7 @@ export default function SettlementsMock() {
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               placeholder="Search ID, Bank UTR..."
-              className="bg-transparent border-none outline-none text-[13px] w-full text-[#0B192C]"
+              className="bg-transparent border-none outline-none text-[15px] w-full text-[#0B192C]"
             />
           </div>
         </div>
@@ -118,11 +118,11 @@ export default function SettlementsMock() {
               <p className="text-[15px] font-bold">No settlements match your filter</p>
             </div>
           ) : (
-            <table className="w-full text-[14px] text-left">
+            <table className="w-full text-base text-left">
               <thead>
                 <tr className="border-b border-[#DCE3ED] bg-[#EFF3F8]/60">
                   {['Settlement ID', 'Bank UTR', 'Amount', 'Fees & Taxes', 'Txn Count', 'Date', 'Status'].map(h => (
-                    <th key={h} className="px-6 py-3.5 text-[11px] font-bold uppercase tracking-wider text-[#718096]">{h}</th>
+                    <th key={h} className="px-6 py-3.5 text-[13px] font-bold uppercase tracking-wider text-[#718096]">{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -133,27 +133,27 @@ export default function SettlementsMock() {
                     onClick={() => setSelectedSetl(s)}
                     className="border-b border-[#E8EEF5] hover:bg-[#E6F0FF]/30 cursor-pointer transition-colors"
                   >
-                    <td className="px-6 py-4 font-mono font-medium text-[13px] text-[#0065FF]">{s.id}</td>
+                    <td className="px-6 py-4 font-mono font-medium text-[15px] text-[#0065FF]">{s.id}</td>
                     <td className="px-6 py-4">
                       {s.utr === '—' ? (
-                        <span className="inline-block px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider border font-mono bg-[#EFF3F8] text-[#718096] border-[#DCE3ED]">N/A</span>
+                        <span className="inline-block px-2 py-0.5 rounded text-xs font-semibold uppercase tracking-wider border font-mono bg-[#EFF3F8] text-[#718096] border-[#DCE3ED]">N/A</span>
                       ) : (
-                        <span className="font-mono text-[13px] font-normal text-[#4A5568]">{s.utr}</span>
+                        <span className="font-mono text-[15px] font-normal text-[#4A5568]">{s.utr}</span>
                       )}
                     </td>
                     <td className="px-6 py-4 font-semibold text-[#0B192C] flex items-center gap-1">
                       <IndianRupee size={14} className="text-[#718096]" />
                       {s.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                     </td>
-                    <td className="px-6 py-4 text-[13px] font-semibold text-[#EF4444]">
+                    <td className="px-6 py-4 text-[15px] font-semibold text-[#EF4444]">
                       -₹{s.fees.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                     </td>
-                    <td className="px-6 py-4 text-[13px] text-[#4A5568]">{s.count}</td>
-                    <td className="px-6 py-4 text-[12px] text-[#718096]">{s.date}</td>
+                    <td className="px-6 py-4 text-[15px] text-[#4A5568]">{s.count}</td>
+                    <td className="px-6 py-4 text-sm text-[#718096]">{s.date}</td>
                     <td className="px-6 py-4">
-                      {s.status === 'processed' && <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[12px] font-semibold bg-[#D1FAE5] text-[#10B981]"><CheckCircle2 size={13}/> Processed</span>}
-                      {s.status === 'pending' && <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[12px] font-semibold bg-[#FEF3C7] text-[#F59E0B]"><TrendingUp size={13}/> Pending</span>}
-                      {s.status === 'failed' && <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[12px] font-semibold bg-[#FEE2E2] text-[#EF4444]"><AlertCircle size={13}/> Failed</span>}
+                      {s.status === 'processed' && <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-sm font-semibold bg-[#D1FAE5] text-[#10B981]"><CheckCircle2 size={13}/> Processed</span>}
+                      {s.status === 'pending' && <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-sm font-semibold bg-[#FEF3C7] text-[#F59E0B]"><TrendingUp size={13}/> Pending</span>}
+                      {s.status === 'failed' && <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-sm font-semibold bg-[#FEE2E2] text-[#EF4444]"><AlertCircle size={13}/> Failed</span>}
                     </td>
                   </tr>
                 ))}
@@ -173,7 +173,7 @@ export default function SettlementsMock() {
                 <X size={18} />
               </button>
             </div>
-            <div className="p-6 space-y-4 text-[14px]">
+            <div className="p-6 space-y-4 text-base">
               <div className="flex justify-between py-2 border-b border-gray-100">
                 <span className="text-gray-500 font-semibold">Settlement ID</span>
                 <span className="font-mono font-bold text-[#0065FF]">{selectedSetl.id}</span>

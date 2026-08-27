@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { getMe, logout } from './api'
 import Sidebar from './components/Sidebar'
 import TopBar from './components/TopBar'
 import ExecutiveDashboard from './components/ExecutiveDashboard'
@@ -19,6 +20,7 @@ import OnboardingOverlay from './components/OnboardingOverlay'
 import HelpFAB from './components/HelpFAB'
 import AdminLogin from './components/AdminLogin'
 import ScenarioLab from './components/ScenarioLab'
+import ErrorBoundary from './components/ErrorBoundary'
 import { FileText, Link as LinkIcon, Layout, Share2, Repeat } from 'lucide-react'
 
 const USER_SESSION_KEY = 'razorpay_authenticated_user_v1'
@@ -35,30 +37,39 @@ function App() {
   const [runId, setRunId] = useState(null)
   const [report, setReport] = useState(null)
 
-  // Check saved login session
+  const [authLoading, setAuthLoading] = useState(true)
+
+  // Check backend session
   useEffect(() => {
-    const savedUser = localStorage.getItem(USER_SESSION_KEY)
-    if (savedUser) {
+    const fetchSession = async () => {
       try {
-        setUser(JSON.parse(savedUser))
+        const userData = await getMe()
+        setUser(userData)
       } catch (e) {
-        localStorage.removeItem(USER_SESSION_KEY)
+        setUser(null)
+      } finally {
+        setAuthLoading(false)
       }
     }
+    fetchSession()
   }, [])
 
   const handleLoginSuccess = (userData) => {
     setUser(userData)
-    localStorage.setItem(USER_SESSION_KEY, JSON.stringify(userData))
+    // Check onboarding logic
     const done = localStorage.getItem(ONBOARDING_KEY)
     if (!done) {
       setShowOnboarding(true)
     }
   }
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await logout()
+    } catch(e) {
+      console.error('Logout failed:', e)
+    }
     setUser(null)
-    localStorage.removeItem(USER_SESSION_KEY)
   }
 
   const handleOnboardingComplete = () => {
@@ -85,6 +96,10 @@ function App() {
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
+
+  if (authLoading) {
+    return <div className="min-h-screen flex items-center justify-center bg-gray-50"><div className="text-[#0065FF] font-bold text-lg animate-pulse">Loading Secure Session...</div></div>
+  }
 
   if (!user) {
     return <AdminLogin onLoginSuccess={handleLoginSuccess} />
@@ -136,7 +151,11 @@ function App() {
           )}
           {activePage === 'settlements' && <SettlementsMock />}
           {activePage === 'exceptions' && <ExceptionTable />}
-          {activePage === 'investigation' && <InvestigationView exceptionId={activeExceptionId} />}
+          {activePage === 'investigation' && (
+            <ErrorBoundary>
+              <InvestigationView exceptionId={activeExceptionId} />
+            </ErrorBoundary>
+          )}
           {activePage === 'scenario-lab' && <ScenarioLab />}
           {activePage === 'ai-assistant' && (
             <div className="max-w-4xl mx-auto space-y-4">

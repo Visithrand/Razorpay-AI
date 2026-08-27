@@ -9,23 +9,23 @@ export default function ConfidenceSlider({ value, onChange, matchCount, exceptio
             <Settings2 size={20} className="text-[#3d8ef8]" />
             Confidence Strictness
           </h3>
-          <p className="text-sm text-[#697386] mt-1">
+          <p className="text-base text-[#697386] mt-1">
             Adjust the AI tolerance for fuzzy matching. Lower values capture more matches (higher recall).
           </p>
         </div>
         <div className="flex items-center gap-8 text-right bg-[#fafbfc] px-5 py-3 rounded-xl border border-[#f0f3f8]">
           <div className="border-r border-[#e3e8ef] pr-8">
-            <p className="text-[10px] text-[#697386] uppercase tracking-widest font-bold mb-1">Strictness</p>
+            <p className="text-xs text-[#697386] uppercase tracking-widest font-bold mb-1">Strictness</p>
             <p className="text-2xl font-bold text-[#3d8ef8]">{(value * 100).toFixed(0)}%</p>
           </div>
           <div className="border-r border-[#e3e8ef] pr-8 pl-4">
-            <p className="text-[10px] text-[#697386] uppercase tracking-widest font-bold mb-1">Matches</p>
+            <p className="text-xs text-[#697386] uppercase tracking-widest font-bold mb-1">Matches</p>
             <p className="text-2xl font-bold text-[#2eb88a] flex items-center gap-2">
               {isLoading ? <Loader2 size={20} className="animate-spin text-[#2eb88a]/50" /> : matchCount}
             </p>
           </div>
           <div className="pl-4">
-            <p className="text-[10px] text-[#697386] uppercase tracking-widest font-bold mb-1">Exceptions</p>
+            <p className="text-xs text-[#697386] uppercase tracking-widest font-bold mb-1">Exceptions</p>
             <p className="text-2xl font-bold text-[#e04d4d] flex items-center gap-2">
               {isLoading ? <Loader2 size={20} className="animate-spin text-[#e04d4d]/50" /> : exceptionCount}
             </p>
@@ -45,7 +45,7 @@ export default function ConfidenceSlider({ value, onChange, matchCount, exceptio
         <div className="absolute top-7 left-[90%] w-0.5 h-3 bg-[#c8d0dc] -translate-x-1/2" />
       </div>
 
-      <div className="flex justify-between text-xs font-semibold text-[#a3acb9]">
+      <div className="flex justify-between text-sm font-semibold text-[#a3acb9]">
         <span className="flex items-center gap-1.5"><Sparkles size={14} /> High Recall (Loose)</span>
         <span className="flex items-center gap-1.5 text-[#697386]">Balanced</span>
         <span className="flex items-center gap-1.5"><Target size={14} /> High Precision (Strict)</span>
@@ -53,7 +53,7 @@ export default function ConfidenceSlider({ value, onChange, matchCount, exceptio
 
       {/* Visual hint pills */}
       <div className="flex gap-3 mt-5 flex-wrap pt-5 border-t border-[#f0f3f8]">
-        <span className="text-xs font-bold text-[#697386] uppercase tracking-wider self-center mr-2">Presets:</span>
+        <span className="text-sm font-bold text-[#697386] uppercase tracking-wider self-center mr-2">Presets:</span>
         {[
           { label: '0%',  hint: 'Match all', icon: Sparkles, color: 'bg-[#fdf0f0] text-[#e04d4d] border-[#e04d4d]/20 hover:bg-[#e04d4d] hover:text-white' },
           { label: '50%', hint: 'Balanced',  icon: Target, color: 'bg-[#fef7e6] text-[#e9a820] border-[#e9a820]/20 hover:bg-[#e9a820] hover:text-white' },
@@ -67,7 +67,7 @@ export default function ConfidenceSlider({ value, onChange, matchCount, exceptio
             <button
               key={p.label}
               onClick={() => onChange(parseFloat(p.label) / 100)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-bold transition-all border ${
                 isActive ? p.color : 'bg-white border-[#e3e8ef] text-[#697386] hover:border-[#1a1f36]'
               }`}
             >

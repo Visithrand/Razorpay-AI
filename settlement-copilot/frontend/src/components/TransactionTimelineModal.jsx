@@ -31,7 +31,7 @@ export default function TransactionTimelineModal({ txnId, onClose }) {
         <div className="px-6 py-4 border-b border-[#DCE3ED] flex items-center justify-between bg-[#05103E] text-white">
           <div>
             <h3 className="font-extrabold text-base">Transaction Lifecycle Timeline</h3>
-            <p className="text-xs text-white/60 font-mono mt-0.5">{txnId}</p>
+            <p className="text-sm text-white/60 font-mono mt-0.5">{txnId}</p>
           </div>
           <button onClick={onClose} className="p-1 rounded hover:bg-white/10 text-white/70 hover:text-white">
             <X size={18} />
@@ -40,12 +40,12 @@ export default function TransactionTimelineModal({ txnId, onClose }) {
 
         <div className="p-6 space-y-4 max-h-[480px] overflow-y-auto custom-scrollbar">
           {loading ? (
-            <p className="text-center text-xs text-gray-500 py-8">Loading timeline events...</p>
+            <p className="text-center text-sm text-gray-500 py-8">Loading timeline events...</p>
           ) : (
             timelineData.timeline.map((item, idx) => (
               <div key={idx} className="relative">
                 <div className="flex items-start gap-4 p-4 rounded-xl border border-gray-100 bg-gray-50/50 hover:bg-white transition-colors">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 ${
                     item.discrepancy ? 'bg-[#FEE2E2] text-[#EF4444]' : 'bg-[#D1FAE5] text-[#10B981]'
                   }`}>
                     {item.discrepancy ? <AlertTriangle size={16} /> : <CheckCircle2 size={16} />}
@@ -53,18 +53,18 @@ export default function TransactionTimelineModal({ txnId, onClose }) {
 
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
-                      <h4 className="text-sm font-extrabold text-[#0B192C]">{item.step}</h4>
-                      <span className="text-xs font-mono text-gray-400">{item.time}</span>
+                      <h4 className="text-base font-extrabold text-[#0B192C]">{item.step}</h4>
+                      <span className="text-sm font-mono text-gray-400">{item.time}</span>
                     </div>
-                    <p className="text-xs text-gray-500 mt-0.5">Source: <strong>{item.source}</strong></p>
+                    <p className="text-sm text-gray-500 mt-0.5">Source: <strong>{item.source}</strong></p>
 
-                    <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-200/60 text-xs">
+                    <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-200/60 text-sm">
                       <span className="font-mono font-bold text-[#0065FF]">{item.ref}</span>
                       <span className="font-extrabold text-[#0B192C]">{item.amount}</span>
                     </div>
 
                     {item.discrepancy && (
-                      <p className="text-xs font-bold text-[#EF4444] bg-[#FEE2E2] px-2.5 py-1 rounded mt-2 border border-[#EF4444]/20">
+                      <p className="text-sm font-bold text-[#EF4444] bg-[#FEE2E2] px-2.5 py-1 rounded mt-2 border border-[#EF4444]/20">
                         {item.discrepancy}
                       </p>
                     )}
@@ -80,7 +80,7 @@ export default function TransactionTimelineModal({ txnId, onClose }) {
         </div>
 
         <div className="px-6 py-3 border-t border-[#DCE3ED] bg-gray-50 flex justify-end">
-          <button onClick={onClose} className="btn-primary text-xs py-2">Close Timeline</button>
+          <button onClick={onClose} className="btn-primary text-sm py-2">Close Timeline</button>
         </div>
       </div>
     </div>

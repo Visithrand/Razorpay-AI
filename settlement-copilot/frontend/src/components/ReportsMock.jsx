@@ -17,7 +17,7 @@ export default function ReportsMock() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-extrabold" style={{ color: 'var(--rz-text-primary)' }}>Reports & Analytics</h1>
-          <p className="text-[13px] mt-0.5" style={{ color: 'var(--rz-text-secondary)' }}>Deep dive into your payment volume, conversion rates, and refunds.</p>
+          <p className="text-[15px] mt-0.5" style={{ color: 'var(--rz-text-secondary)' }}>Deep dive into your payment volume, conversion rates, and refunds.</p>
         </div>
         <div className="flex items-center gap-2">
           <button className="btn-secondary"><Calendar size={14} /> Last 6 Months</button>
@@ -29,9 +29,9 @@ export default function ReportsMock() {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h3 className="text-[15px] font-bold" style={{ color: 'var(--rz-text-primary)' }}>Monthly Volume Breakdown</h3>
-            <p className="text-[12px] mt-0.5" style={{ color: 'var(--rz-text-muted)' }}>Gross volume and refunds by month</p>
+            <p className="text-sm mt-0.5" style={{ color: 'var(--rz-text-muted)' }}>Gross volume and refunds by month</p>
           </div>
-          <div className="flex gap-4 items-center text-[12px] font-semibold" style={{ color: 'var(--rz-text-secondary)' }}>
+          <div className="flex gap-4 items-center text-sm font-semibold" style={{ color: 'var(--rz-text-secondary)' }}>
             <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded" style={{ background: 'var(--rz-blue)' }} /> Gross Volume</div>
             <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded" style={{ background: 'var(--rz-red)' }} /> Refunds</div>
           </div>

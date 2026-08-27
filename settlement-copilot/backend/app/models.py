@@ -14,14 +14,18 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
-    identifier = Column(String, unique=True, index=True, nullable=False) # email (@gmail.com) or phone (+91...)
+    identifier = Column(String, unique=True, index=True, nullable=False) # email (@gmail.com)
+    hashed_password = Column(String, nullable=True)
+    salt = Column(String, nullable=True)
+    session_token = Column(String, unique=True, index=True, nullable=True)
     name = Column(String, default="Merchant Admin")
-    role = Column(String, default="Admin")
+    role = Column(String, default="FINANCE_OPERATOR")
     mid = Column(String, default="mid_rzp_live")
-    otp = Column(String, nullable=True)
-    otp_expires_at = Column(DateTime, nullable=True)
+    otp = Column(String, nullable=True) # legacy
+    otp_expires_at = Column(DateTime, nullable=True) # legacy
     is_verified = Column(Integer, default=1)
     created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 
 class RawTransaction(Base):
@@ -253,6 +257,9 @@ class AuditLog(Base):
     id = Column(Integer, primary_key=True, index=True)
     timestamp = Column(DateTime, default=datetime.utcnow, index=True)
     actor = Column(String, nullable=False)             # Finance Admin | AI Agent | System
+    user_id = Column(Integer, nullable=True)
+    user_email = Column(String, nullable=True)
+    user_role = Column(String, nullable=True)
     action_type = Column(String, nullable=False)       # APPROVE_RECOMMENDATION | REJECT_RECOMMENDATION | HUMAN_FEEDBACK | AI_INVESTIGATION
     entity_type = Column(String, nullable=False)
     entity_id = Column(String, nullable=False)

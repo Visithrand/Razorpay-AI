@@ -81,7 +81,7 @@ export default function MatchTable({ matches = [], onRowClick }) {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search by Txn ID, UTR number, Customer reference, or Reason..."
-              className="w-full bg-white border border-[#DCE3ED] rounded-lg pl-9 pr-3 py-2 text-xs text-[#0B192C] outline-none focus:border-[#0065FF] font-medium shadow-2xs"
+              className="w-full bg-white border border-[#DCE3ED] rounded-lg pl-9 pr-3 py-2 text-sm text-[#0B192C] outline-none focus:border-[#0065FF] font-medium shadow-2xs"
             />
           </div>
 
@@ -90,7 +90,7 @@ export default function MatchTable({ matches = [], onRowClick }) {
             <select
               value={matchTypeFilter}
               onChange={(e) => setMatchTypeFilter(e.target.value)}
-              className="bg-white border border-[#DCE3ED] rounded-lg px-3 py-2 text-xs font-extrabold text-[#0B192C] outline-none focus:border-[#0065FF] shadow-2xs"
+              className="bg-white border border-[#DCE3ED] rounded-lg px-3 py-2 text-sm font-extrabold text-[#0B192C] outline-none focus:border-[#0065FF] shadow-2xs"
             >
               <option value="all">All Match Types</option>
               <option value="exact">Exact Match</option>
@@ -102,7 +102,7 @@ export default function MatchTable({ matches = [], onRowClick }) {
             <select
               value={priorityFilter}
               onChange={(e) => setPriorityFilter(e.target.value)}
-              className="bg-white border border-[#DCE3ED] rounded-lg px-3 py-2 text-xs font-extrabold text-[#0B192C] outline-none focus:border-[#0065FF] shadow-2xs"
+              className="bg-white border border-[#DCE3ED] rounded-lg px-3 py-2 text-sm font-extrabold text-[#0B192C] outline-none focus:border-[#0065FF] shadow-2xs"
             >
               <option value="all">All Priorities</option>
               <option value="CRITICAL">🚨 CRITICAL (&gt; ₹5L)</option>
@@ -114,15 +114,15 @@ export default function MatchTable({ matches = [], onRowClick }) {
         </div>
 
         {/* Amount Range & Results Row */}
-        <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
           <div className="flex items-center gap-2">
-            <span className="text-gray-500 font-extrabold uppercase text-[10px] tracking-wider">Amount Range:</span>
+            <span className="text-gray-500 font-extrabold uppercase text-xs tracking-wider">Amount Range:</span>
             <input
               type="number"
               value={minAmount}
               onChange={(e) => setMinAmount(e.target.value)}
               placeholder="Min ₹"
-              className="w-24 bg-white border border-[#DCE3ED] rounded px-2 py-1 text-xs outline-none focus:border-[#0065FF]"
+              className="w-24 bg-white border border-[#DCE3ED] rounded px-2 py-1 text-sm outline-none focus:border-[#0065FF]"
             />
             <span className="text-gray-400 font-bold">–</span>
             <input
@@ -130,18 +130,18 @@ export default function MatchTable({ matches = [], onRowClick }) {
               value={maxAmount}
               onChange={(e) => setMaxAmount(e.target.value)}
               placeholder="Max ₹"
-              className="w-24 bg-white border border-[#DCE3ED] rounded px-2 py-1 text-xs outline-none focus:border-[#0065FF]"
+              className="w-24 bg-white border border-[#DCE3ED] rounded px-2 py-1 text-sm outline-none focus:border-[#0065FF]"
             />
           </div>
 
           <div className="flex items-center gap-3 ml-auto">
-            <span className="text-xs font-bold text-gray-500">
+            <span className="text-sm font-bold text-gray-500">
               Showing <strong className="text-[#0065FF]">{filteredMatches.length}</strong> of {matches.length} matches
             </span>
             {hasActiveFilters && (
               <button
                 onClick={clearFilters}
-                className="text-xs font-extrabold text-[#EF4444] hover:underline flex items-center gap-1 bg-red-50 px-2.5 py-1 rounded border border-red-200"
+                className="text-sm font-extrabold text-[#EF4444] hover:underline flex items-center gap-1 bg-red-50 px-2.5 py-1 rounded border border-red-200"
               >
                 <RotateCcw size={12} /> Clear Filters
               </button>
@@ -157,18 +157,18 @@ export default function MatchTable({ matches = [], onRowClick }) {
             <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-3 text-gray-400">
               <Info size={24} />
             </div>
-            <h3 className="text-sm font-extrabold text-[#0B192C]">No matching records found</h3>
-            <p className="text-xs text-gray-500 mt-0.5">Try clearing filters or adjusting your search keywords.</p>
+            <h3 className="text-base font-extrabold text-[#0B192C]">No matching records found</h3>
+            <p className="text-sm text-gray-500 mt-0.5">Try clearing filters or adjusting your search keywords.</p>
             {hasActiveFilters && (
-              <button onClick={clearFilters} className="btn-secondary text-xs mt-3">
+              <button onClick={clearFilters} className="btn-secondary text-sm mt-3">
                 Reset All Filters
               </button>
             )}
           </div>
         ) : (
-          <table className="w-full text-xs text-left border-collapse">
+          <table className="w-full text-sm text-left border-collapse">
             <thead>
-              <tr className="border-b border-[#DCE3ED] bg-[#EFF3F8]/40 text-gray-500 font-extrabold uppercase text-[11px]">
+              <tr className="border-b border-[#DCE3ED] bg-[#EFF3F8]/40 text-gray-500 font-extrabold uppercase text-[13px]">
                 <th className="px-4 py-3">Priority</th>
                 <th className="px-4 py-3">Transaction ID</th>
                 <th className="px-4 py-3">Gateway UTR</th>
@@ -201,7 +201,7 @@ export default function MatchTable({ matches = [], onRowClick }) {
                     className="border-b border-[#E8EEF5] cursor-pointer hover:bg-[#E6F0FF]/30 transition-colors"
                   >
                     <td className="px-4 py-3">
-                      <span className="px-2 py-0.5 rounded text-[10px] font-extrabold flex items-center gap-1 w-fit" style={{ background: prioBadge.bg, color: prioBadge.text }}>
+                      <span className="px-2 py-0.5 rounded text-xs font-extrabold flex items-center gap-1 w-fit" style={{ background: prioBadge.bg, color: prioBadge.text }}>
                         <span>{prioBadge.icon}</span> {prioBadge.label}
                       </span>
                     </td>
@@ -214,13 +214,13 @@ export default function MatchTable({ matches = [], onRowClick }) {
                           {m.gateway_utr.slice(0, 18)}
                         </span>
                       ) : (
-                        <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-gray-100 text-gray-400 font-mono">
+                        <span className="px-1.5 py-0.5 rounded text-xs font-semibold bg-gray-100 text-gray-400 font-mono">
                           N/A
                         </span>
                       )}
                     </td>
                     <td className="px-4 py-3">
-                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-extrabold" style={{ background: badge.bg, color: badge.text }}>
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[13px] font-extrabold" style={{ background: badge.bg, color: badge.text }}>
                         <BadgeIcon size={12} />
                         {m.match_type}
                       </span>
@@ -236,7 +236,7 @@ export default function MatchTable({ matches = [], onRowClick }) {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <span className="text-[12px] font-extrabold w-8" style={{ color: colors.text }}>{confPct}%</span>
+                        <span className="text-sm font-extrabold w-8" style={{ color: colors.text }}>{confPct}%</span>
                         <div className="w-14 h-1.5 rounded-full bg-gray-100 overflow-hidden">
                           <div className="h-full rounded-full" style={{ width: `${confPct}%`, background: colors.bar }} />
                         </div>

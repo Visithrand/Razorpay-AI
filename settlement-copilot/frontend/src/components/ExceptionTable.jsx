@@ -118,12 +118,12 @@ export default function ExceptionTable({ exceptions = [], loading = false }) {
                 <h3 className="font-extrabold text-[#0B192C] text-base">
                   Unmatched Exceptions ({filteredItems.length} of {items.length})
                 </h3>
-                <p className="text-xs text-gray-500 mt-0.5">Filter by customer, transaction ID, priority level, or amount to resolve claims.</p>
+                <p className="text-sm text-gray-500 mt-0.5">Filter by customer, transaction ID, priority level, or amount to resolve claims.</p>
               </div>
 
               <button 
                 onClick={fetchLiveExceptions}
-                className="px-3 py-1.5 bg-white border border-[#DCE3ED] hover:bg-gray-50 text-xs font-bold text-[#0B192C] rounded-lg transition-all flex items-center gap-1.5 shadow-2xs self-start sm:self-auto"
+                className="px-3 py-1.5 bg-white border border-[#DCE3ED] hover:bg-gray-50 text-sm font-bold text-[#0B192C] rounded-lg transition-all flex items-center gap-1.5 shadow-2xs self-start sm:self-auto"
               >
                 <RefreshCw size={13} className={isFetching ? 'animate-spin text-[#0065FF]' : ''} />
                 Refresh Exceptions
@@ -140,7 +140,7 @@ export default function ExceptionTable({ exceptions = [], loading = false }) {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Search by ID, UTR, merchant name, or reason..."
-                  className="w-full bg-white border border-[#DCE3ED] rounded-lg pl-9 pr-3 py-1.5 text-xs text-[#0B192C] outline-none focus:border-[#0065FF] font-medium"
+                  className="w-full bg-white border border-[#DCE3ED] rounded-lg pl-9 pr-3 py-1.5 text-sm text-[#0B192C] outline-none focus:border-[#0065FF] font-medium"
                 />
               </div>
 
@@ -149,7 +149,7 @@ export default function ExceptionTable({ exceptions = [], loading = false }) {
                 <select
                   value={priorityFilter}
                   onChange={(e) => setPriorityFilter(e.target.value)}
-                  className="bg-white border border-[#DCE3ED] rounded-lg px-3 py-1.5 text-xs font-extrabold text-[#0B192C] outline-none focus:border-[#0065FF]"
+                  className="bg-white border border-[#DCE3ED] rounded-lg px-3 py-1.5 text-sm font-extrabold text-[#0B192C] outline-none focus:border-[#0065FF]"
                 >
                   <option value="all">All Priorities</option>
                   <option value="CRITICAL">🚨 CRITICAL (&gt; ₹5L)</option>
@@ -161,7 +161,7 @@ export default function ExceptionTable({ exceptions = [], loading = false }) {
                 <select
                   value={categoryFilter}
                   onChange={(e) => setCategoryFilter(e.target.value)}
-                  className="bg-white border border-[#DCE3ED] rounded-lg px-3 py-1.5 text-xs font-extrabold text-[#0B192C] outline-none focus:border-[#0065FF]"
+                  className="bg-white border border-[#DCE3ED] rounded-lg px-3 py-1.5 text-sm font-extrabold text-[#0B192C] outline-none focus:border-[#0065FF]"
                 >
                   <option value="all">All Classifications</option>
                   <option value="AMOUNT_MISMATCH">AMOUNT MISMATCH</option>
@@ -174,15 +174,15 @@ export default function ExceptionTable({ exceptions = [], loading = false }) {
             </div>
 
             {/* Amount Filters & Clear */}
-            <div className="flex items-center justify-between gap-3 text-xs pt-1">
+            <div className="flex items-center justify-between gap-3 text-sm pt-1">
               <div className="flex items-center gap-2">
-                <span className="text-gray-400 font-bold uppercase text-[10px]">Amount Range:</span>
+                <span className="text-gray-400 font-bold uppercase text-xs">Amount Range:</span>
                 <input
                   type="number"
                   value={minAmount}
                   onChange={(e) => setMinAmount(e.target.value)}
                   placeholder="Min ₹"
-                  className="w-20 bg-white border border-[#DCE3ED] rounded px-2 py-1 text-xs outline-none focus:border-[#0065FF]"
+                  className="w-20 bg-white border border-[#DCE3ED] rounded px-2 py-1 text-sm outline-none focus:border-[#0065FF]"
                 />
                 <span className="text-gray-400 font-bold">–</span>
                 <input
@@ -190,14 +190,14 @@ export default function ExceptionTable({ exceptions = [], loading = false }) {
                   value={maxAmount}
                   onChange={(e) => setMaxAmount(e.target.value)}
                   placeholder="Max ₹"
-                  className="w-20 bg-white border border-[#DCE3ED] rounded px-2 py-1 text-xs outline-none focus:border-[#0065FF]"
+                  className="w-20 bg-white border border-[#DCE3ED] rounded px-2 py-1 text-sm outline-none focus:border-[#0065FF]"
                 />
               </div>
 
               {hasActiveFilters && (
                 <button
                   onClick={clearFilters}
-                  className="text-xs font-extrabold text-[#EF4444] hover:underline flex items-center gap-1 bg-red-50 px-2 py-0.5 rounded border border-red-200"
+                  className="text-sm font-extrabold text-[#EF4444] hover:underline flex items-center gap-1 bg-red-50 px-2 py-0.5 rounded border border-red-200"
                 >
                   <RotateCcw size={12} /> Clear Filters
                 </button>
@@ -208,14 +208,14 @@ export default function ExceptionTable({ exceptions = [], loading = false }) {
           {/* Exceptions Table */}
           <div className="overflow-x-auto">
             {filteredItems.length === 0 ? (
-              <div className="p-12 text-center text-gray-500 text-xs">
-                <p className="font-extrabold text-sm text-[#0B192C]">No exception records match your filter criteria</p>
-                <button onClick={clearFilters} className="btn-secondary text-xs mt-3">Reset Filters</button>
+              <div className="p-12 text-center text-gray-500 text-sm">
+                <p className="font-extrabold text-base text-[#0B192C]">No exception records match your filter criteria</p>
+                <button onClick={clearFilters} className="btn-secondary text-sm mt-3">Reset Filters</button>
               </div>
             ) : (
-              <table className="w-full text-left text-sm">
+              <table className="w-full text-left text-base">
                 <thead>
-                  <tr className="border-b border-[#DCE3ED] bg-[#EFF3F8]/60 text-xs font-extrabold uppercase text-gray-500">
+                  <tr className="border-b border-[#DCE3ED] bg-[#EFF3F8]/60 text-sm font-extrabold uppercase text-gray-500">
                     <th className="px-6 py-3.5">Priority</th>
                     <th className="px-6 py-3.5">ID / Ref</th>
                     <th className="px-6 py-3.5">Source</th>
@@ -233,25 +233,25 @@ export default function ExceptionTable({ exceptions = [], loading = false }) {
                     return (
                       <tr key={row.id} className="border-b border-[#E8EEF5] hover:bg-[#E6F0FF]/30 transition-colors">
                         <td className="px-6 py-4">
-                          <span className="px-2.5 py-0.5 rounded text-[11px] font-extrabold flex items-center gap-1 w-fit border" style={{ background: prio.bg, color: prio.text, borderColor: prio.border }}>
+                          <span className="px-2.5 py-0.5 rounded text-[13px] font-extrabold flex items-center gap-1 w-fit border" style={{ background: prio.bg, color: prio.text, borderColor: prio.border }}>
                             <span>{prio.icon}</span> {row.priority || 'MEDIUM'}
                           </span>
                         </td>
-                        <td className="px-6 py-4 font-mono font-bold text-[#0065FF] text-xs">EX-{row.id}</td>
-                        <td className="px-6 py-4 font-bold text-xs uppercase text-gray-700">{row.source || 'Gateway'}</td>
+                        <td className="px-6 py-4 font-mono font-bold text-[#0065FF] text-sm">EX-{row.id}</td>
+                        <td className="px-6 py-4 font-bold text-sm uppercase text-gray-700">{row.source || 'Gateway'}</td>
                         <td className="px-6 py-4">
-                          <span className="px-2 py-0.5 rounded text-[11px] font-mono font-extrabold tracking-tight" style={{ background: cat.bg, color: cat.text }}>
+                          <span className="px-2 py-0.5 rounded text-[13px] font-mono font-extrabold tracking-tight" style={{ background: cat.bg, color: cat.text }}>
                             {cat.label}
                           </span>
                         </td>
                         <td className="px-6 py-4 font-extrabold text-[#0B192C]">
                           ₹{Number(row.amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                         </td>
-                        <td className="px-6 py-4 text-xs text-gray-600 max-w-sm">
+                        <td className="px-6 py-4 text-sm text-gray-600 max-w-sm">
                           {row.description || 'Discrepancy detected across Bank credit & ERP statement'}
                         </td>
                         <td className="px-6 py-4">
-                          <span className={`px-2.5 py-0.5 rounded text-[11px] font-extrabold uppercase border ${
+                          <span className={`px-2.5 py-0.5 rounded text-[13px] font-extrabold uppercase border ${
                             row.status === 'RESOLVED' ? 'bg-[#D1FAE5] text-[#059669] border-[#10B981]' :
                             row.status === 'REJECTED' ? 'bg-[#FEE2E2] text-[#DC2626] border-[#EF4444]' :
                             'bg-yellow-50 text-yellow-700 border-yellow-200'
@@ -262,7 +262,7 @@ export default function ExceptionTable({ exceptions = [], loading = false }) {
                         <td className="px-6 py-4 text-right">
                           <button
                             onClick={() => setSelectedInvestigateId(row.id)}
-                            className="btn-primary py-1.5 px-3 text-xs bg-[#0065FF] shadow-sm hover:shadow"
+                            className="btn-primary py-1.5 px-3 text-sm bg-[#0065FF] shadow-sm hover:shadow"
                           >
                             <Zap size={13} /> Investigate
                           </button>

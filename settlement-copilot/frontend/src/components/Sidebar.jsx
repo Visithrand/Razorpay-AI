@@ -59,17 +59,17 @@ export default function Sidebar({ activePage, onNavigate, collapsed, onToggle })
         {!collapsed && (
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded flex items-center justify-center p-1 bg-white">
-              <img src="/razorpay-logo.jpg" alt="Razorpay" className="w-full h-full object-contain" />
+              <img src="https://razorpay.com/assets/razorpay-glyph.svg" alt="Razorpay" className="w-full h-full object-contain" />
             </div>
             <div className="flex flex-col">
-              <span className="text-[14px] font-extrabold tracking-wide text-white leading-tight">Settlement Copilot</span>
-              <span className="text-[10px] text-white/50 font-bold uppercase tracking-widest">AI Finance Controller</span>
+              <span className="text-base font-extrabold tracking-wide text-white leading-tight">Settlement Copilot</span>
+              <span className="text-xs text-white/50 font-bold uppercase tracking-widest">AI Finance Controller</span>
             </div>
           </div>
         )}
         {collapsed && (
           <div className="w-8 h-8 mx-auto rounded flex items-center justify-center p-1 bg-white">
-            <img src="/razorpay-logo.jpg" alt="Razorpay" className="w-full h-full object-contain" />
+            <img src="https://razorpay.com/assets/razorpay-glyph.svg" alt="Razorpay" className="w-full h-full object-contain" />
           </div>
         )}
       </div>
@@ -78,7 +78,7 @@ export default function Sidebar({ activePage, onNavigate, collapsed, onToggle })
         {NAV_SECTIONS.map((section, idx) => (
           <div key={idx}>
             {!collapsed && (
-              <h3 className="px-3 mb-2 text-[10px] font-bold text-white/40 tracking-[1px] uppercase">
+              <h3 className="px-3 mb-2 text-xs font-bold text-white/40 tracking-[1px] uppercase">
                 {section.title}
               </h3>
             )}
@@ -102,7 +102,7 @@ export default function Sidebar({ activePage, onNavigate, collapsed, onToggle })
                     <Icon size={18} className={isActive ? 'text-white' : 'text-white/50 group-hover:text-white/80'} />
                     
                     {!collapsed && (
-                      <span className="text-[13px] tracking-wide flex-1 text-left">{item.label}</span>
+                      <span className="text-[15px] tracking-wide flex-1 text-left">{item.label}</span>
                     )}
 
                     {!collapsed && item.badge && (

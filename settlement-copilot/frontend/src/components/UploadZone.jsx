@@ -29,7 +29,7 @@ export default function UploadZone({ onResults, onRunDemo, loading }) {
           </div>
           <div>
             <h2 className="text-xl font-extrabold text-[#0B192C]">Data Ingestion Engine</h2>
-            <p className="text-[14px] text-[#4A5568] mt-0.5">Upload your transaction files or run the instant AI reconciliation demo.</p>
+            <p className="text-base text-[#4A5568] mt-0.5">Upload your transaction files or run the instant AI reconciliation demo.</p>
           </div>
         </div>
 
@@ -37,7 +37,7 @@ export default function UploadZone({ onResults, onRunDemo, loading }) {
         <button
           onClick={onRunDemo}
           disabled={loading}
-          className="px-5 py-2.5 bg-gradient-to-r from-[#0065FF] to-[#00C2FF] hover:from-[#0052CC] hover:to-[#00B0E6] text-white font-bold text-sm rounded-lg transition-all shadow-md hover:shadow-lg flex items-center gap-2 flex-shrink-0 disabled:opacity-50"
+          className="px-5 py-2.5 bg-gradient-to-r from-[#0065FF] to-[#00C2FF] hover:from-[#0052CC] hover:to-[#00B0E6] text-white font-bold text-base rounded-lg transition-all shadow-md hover:shadow-lg flex items-center gap-2 flex-shrink-0 disabled:opacity-50"
         >
           <Sparkles size={16} className="text-[#00E6A0]" />
           {loading ? 'Running AI Engine...' : '⚡ Run 1-Click AI Demo'}
@@ -52,12 +52,12 @@ export default function UploadZone({ onResults, onRunDemo, loading }) {
         ].map((block) => (
           <div key={block.id} className="flex flex-col border border-[#DCE3ED] rounded-xl p-5 bg-[#EFF3F8]/40 hover:bg-white hover:border-[#0065FF] transition-all duration-200 relative">
             {block.required && (
-              <span className="absolute top-4 right-4 text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#FEE2E2] text-[#EF4444]">
+              <span className="absolute top-4 right-4 text-xs font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#FEE2E2] text-[#EF4444]">
                 Required
               </span>
             )}
             <h3 className="text-[15px] font-extrabold text-[#0B192C] mb-1">{block.label}</h3>
-            <p className="text-[13px] text-[#718096] mb-4">{block.desc}</p>
+            <p className="text-[15px] text-[#718096] mb-4">{block.desc}</p>
             
             <div 
               className="flex-1 flex flex-col items-center justify-center border-2 border-dashed border-[#DCE3ED] rounded-xl p-5 bg-white cursor-pointer min-h-[150px] hover:border-[#0065FF] transition-colors"
@@ -69,15 +69,15 @@ export default function UploadZone({ onResults, onRunDemo, loading }) {
                   <div className="w-11 h-11 rounded-full flex items-center justify-center mb-2.5 bg-[#D1FAE5] text-[#10B981]">
                     <CheckCircle2 size={22} />
                   </div>
-                  <p className="font-extrabold text-[13px] text-[#0B192C] text-center break-all line-clamp-2">{files[block.id].name}</p>
+                  <p className="font-extrabold text-[15px] text-[#0B192C] text-center break-all line-clamp-2">{files[block.id].name}</p>
                 </div>
               ) : (
                 <div className="flex flex-col items-center text-center">
                   <div className="w-11 h-11 rounded-full flex items-center justify-center mb-2 bg-[#EFF3F8] text-[#718096]">
                     <UploadCloud size={22} />
                   </div>
-                  <p className="font-extrabold text-[13px] text-[#0065FF]">Click to select file</p>
-                  <p className="text-[11px] text-[#718096] mt-1 font-mono">{block.accept}</p>
+                  <p className="font-extrabold text-[15px] text-[#0065FF]">Click to select file</p>
+                  <p className="text-[13px] text-[#718096] mt-1 font-mono">{block.accept}</p>
                 </div>
               )}
               <input
@@ -93,7 +93,7 @@ export default function UploadZone({ onResults, onRunDemo, loading }) {
       </div>
 
       <div className="mt-7 pt-5 border-t border-[#E8EEF5] flex flex-col md:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-2.5 text-[13px] font-bold">
+        <div className="flex items-center gap-2.5 text-[15px] font-bold">
           <AlertTriangle size={18} className={allPresent ? 'text-[#10B981]' : 'text-[#0065FF]'} />
           <span className="text-[#0B192C]">
             {allPresent ? 'Custom files attached and ready.' : 'Click button to run 3-pass reconciliation engine on demo or uploaded data.'}
@@ -103,7 +103,7 @@ export default function UploadZone({ onResults, onRunDemo, loading }) {
         <button
           disabled={loading}
           onClick={handleStartReconciliation}
-          className="btn-primary px-7 py-3 text-[14px] disabled:opacity-50 shadow-md"
+          className="btn-primary px-7 py-3 text-base disabled:opacity-50 shadow-md"
         >
           {loading ? 'Running 3-Pass Matcher...' : 'Initialize Reconciliation Engine'}
         </button>

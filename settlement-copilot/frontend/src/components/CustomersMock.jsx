@@ -51,7 +51,7 @@ export default function CustomersMock() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-extrabold text-[#0B192C]">Customers</h1>
-          <p className="text-[14px] text-[#4A5568] mt-0.5">Manage your customer directory and purchase history.</p>
+          <p className="text-base text-[#4A5568] mt-0.5">Manage your customer directory and purchase history.</p>
         </div>
         <div className="flex items-center gap-3">
           <button onClick={handleExport} className="btn-secondary">
@@ -66,7 +66,7 @@ export default function CustomersMock() {
       <div className="bg-white rounded-xl border border-[#DCE3ED] overflow-hidden shadow-sm min-h-[500px]">
         {/* Header Filter Tabs & Search */}
         <div className="px-6 py-3 border-b border-[#DCE3ED] flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#EFF3F8]/30">
-          <div className="flex items-center gap-6 text-[14px] font-bold text-[#4A5568]">
+          <div className="flex items-center gap-6 text-base font-bold text-[#4A5568]">
             {[
               { id: 'all', label: `All (${customers.length})` },
               { id: 'active', label: `Active (${customers.filter(c => c.status === 'Active').length})` },
@@ -91,7 +91,7 @@ export default function CustomersMock() {
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               placeholder="Search name, email, phone..."
-              className="bg-transparent border-none outline-none text-[13px] w-full text-[#0B192C]"
+              className="bg-transparent border-none outline-none text-[15px] w-full text-[#0B192C]"
             />
           </div>
         </div>
@@ -102,11 +102,11 @@ export default function CustomersMock() {
               <p className="text-[15px] font-bold">No customers match your search</p>
             </div>
           ) : (
-            <table className="w-full text-[14px] text-left">
+            <table className="w-full text-base text-left">
               <thead>
                 <tr className="border-b border-[#DCE3ED] bg-[#EFF3F8]/60">
                   {['Customer', 'Contact Info', 'Total Spent', 'Created At', 'Status'].map(h => (
-                    <th key={h} className="px-6 py-3.5 text-[11px] font-extrabold uppercase tracking-wider text-[#718096]">{h}</th>
+                    <th key={h} className="px-6 py-3.5 text-[13px] font-extrabold uppercase tracking-wider text-[#718096]">{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -114,17 +114,17 @@ export default function CustomersMock() {
                 {filteredCustomers.map((c) => (
                   <tr key={c.id} className="border-b border-[#E8EEF5] hover:bg-[#E6F0FF]/30 transition-colors">
                     <td className="px-6 py-4">
-                      <p className="font-extrabold text-[14px] text-[#0065FF]">{c.name}</p>
-                      <p className="text-[11px] font-mono mt-0.5 text-[#718096]">{c.id}</p>
+                      <p className="font-extrabold text-base text-[#0065FF]">{c.name}</p>
+                      <p className="text-[13px] font-mono mt-0.5 text-[#718096]">{c.id}</p>
                     </td>
                     <td className="px-6 py-4">
-                      <p className="flex items-center gap-1.5 text-[12px] text-[#4A5568]"><Mail size={12}/> {c.email}</p>
-                      <p className="flex items-center gap-1.5 text-[12px] text-[#4A5568] mt-1"><Phone size={12}/> {c.phone}</p>
+                      <p className="flex items-center gap-1.5 text-sm text-[#4A5568]"><Mail size={12}/> {c.email}</p>
+                      <p className="flex items-center gap-1.5 text-sm text-[#4A5568] mt-1"><Phone size={12}/> {c.phone}</p>
                     </td>
                     <td className="px-6 py-4 font-bold text-[#0B192C]">{c.spent}</td>
-                    <td className="px-6 py-4 text-[12px] text-[#718096]">{c.created}</td>
+                    <td className="px-6 py-4 text-sm text-[#718096]">{c.created}</td>
                     <td className="px-6 py-4">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-[11px] font-extrabold uppercase tracking-wider"
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-[13px] font-extrabold uppercase tracking-wider"
                         style={{ 
                           background: c.status === 'Active' ? '#D1FAE5' : '#EFF3F8', 
                           color: c.status === 'Active' ? '#10B981' : '#718096' 
@@ -149,9 +149,9 @@ export default function CustomersMock() {
                 <X size={18} />
               </button>
             </div>
-            <div className="p-6 space-y-4 text-[14px]">
+            <div className="p-6 space-y-4 text-base">
               <div>
-                <label className="block text-[12px] font-bold text-[#718096] uppercase mb-1">Customer Name *</label>
+                <label className="block text-sm font-bold text-[#718096] uppercase mb-1">Customer Name *</label>
                 <input
                   type="text"
                   required
@@ -162,7 +162,7 @@ export default function CustomersMock() {
                 />
               </div>
               <div>
-                <label className="block text-[12px] font-bold text-[#718096] uppercase mb-1">Email Address *</label>
+                <label className="block text-sm font-bold text-[#718096] uppercase mb-1">Email Address *</label>
                 <input
                   type="email"
                   required
@@ -173,7 +173,7 @@ export default function CustomersMock() {
                 />
               </div>
               <div>
-                <label className="block text-[12px] font-bold text-[#718096] uppercase mb-1">Phone Number</label>
+                <label className="block text-sm font-bold text-[#718096] uppercase mb-1">Phone Number</label>
                 <input
                   type="text"
                   value={newCust.phone}

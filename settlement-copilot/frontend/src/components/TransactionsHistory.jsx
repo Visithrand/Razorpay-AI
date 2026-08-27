@@ -90,7 +90,7 @@ export default function TransactionsHistory() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-extrabold text-[#0B192C]">Transactions & Customer Claims</h1>
-          <p className="text-[14px] text-[#4A5568] mt-0.5">Filter by customer name, payment ID, amount range, or priority level to investigate claims.</p>
+          <p className="text-base text-[#4A5568] mt-0.5">Filter by customer name, payment ID, amount range, or priority level to investigate claims.</p>
         </div>
         <div className="flex items-center gap-3">
           <button onClick={handleExport} className="btn-primary">
@@ -102,7 +102,7 @@ export default function TransactionsHistory() {
       <div className="bg-white rounded-xl border border-[#DCE3ED] overflow-hidden shadow-sm">
         {/* Top Control Bar: Status Tabs */}
         <div className="px-6 py-3 border-b border-[#DCE3ED] flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#EFF3F8]/30">
-          <div className="flex items-center gap-6 text-[14px] font-bold text-[#4A5568]">
+          <div className="flex items-center gap-6 text-base font-bold text-[#4A5568]">
             {[
               { id: 'all', label: `All (${INITIAL_TXNS.length})` },
               { id: 'captured', label: `Captured (${INITIAL_TXNS.filter(t => t.status === 'captured').length})` },
@@ -133,7 +133,7 @@ export default function TransactionsHistory() {
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 placeholder="Search by customer name, email, payment ID, or UTR..."
-                className="w-full bg-white border border-[#DCE3ED] rounded-lg pl-9 pr-3 py-2 text-xs text-[#0B192C] outline-none focus:border-[#0065FF] font-medium"
+                className="w-full bg-white border border-[#DCE3ED] rounded-lg pl-9 pr-3 py-2 text-sm text-[#0B192C] outline-none focus:border-[#0065FF] font-medium"
               />
             </div>
 
@@ -142,7 +142,7 @@ export default function TransactionsHistory() {
               <select
                 value={priorityFilter}
                 onChange={(e) => setPriorityFilter(e.target.value)}
-                className="bg-white border border-[#DCE3ED] rounded-lg px-3 py-2 text-xs font-extrabold text-[#0B192C] outline-none focus:border-[#0065FF]"
+                className="bg-white border border-[#DCE3ED] rounded-lg px-3 py-2 text-sm font-extrabold text-[#0B192C] outline-none focus:border-[#0065FF]"
               >
                 <option value="all">All Priorities</option>
                 <option value="CRITICAL">🚨 CRITICAL (&gt; ₹5L)</option>
@@ -154,7 +154,7 @@ export default function TransactionsHistory() {
               <select
                 value={methodFilter}
                 onChange={e => setMethodFilter(e.target.value)}
-                className="bg-white border border-[#DCE3ED] rounded-lg px-3 py-2 text-xs font-extrabold text-[#0B192C] outline-none focus:border-[#0065FF]"
+                className="bg-white border border-[#DCE3ED] rounded-lg px-3 py-2 text-sm font-extrabold text-[#0B192C] outline-none focus:border-[#0065FF]"
               >
                 <option value="all">All Methods</option>
                 <option value="upi">UPI</option>
@@ -165,15 +165,15 @@ export default function TransactionsHistory() {
           </div>
 
           {/* Amount Range & Clear Row */}
-          <div className="flex items-center justify-between gap-3 text-xs pt-1">
+          <div className="flex items-center justify-between gap-3 text-sm pt-1">
             <div className="flex items-center gap-2">
-              <span className="text-gray-400 font-bold uppercase text-[10px]">Amount Range:</span>
+              <span className="text-gray-400 font-bold uppercase text-xs">Amount Range:</span>
               <input
                 type="number"
                 value={minAmount}
                 onChange={(e) => setMinAmount(e.target.value)}
                 placeholder="Min ₹"
-                className="w-24 bg-white border border-[#DCE3ED] rounded px-2 py-1 text-xs outline-none focus:border-[#0065FF]"
+                className="w-24 bg-white border border-[#DCE3ED] rounded px-2 py-1 text-sm outline-none focus:border-[#0065FF]"
               />
               <span className="text-gray-400 font-bold">–</span>
               <input
@@ -181,14 +181,14 @@ export default function TransactionsHistory() {
                 value={maxAmount}
                 onChange={(e) => setMaxAmount(e.target.value)}
                 placeholder="Max ₹"
-                className="w-24 bg-white border border-[#DCE3ED] rounded px-2 py-1 text-xs outline-none focus:border-[#0065FF]"
+                className="w-24 bg-white border border-[#DCE3ED] rounded px-2 py-1 text-sm outline-none focus:border-[#0065FF]"
               />
             </div>
 
             {hasActiveFilters && (
               <button
                 onClick={clearFilters}
-                className="text-xs font-extrabold text-[#EF4444] hover:underline flex items-center gap-1 bg-red-50 px-2.5 py-1 rounded border border-red-200"
+                className="text-sm font-extrabold text-[#EF4444] hover:underline flex items-center gap-1 bg-red-50 px-2.5 py-1 rounded border border-red-200"
               >
                 <RotateCcw size={12} /> Reset Filters
               </button>
@@ -201,22 +201,22 @@ export default function TransactionsHistory() {
           {filteredTxns.length === 0 ? (
             <div className="p-12 text-center text-[#718096]">
               <p className="text-[15px] font-bold">No matching transactions found</p>
-              <p className="text-[13px] mt-1">Try clearing your filters or search query.</p>
+              <p className="text-[15px] mt-1">Try clearing your filters or search query.</p>
               {hasActiveFilters && (
-                <button onClick={clearFilters} className="btn-secondary text-xs mt-3">Reset All Filters</button>
+                <button onClick={clearFilters} className="btn-secondary text-sm mt-3">Reset All Filters</button>
               )}
             </div>
           ) : (
-            <table className="w-full text-[14px] text-left">
+            <table className="w-full text-base text-left">
               <thead>
                 <tr className="border-b border-[#DCE3ED] bg-[#EFF3F8]/60">
-                  <th className="px-6 py-3.5 text-[11px] font-extrabold uppercase tracking-wider text-[#718096]">Priority</th>
-                  <th className="px-6 py-3.5 text-[11px] font-extrabold uppercase tracking-wider text-[#718096]">Payment ID</th>
-                  <th className="px-6 py-3.5 text-[11px] font-extrabold uppercase tracking-wider text-[#718096]">Customer / Person</th>
-                  <th className="px-6 py-3.5 text-[11px] font-extrabold uppercase tracking-wider text-[#718096]">Amount</th>
-                  <th className="px-6 py-3.5 text-[11px] font-extrabold uppercase tracking-wider text-[#718096]">Status</th>
-                  <th className="px-6 py-3.5 text-[11px] font-extrabold uppercase tracking-wider text-[#718096]">Method</th>
-                  <th className="px-6 py-3.5 text-[11px] font-extrabold uppercase tracking-wider text-[#718096]">Created At</th>
+                  <th className="px-6 py-3.5 text-[13px] font-extrabold uppercase tracking-wider text-[#718096]">Priority</th>
+                  <th className="px-6 py-3.5 text-[13px] font-extrabold uppercase tracking-wider text-[#718096]">Payment ID</th>
+                  <th className="px-6 py-3.5 text-[13px] font-extrabold uppercase tracking-wider text-[#718096]">Customer / Person</th>
+                  <th className="px-6 py-3.5 text-[13px] font-extrabold uppercase tracking-wider text-[#718096]">Amount</th>
+                  <th className="px-6 py-3.5 text-[13px] font-extrabold uppercase tracking-wider text-[#718096]">Status</th>
+                  <th className="px-6 py-3.5 text-[13px] font-extrabold uppercase tracking-wider text-[#718096]">Method</th>
+                  <th className="px-6 py-3.5 text-[13px] font-extrabold uppercase tracking-wider text-[#718096]">Created At</th>
                 </tr>
               </thead>
               <tbody>
@@ -239,19 +239,19 @@ export default function TransactionsHistory() {
                       className="border-b border-[#E8EEF5] hover:bg-[#E6F0FF]/30 cursor-pointer transition-colors"
                     >
                       <td className="px-6 py-4">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-extrabold flex items-center gap-1 w-fit" style={{ background: prioBadge.bg, color: prioBadge.text }}>
+                        <span className="px-2 py-0.5 rounded text-xs font-extrabold flex items-center gap-1 w-fit" style={{ background: prioBadge.bg, color: prioBadge.text }}>
                           <span>{prioBadge.icon}</span> {prioBadge.label}
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        <span className="font-mono font-bold text-[13px] text-[#0065FF]">{txn.id}</span>
+                        <span className="font-mono font-bold text-[15px] text-[#0065FF]">{txn.id}</span>
                       </td>
-                      <td className="px-6 py-4 text-[13px] font-bold text-[#0B192C]">{txn.cust}</td>
+                      <td className="px-6 py-4 text-[15px] font-bold text-[#0B192C]">{txn.cust}</td>
                       <td className="px-6 py-4 font-extrabold text-[#0B192C]">
                         ₹{txn.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                       </td>
                       <td className="px-6 py-4">
-                        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[12px] font-semibold" style={{ background: status.bg, color: status.color }}>
+                        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-sm font-semibold" style={{ background: status.bg, color: status.color }}>
                           <StatusIcon size={13} />
                           <span className="capitalize">{txn.status}</span>
                         </div>
@@ -261,10 +261,10 @@ export default function TransactionsHistory() {
                           <div className="w-6 h-6 rounded flex items-center justify-center bg-[#EFF3F8] border border-[#DCE3ED]">
                             <MethodIcon size={13} />
                           </div>
-                          <span className="text-[13px] font-medium">{method.label}</span>
+                          <span className="text-[15px] font-medium">{method.label}</span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-[12px] text-[#718096]">{txn.date}</td>
+                      <td className="px-6 py-4 text-sm text-[#718096]">{txn.date}</td>
                     </tr>
                   )
                 })}
@@ -274,7 +274,7 @@ export default function TransactionsHistory() {
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-[#DCE3ED] flex items-center justify-between text-[13px] text-[#718096]">
+        <div className="px-6 py-4 border-t border-[#DCE3ED] flex items-center justify-between text-[15px] text-[#718096]">
           <span className="font-semibold">Showing {filteredTxns.length} of {INITIAL_TXNS.length} entries</span>
         </div>
       </div>

@@ -19,7 +19,7 @@ export default function MatchDashboard({ report }) {
         <div>
           <h2 className="text-[16px] font-extrabold" style={{ color: 'var(--rz-text-primary)' }}>Reconciliation Summary</h2>
           <div className="flex items-center gap-2 mt-1">
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider"
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider"
               style={{
                 background: isHealthy ? 'var(--rz-green-light)' : 'var(--rz-red-light)',
                 color: isHealthy ? 'var(--rz-green)' : 'var(--rz-red)'
@@ -28,15 +28,15 @@ export default function MatchDashboard({ report }) {
               {isHealthy ? <CheckCircle size={12}/> : <XCircle size={12}/>}
               {isHealthy ? 'Healthy State' : 'Needs Attention'}
             </span>
-            <span className="text-[11px]" style={{ color: 'var(--rz-text-muted)' }}>Generated just now</span>
+            <span className="text-[13px]" style={{ color: 'var(--rz-text-muted)' }}>Generated just now</span>
           </div>
         </div>
         
         <div className="flex items-center gap-2">
-          <button className="btn-secondary text-[12px]">
+          <button className="btn-secondary text-sm">
             <Printer size={13} /> Print
           </button>
-          <button className="btn-primary text-[12px]">
+          <button className="btn-primary text-sm">
             <Download size={13} /> Export PDF
           </button>
         </div>
@@ -45,7 +45,7 @@ export default function MatchDashboard({ report }) {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {stats.map((s, i) => (
           <div key={i} className="rounded-lg border p-4" style={{ borderColor: 'var(--rz-border)', background: s.bg }}>
-            <p className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: 'var(--rz-text-muted)' }}>{s.label}</p>
+            <p className="text-xs font-bold uppercase tracking-wider mb-1" style={{ color: 'var(--rz-text-muted)' }}>{s.label}</p>
             <p className="text-2xl font-extrabold" style={{ color: s.color }}>{s.val}</p>
           </div>
         ))}
@@ -62,7 +62,7 @@ export default function MatchDashboard({ report }) {
             }} 
           />
         </div>
-        <span className="text-[12px] font-extrabold" style={{ color: isHealthy ? 'var(--rz-green)' : 'var(--rz-red)' }}>
+        <span className="text-sm font-extrabold" style={{ color: isHealthy ? 'var(--rz-green)' : 'var(--rz-red)' }}>
           {matchRate.toFixed(1)}% Matched
         </span>
       </div>

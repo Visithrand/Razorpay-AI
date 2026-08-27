@@ -62,11 +62,11 @@ function StatCard({ title, value, trend, trendValue, icon: Icon, bgColor, iconCo
         <div className="w-11 h-11 rounded-xl flex items-center justify-center shadow-sm" style={{ background: bgColor }}>
           <Icon size={22} style={{ color: iconColor }} />
         </div>
-        <h3 className="text-[14px] font-bold text-[#4A5568]">{title}</h3>
+        <h3 className="text-base font-bold text-[#4A5568]">{title}</h3>
       </div>
       <div className="flex items-baseline gap-3">
         <h2 className="text-3xl font-extrabold text-[#0B192C] tracking-tight">{value}</h2>
-        <span className="flex items-center text-[12px] font-extrabold px-2.5 py-1 rounded-md" 
+        <span className="flex items-center text-sm font-extrabold px-2.5 py-1 rounded-md" 
           style={{ 
             background: isPositive ? '#D1FAE5' : '#FEE2E2', 
             color: isPositive ? '#10B981' : '#EF4444' 
@@ -99,7 +99,7 @@ export default function HomeDashboard({ onNavigate }) {
       {/* Hero Banner — Exact style from user reference picture */}
       <div className="rz-hero-banner rounded-2xl p-8 text-white shadow-xl">
         <div className="relative z-10 max-w-2xl">
-          <div className="flex items-center gap-2 text-xs font-bold text-[#00E6A0] uppercase tracking-widest mb-2">
+          <div className="flex items-center gap-2 text-sm font-bold text-[#00E6A0] uppercase tracking-widest mb-2">
             <Zap size={14} /> Razorpay Settlement Copilot
           </div>
           <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-2">
@@ -118,7 +118,7 @@ export default function HomeDashboard({ onNavigate }) {
             </button>
             <button 
               onClick={() => onNavigate && onNavigate('settlements')}
-              className="px-5 py-3 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-sm rounded-md transition-all shadow-sm"
+              className="px-5 py-3 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-base rounded-md transition-all shadow-sm"
             >
               View Settlements
             </button>
@@ -151,7 +151,7 @@ export default function HomeDashboard({ onNavigate }) {
         </div>
 
         <div className="hidden sm:flex items-center gap-3 py-2">
-          <select className="px-3.5 py-1.5 bg-[#EFF3F8] border border-[#DCE3ED] rounded-lg text-[13px] font-bold text-[#0B192C] outline-none hover:border-[#0065FF] transition-colors">
+          <select className="px-3.5 py-1.5 bg-[#EFF3F8] border border-[#DCE3ED] rounded-lg text-[15px] font-bold text-[#0B192C] outline-none hover:border-[#0065FF] transition-colors">
             <option>Last 7 days</option>
             <option>Last 30 days</option>
             <option>This Month</option>
@@ -170,7 +170,7 @@ export default function HomeDashboard({ onNavigate }) {
       <div>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-xl font-extrabold text-[#0B192C]">Quick Actions</h3>
-          <span className="text-xs font-semibold text-[#718096]">Jump to any section</span>
+          <span className="text-sm font-semibold text-[#718096]">Jump to any section</span>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {QUICK_ACTIONS.map((action, i) => {
@@ -190,7 +190,7 @@ export default function HomeDashboard({ onNavigate }) {
                   {action.label}
                   <ArrowRight size={14} className="text-[#718096] opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
                 </h4>
-                <p className="text-[13px] text-[#4A5568] leading-relaxed">{action.desc}</p>
+                <p className="text-[15px] text-[#4A5568] leading-relaxed">{action.desc}</p>
               </button>
             )
           })}
@@ -204,9 +204,9 @@ export default function HomeDashboard({ onNavigate }) {
           <div className="flex items-center justify-between mb-6">
             <div>
               <h3 className="text-lg font-extrabold text-[#0B192C]">Payment Volume Overview</h3>
-              <p className="text-[13px] text-[#4A5568] mt-0.5">Gross payment volume vs Refunds over the last 7 days</p>
+              <p className="text-[15px] text-[#4A5568] mt-0.5">Gross payment volume vs Refunds over the last 7 days</p>
             </div>
-            <div className="flex gap-5 items-center text-[13px] font-bold text-[#4A5568]">
+            <div className="flex gap-5 items-center text-[15px] font-bold text-[#4A5568]">
               <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#0065FF]" /> Gross</div>
               <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#EF4444]" /> Refunds</div>
             </div>
@@ -249,9 +249,9 @@ export default function HomeDashboard({ onNavigate }) {
                   <Zap size={16} className="text-[#0065FF]" />
                   Getting Started
                 </h3>
-                <p className="text-[12px] text-[#718096] mt-0.5">{completedCount}/{totalCount} completed</p>
+                <p className="text-sm text-[#718096] mt-0.5">{completedCount}/{totalCount} completed</p>
               </div>
-              <span className="text-sm font-extrabold text-[#0065FF]">{Math.round(progress)}%</span>
+              <span className="text-base font-extrabold text-[#0065FF]">{Math.round(progress)}%</span>
             </div>
 
             <div className="w-full h-2 bg-[#EFF3F8] rounded-full mb-4 overflow-hidden">
@@ -277,10 +277,10 @@ export default function HomeDashboard({ onNavigate }) {
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className={`text-[13px] font-bold ${isDone ? 'line-through text-[#10B981]' : 'text-[#0B192C]'}`}>
+                      <p className={`text-[15px] font-bold ${isDone ? 'line-through text-[#10B981]' : 'text-[#0B192C]'}`}>
                         {item.label}
                       </p>
-                      <p className="text-[11px] text-[#718096] mt-0.5">{item.desc}</p>
+                      <p className="text-[13px] text-[#718096] mt-0.5">{item.desc}</p>
                     </div>
                   </button>
                 )
@@ -295,7 +295,7 @@ export default function HomeDashboard({ onNavigate }) {
                 <Clock size={16} className="text-[#718096]" />
                 Recent Activity
               </h3>
-              <button className="text-[12px] font-bold text-[#0065FF] hover:underline flex items-center gap-1">
+              <button className="text-sm font-bold text-[#0065FF] hover:underline flex items-center gap-1">
                 View All <ChevronRight size={12} />
               </button>
             </div>
@@ -309,8 +309,8 @@ export default function HomeDashboard({ onNavigate }) {
                       <Icon size={14} style={{ color: item.color }} />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-[13px] font-semibold text-[#0B192C] leading-snug">{item.text}</p>
-                      <p className="text-[11px] text-[#718096] mt-0.5">{item.time}</p>
+                      <p className="text-[15px] font-semibold text-[#0B192C] leading-snug">{item.text}</p>
+                      <p className="text-[13px] text-[#718096] mt-0.5">{item.time}</p>
                     </div>
                   </div>
                 )

@@ -76,15 +76,15 @@ export default function ExecutiveDashboard({ onNavigate }) {
           <ServerCrash size={24} />
           <div>
             <h3 className="font-bold text-[16px]">Backend unavailable</h3>
-            <p className="text-[14px]">Unable to retrieve settlement data.</p>
-            <button onClick={fetchDashboardData} className="mt-3 text-[14px] font-bold underline">Retry connection</button>
+            <p className="text-base">Unable to retrieve settlement data.</p>
+            <button onClick={fetchDashboardData} className="mt-3 text-base font-bold underline">Retry connection</button>
           </div>
         </div>
       </div>
     )
   }
 
-  const kpis = metrics?.kpis || { transactions: 0, match_rate: 0, anomalies: 0, exceptions: 0, amount_at_risk: 0 }
+  const kpis = metrics || { total_volume: 0, matched_amount: 0, at_risk_amount: 0, open_exceptions: 0, high_priority_exceptions: 0 }
   const ce = metrics?.control_effectiveness || {}
   const lastRun = metrics?.last_run
 
@@ -95,14 +95,10 @@ export default function ExecutiveDashboard({ onNavigate }) {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-[#E5E7EB] pb-4">
           <div>
-            <h1 className="text-[24px] font-semibold text-[#111827]">Settlement Overview</h1>
-            <p className="text-[14px] text-[#6B7280]">Continuous payment monitoring and reconciliation</p>
+            <h1 className="text-[24px] font-semibold text-[#111827]">Financial Control Center</h1>
+            <p className="text-base text-[#6B7280]">Continuous payment monitoring and financial exposure</p>
           </div>
-          <div className="flex gap-8 text-[13px] text-[#374151]">
-            <div>
-              <p className="font-semibold text-[#6B7280] uppercase tracking-wider mb-1">Last reconciliation</p>
-              <p className="font-medium">{lastRun ? new Date(lastRun.run_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }) : 'No runs yet'}</p>
-            </div>
+          <div className="flex gap-8 text-[15px] text-[#374151]">
             <div>
               <p className="font-semibold text-[#6B7280] uppercase tracking-wider mb-1">Monitoring</p>
               <p className="font-bold text-[#059669] flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#059669] animate-pulse" /> LIVE</p>
@@ -110,27 +106,46 @@ export default function ExecutiveDashboard({ onNavigate }) {
           </div>
         </div>
 
-        {/* KPI Row */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        {/* Phase 12: Cash Position View */}
+        <div className="bg-[#0B1221] rounded-xl p-6 text-white shadow-md">
+          <h2 className="text-base font-bold uppercase tracking-wider text-[#9CA3AF] mb-4">Live Cash Position (Estimate)</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div>
+              <p className="text-sm text-[#6B7280] uppercase tracking-wider mb-1">Expected Settlement</p>
+              <p className="text-[28px] font-bold">₹{kpis.total_volume.toLocaleString('en-IN')}</p>
+            </div>
+            <div>
+              <p className="text-sm text-[#6B7280] uppercase tracking-wider mb-1">Received (Matched)</p>
+              <p className="text-[28px] font-bold text-[#059669]">₹{kpis.matched_amount.toLocaleString('en-IN')}</p>
+            </div>
+            <div>
+              <p className="text-sm text-[#6B7280] uppercase tracking-wider mb-1">Pending Processing</p>
+              <p className="text-[28px] font-bold text-[#F59E0B]">₹{(kpis.total_volume - kpis.matched_amount - kpis.at_risk_amount).toLocaleString('en-IN')}</p>
+            </div>
+            <div>
+              <p className="text-sm text-[#6B7280] uppercase tracking-wider mb-1">Amount at Risk</p>
+              <p className="text-[28px] font-bold text-[#EF4444]">₹{kpis.at_risk_amount.toLocaleString('en-IN')}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* KPI Row (Phase 11: Financial Exposure) */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="bg-white border border-[#E5E7EB] rounded-md p-5 shadow-sm">
-            <p className="text-[13px] font-semibold text-[#6B7280] uppercase tracking-wider mb-1">Transactions</p>
-            <p className="text-[24px] font-bold text-[#111827]">{kpis.transactions.toLocaleString()}</p>
+            <p className="text-[15px] font-semibold text-[#6B7280] uppercase tracking-wider mb-1">Total Volume</p>
+            <p className="text-[24px] font-bold text-[#111827]">₹{kpis.total_volume.toLocaleString('en-IN')}</p>
           </div>
           <div className="bg-white border border-[#E5E7EB] rounded-md p-5 shadow-sm">
-            <p className="text-[13px] font-semibold text-[#6B7280] uppercase tracking-wider mb-1">Match Rate</p>
-            <p className="text-[24px] font-bold text-[#111827]">{(kpis.match_rate * 100).toFixed(1)}%</p>
+            <p className="text-[15px] font-semibold text-[#6B7280] uppercase tracking-wider mb-1">Matched Amount</p>
+            <p className="text-[24px] font-bold text-[#059669]">₹{kpis.matched_amount.toLocaleString('en-IN')}</p>
           </div>
           <div className="bg-white border border-[#E5E7EB] rounded-md p-5 shadow-sm border-l-4 border-l-[#D97706]">
-            <p className="text-[13px] font-semibold text-[#6B7280] uppercase tracking-wider mb-1">Anomalies</p>
-            <p className="text-[24px] font-bold text-[#111827]">{kpis.anomalies}</p>
+            <p className="text-[15px] font-semibold text-[#6B7280] uppercase tracking-wider mb-1">Open Exceptions</p>
+            <p className="text-[24px] font-bold text-[#111827]">{kpis.open_exceptions}</p>
           </div>
-          <div className="bg-white border border-[#E5E7EB] rounded-md p-5 shadow-sm border-l-4 border-l-[#DC2626]">
-            <p className="text-[13px] font-semibold text-[#6B7280] uppercase tracking-wider mb-1">Exceptions</p>
-            <p className="text-[24px] font-bold text-[#111827]">{kpis.exceptions}</p>
-          </div>
-          <div className="bg-white border border-[#E5E7EB] rounded-md p-5 shadow-sm bg-[#FEF2F2]">
-            <p className="text-[13px] font-semibold text-[#DC2626] uppercase tracking-wider mb-1">Amount at Risk</p>
-            <p className="text-[24px] font-bold text-[#DC2626]">₹{kpis.amount_at_risk.toLocaleString('en-IN')}</p>
+          <div className="bg-[#FEF2F2] border border-[#F87171] rounded-md p-5 shadow-sm border-l-4 border-l-[#DC2626]">
+            <p className="text-[15px] font-semibold text-[#DC2626] uppercase tracking-wider mb-1">High Priority</p>
+            <p className="text-[24px] font-bold text-[#DC2626]">{kpis.high_priority_exceptions}</p>
           </div>
         </div>
 
@@ -142,9 +157,9 @@ export default function ExecutiveDashboard({ onNavigate }) {
             
             {/* Transaction & Risk Activity Graph */}
             <div className="bg-white border border-[#E5E7EB] rounded-md shadow-sm p-6">
-              <h3 className="text-[14px] font-bold text-[#111827] mb-4 uppercase tracking-wider">Transaction & Risk Activity</h3>
+              <h3 className="text-base font-bold text-[#111827] mb-4 uppercase tracking-wider">Transaction & Risk Activity</h3>
               {graphData.length === 0 ? (
-                <div className="h-[200px] flex items-center justify-center text-[#6B7280] text-[13px]">
+                <div className="h-[200px] flex items-center justify-center text-[#6B7280] text-[15px]">
                   No recent payment events
                 </div>
               ) : (
@@ -172,11 +187,11 @@ export default function ExecutiveDashboard({ onNavigate }) {
 
             {/* Recent Exceptions Table */}
             <div className="bg-white border border-[#E5E7EB] rounded-md shadow-sm overflow-hidden">
-              <h3 className="px-6 py-4 text-[14px] font-bold text-[#111827] border-b border-[#E5E7EB] uppercase tracking-wider">Recent Exceptions</h3>
+              <h3 className="px-6 py-4 text-base font-bold text-[#111827] border-b border-[#E5E7EB] uppercase tracking-wider">Recent Exceptions</h3>
               {exceptions.length === 0 ? (
-                <div className="p-6 text-center text-[#6B7280] text-[13px]">No pending exceptions require attention.</div>
+                <div className="p-6 text-center text-[#6B7280] text-[15px]">No pending exceptions require attention.</div>
               ) : (
-                <table className="w-full text-left text-[13px]">
+                <table className="w-full text-left text-[15px]">
                   <thead>
                     <tr className="bg-[#F7F8FA] border-b border-[#E5E7EB] text-[#6B7280]">
                       <th className="px-6 py-3 font-semibold">Transaction</th>
@@ -194,7 +209,7 @@ export default function ExecutiveDashboard({ onNavigate }) {
                         <td className="px-6 py-3 text-[#374151]">{exc.category.replace(/_/g, ' ')}</td>
                         <td className="px-6 py-3 font-mono text-[#111827]">₹{exc.amount?.toLocaleString('en-IN')}</td>
                         <td className="px-6 py-3">
-                          <span className={`px-2 py-0.5 rounded text-[11px] font-bold ${
+                          <span className={`px-2 py-0.5 rounded text-[13px] font-bold ${
                             exc.priority === 'CRITICAL' ? 'bg-[#FEF2F2] text-[#DC2626]' :
                             exc.priority === 'HIGH' ? 'bg-[#FFFBEB] text-[#D97706]' : 'bg-[#F3F4F6] text-[#374151]'
                           }`}>
@@ -219,8 +234,8 @@ export default function ExecutiveDashboard({ onNavigate }) {
             
             {/* Ingest Settlement Data */}
             <div className="bg-white border border-[#E5E7EB] rounded-md shadow-sm p-6">
-              <h3 className="text-[14px] font-bold text-[#111827] uppercase tracking-wider mb-1">Ingest Settlement Data</h3>
-              <p className="text-[12px] text-[#6B7280] mb-5">Upload Gateway, Bank and ERP records to begin reconciliation.</p>
+              <h3 className="text-base font-bold text-[#111827] uppercase tracking-wider mb-1">Ingest Settlement Data</h3>
+              <p className="text-sm text-[#6B7280] mb-5">Upload Gateway, Bank and ERP records to begin reconciliation.</p>
               
               {uploadStatus === 'idle' && (
                 <div 
@@ -228,9 +243,9 @@ export default function ExecutiveDashboard({ onNavigate }) {
                   onClick={handleSimulateUpload}
                 >
                   <UploadCloud className="mx-auto mb-2 text-[#9CA3AF]" size={24} />
-                  <p className="text-[13px] font-semibold text-[#374151] mb-1">Drop CSV / XLSX files here</p>
-                  <p className="text-[12px] text-[#6B7280] mb-4">or click to select files</p>
-                  <div className="flex justify-center gap-3 text-[11px] font-semibold text-[#6B7280] uppercase tracking-wider">
+                  <p className="text-[15px] font-semibold text-[#374151] mb-1">Drop CSV / XLSX files here</p>
+                  <p className="text-sm text-[#6B7280] mb-4">or click to select files</p>
+                  <div className="flex justify-center gap-3 text-[13px] font-semibold text-[#6B7280] uppercase tracking-wider">
                     <span>Gateway</span> • <span>Bank</span> • <span>ERP</span>
                   </div>
                 </div>
@@ -238,8 +253,8 @@ export default function ExecutiveDashboard({ onNavigate }) {
 
               {uploadStatus === 'processing' && (
                 <div className="bg-[#F7F8FA] border border-[#E5E7EB] rounded-md p-4">
-                  <p className="text-[13px] font-bold text-[#111827] mb-3">Processing financial records...</p>
-                  <div className="space-y-2 text-[12px] text-[#374151]">
+                  <p className="text-[15px] font-bold text-[#111827] mb-3">Processing financial records...</p>
+                  <div className="space-y-2 text-sm text-[#374151]">
                     {uploadProgress.map((step, idx) => (
                       <div key={idx} className="flex items-center gap-2">
                         {idx === uploadProgress.length - 1 ? (
@@ -257,8 +272,8 @@ export default function ExecutiveDashboard({ onNavigate }) {
               {uploadStatus === 'complete' && (
                 <div className="space-y-4">
                   <div className="bg-[#F7F8FA] border border-[#E5E7EB] rounded-md p-4">
-                    <p className="text-[11px] font-bold text-[#6B7280] uppercase tracking-wider mb-2">Ingestion Status</p>
-                    <div className="space-y-2 text-[13px] font-medium text-[#111827]">
+                    <p className="text-[13px] font-bold text-[#6B7280] uppercase tracking-wider mb-2">Ingestion Status</p>
+                    <div className="space-y-2 text-[15px] font-medium text-[#111827]">
                       <div className="flex justify-between items-center">
                         <span>Gateway</span>
                         <span className="flex items-center gap-1.5 text-[#059669]"><CheckCircle2 size={14} /> 294 records</span>
@@ -278,17 +293,17 @@ export default function ExecutiveDashboard({ onNavigate }) {
                   <div className="bg-[#FFFBEB] border border-[#FDE68A] rounded-md p-4">
                     <div className="flex items-center gap-2 text-[#D97706] mb-2">
                       <AlertTriangle size={16} />
-                      <p className="text-[13px] font-bold">Data Quality Issues</p>
+                      <p className="text-[15px] font-bold">Data Quality Issues</p>
                     </div>
-                    <p className="text-[12px] text-[#92400E] mb-2">Gateway.csv: 5 records require attention</p>
-                    <ul className="text-[11px] text-[#B45309] list-disc list-inside">
+                    <p className="text-sm text-[#92400E] mb-2">Gateway.csv: 5 records require attention</p>
+                    <ul className="text-[13px] text-[#B45309] list-disc list-inside">
                       <li>3 missing UTR</li>
                       <li>2 invalid timestamps</li>
                     </ul>
-                    <button className="mt-2 text-[11px] font-bold text-[#D97706] underline">View Issues</button>
+                    <button className="mt-2 text-[13px] font-bold text-[#D97706] underline">View Issues</button>
                   </div>
 
-                  <button className="w-full bg-[#0258FF] text-white py-2.5 rounded text-[13px] font-semibold hover:bg-[#014CE0] transition-colors">
+                  <button className="w-full bg-[#0258FF] text-white py-2.5 rounded text-[15px] font-semibold hover:bg-[#014CE0] transition-colors">
                     Run Reconciliation
                   </button>
                 </div>
@@ -297,17 +312,17 @@ export default function ExecutiveDashboard({ onNavigate }) {
 
             {/* Control Effectiveness */}
             <div className="bg-white border border-[#E5E7EB] rounded-md shadow-sm p-6">
-              <h3 className="text-[14px] font-bold text-[#111827] uppercase tracking-wider mb-4">Control Effectiveness</h3>
+              <h3 className="text-base font-bold text-[#111827] uppercase tracking-wider mb-4">Control Effectiveness</h3>
               
               <div className="space-y-4">
                 <div>
                   <p className="text-[20px] font-bold text-[#111827] leading-none">{ce.monitored?.toLocaleString() || 0}</p>
-                  <p className="text-[12px] font-medium text-[#6B7280]">Events monitored</p>
+                  <p className="text-sm font-medium text-[#6B7280]">Events monitored</p>
                 </div>
                 
                 <div className="h-px bg-[#E5E7EB] w-full" />
                 
-                <div className="grid grid-cols-2 gap-y-4 text-[13px]">
+                <div className="grid grid-cols-2 gap-y-4 text-[15px]">
                   <div>
                     <p className="font-bold text-[#111827]">{ce.normal?.toLocaleString() || 0}</p>
                     <p className="text-[#6B7280]">Normal</p>
@@ -327,7 +342,7 @@ export default function ExecutiveDashboard({ onNavigate }) {
                 </div>
                 
                 <div className="bg-[#F3F4F6] rounded-md p-3 flex justify-between items-center mt-2 border border-[#E5E7EB]">
-                  <span className="text-[13px] font-bold text-[#374151]">Human review</span>
+                  <span className="text-[15px] font-bold text-[#374151]">Human review</span>
                   <span className="text-[16px] font-bold text-[#111827]">{ce.human_review?.toLocaleString() || 0}</span>
                 </div>
               </div>
@@ -336,15 +351,15 @@ export default function ExecutiveDashboard({ onNavigate }) {
             {/* Last Reconciliation Run */}
             {lastRun && (
               <div className="bg-white border border-[#E5E7EB] rounded-md shadow-sm p-6">
-                <h3 className="text-[12px] font-bold text-[#6B7280] uppercase tracking-wider mb-4">Last Reconciliation</h3>
-                <div className="text-[13px] text-[#374151] space-y-1 mb-4">
+                <h3 className="text-sm font-bold text-[#6B7280] uppercase tracking-wider mb-4">Last Reconciliation</h3>
+                <div className="text-[15px] text-[#374151] space-y-1 mb-4">
                   <p className="font-semibold text-[#111827] mb-2">{new Date(lastRun.run_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}</p>
                   <p>{lastRun.transactions?.toLocaleString()} transactions</p>
                   <p>{lastRun.matched?.toLocaleString()} matched</p>
                   <p>{lastRun.unresolved?.toLocaleString()} unresolved</p>
                   <p className="font-semibold text-[#059669]">{(lastRun.match_rate * 100).toFixed(1)}% match rate</p>
                 </div>
-                <button className="text-[13px] font-semibold text-[#0258FF] flex items-center gap-1 hover:underline">
+                <button className="text-[15px] font-semibold text-[#0258FF] flex items-center gap-1 hover:underline">
                   View Run <ArrowRight size={14} />
                 </button>
               </div>
