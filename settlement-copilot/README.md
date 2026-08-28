@@ -1416,8 +1416,7 @@ settlement-copilot/
 │   │   │   ├── scoring.py    # Confidence score helper
 │   │   │   └── engine.py     # Orchestrates 3 passes
 │   │   ├── agent/
-│   │   │   ├── nl2sql.py     # Groq streaming NL2SQL
-│   │   │   └── rag.py        # Schema context (extendable)
+│   │   │   └── nl2sql.py     # Groq streaming NL2SQL
 │   │   └── api/routes.py
 │   ├── tests/
 │   │   ├── test_matcher.py   # Known-answer fixtures
