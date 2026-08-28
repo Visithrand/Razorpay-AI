@@ -158,11 +158,7 @@ function App() {
           )}
           {activePage === 'scenario-lab' && <ScenarioLab />}
           {activePage === 'ai-assistant' && (
-            <div className="max-w-4xl mx-auto space-y-4">
-              <div className="bg-[#05103E] text-white p-6 rounded-xl shadow-sm border border-white/10">
-                <h2 className="text-xl font-extrabold text-white">Where is my money? — AI Financial Investigation Assistant</h2>
-                <p className="text-xs text-white/70 mt-1 font-medium">Trace settlement discrepancies across Gateway, Bank statement, and Ledger using verified database queries.</p>
-              </div>
+            <div className="max-w-5xl mx-auto py-2">
               <ChatPanel runId={runId} embedded={true} />
             </div>
           )}

@@ -1,39 +1,53 @@
 import pytest
-from app.agent.multi_agent.schemas import MatchAgentResult, RiskAgentResult, FinanceAgentResult, JudgeResult
-from app.agent.multi_agent.agents import MatchInvestigator, FinancialRiskAnalyst, FinanceOperationsAnalyst, JudgeAgent
 import asyncio
+from app.agent.multi_agent.schemas import (
+    DataGatheringResult, FinancialRiskResult, FinanceOperationsResult, JudgeResult
+)
+from app.agent.multi_agent.agents import (
+    DataGatheringAgent, FinancialRiskAnalyst, FinanceOperationsAgent, JudgeAgent
+)
 
 @pytest.mark.asyncio
-async def test_match_investigator_fallback():
-    evidence_json = '{"test": "data"}'
-    result = await MatchInvestigator.analyze(evidence_json)
-    assert isinstance(result, MatchAgentResult)
-    assert result.agent == "match_investigator"
+async def test_data_gathering_fallback():
+    anomaly_json = '{"anomaly_id": "EX-101", "type": "amount_mismatch"}'
+    result = await DataGatheringAgent.analyze(anomaly_json)
+    assert isinstance(result, DataGatheringResult)
+    assert result.anomaly_id == "EX-101"
+    assert result.data_confidence in ["high", "medium", "low"]
 
 @pytest.mark.asyncio
 async def test_risk_analyst_fallback():
-    evidence_json = '{"test": "data"}'
-    result = await FinancialRiskAnalyst.analyze(evidence_json)
-    assert isinstance(result, RiskAgentResult)
-    assert result.agent == "financial_risk"
+    chained_json = '{"anomaly_id": "EX-101", "data_gathering": {}}'
+    result = await FinancialRiskAnalyst.analyze(chained_json)
+    assert isinstance(result, FinancialRiskResult)
+    assert result.anomaly_id == "EX-101"
+    assert result.recommended_risk_tier in ["low", "medium", "high", "critical"]
 
 @pytest.mark.asyncio
 async def test_finance_ops_fallback():
-    evidence_json = '{"test": "data"}'
-    result = await FinanceOperationsAnalyst.analyze(evidence_json)
-    assert isinstance(result, FinanceAgentResult)
-    assert result.agent == "finance_operations"
+    chained_json = '{"anomaly_id": "EX-101", "data_gathering": {}}'
+    result = await FinanceOperationsAgent.analyze(chained_json)
+    assert isinstance(result, FinanceOperationsResult)
+    assert result.anomaly_id == "EX-101"
+    assert isinstance(result.auto_resolution_eligible, bool)
 
 @pytest.mark.asyncio
 async def test_judge_fallback():
-    evidence_json = '{"test": "data"}'
-    result = await JudgeAgent.evaluate(evidence_json)
+    chained_json = '{"anomaly": {"anomaly_id": "EX-101"}}'
+    result = await JudgeAgent.evaluate(chained_json)
     assert isinstance(result, JudgeResult)
-    assert result.decision == "INSUFFICIENT_EVIDENCE"
-    assert result.requires_human_review == True
+    assert result.requires_hitl is True
+    assert result.decision == "HUMAN_REVIEW"
+    assert result.final_confidence_0_100 >= 0.0
 
-# Basic testing of the schema correctness
 def test_schema_validations():
-    mr = MatchAgentResult(finding="test", candidate_transaction_ids=[1,2], evidence=["e1"], confidence=0.8, recommendation="rec")
-    assert mr.finding == "test"
-    assert mr.confidence == 0.8
+    judge = JudgeResult(
+        anomaly_id="EX-1",
+        final_confidence_0_100=90.0,
+        proposed_action="Execute automatic ledger adjustment",
+        requires_hitl=False,
+        verdict_summary="Reconciliation confirmed with high confidence."
+    )
+    assert judge.confidence == 0.9
+    assert judge.decision == "RESOLVED"
+    assert judge.recommendation == "Execute automatic ledger adjustment"
