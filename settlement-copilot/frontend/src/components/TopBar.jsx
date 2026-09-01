@@ -127,10 +127,12 @@ export default function TopBar({ activePage, runId, report, sidebarCollapsed, on
           {sidebarCollapsed ? <Menu size={20} /> : <PanelLeftClose size={20} />}
         </button>
 
-        <div className="hidden sm:flex items-center gap-2 text-base">
-          <img src="https://razorpay.com/assets/razorpay-glyph.svg" alt="Razorpay" className="h-5 object-contain opacity-80" />
-          <span className="text-white/30">/</span>
-          <span className="font-extrabold text-white text-[15px]">
+        <div className="hidden sm:flex items-center gap-3">
+          <div className="flex items-center justify-center w-6 h-6 bg-white rounded-md">
+            <img src="https://razorpay.com/assets/razorpay-glyph.svg" alt="Razorpay" className="h-4 w-4" />
+          </div>
+          <span className="text-gray-500 text-sm">/</span>
+          <span className="font-semibold text-white text-sm">
             {pageTitles[activePage] || 'Home'}
           </span>
         </div>
@@ -151,7 +153,7 @@ export default function TopBar({ activePage, runId, report, sidebarCollapsed, on
       {/* Right */}
       <div className="flex items-center gap-4">
         {matchRate && activePage === 'reconciliation' && (
-          <div className="hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm font-extrabold bg-[#00E6A0]/20 text-[#00E6A0] border border-[#00E6A0]/30">
+          <div className="hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm font-medium bg-[#00E6A0]/20 text-[#00E6A0] border border-[#00E6A0]/30">
             <div className="w-2 h-2 rounded-full bg-[#00E6A0] animate-pulse" />
             {matchRate}% Matched
           </div>
@@ -161,7 +163,7 @@ export default function TopBar({ activePage, runId, report, sidebarCollapsed, on
           href="https://razorpay.com/docs/" 
           target="_blank" 
           rel="noopener noreferrer"
-          className="hidden lg:flex items-center gap-1.5 px-3.5 py-1.5 text-[15px] font-bold rounded-lg hover:bg-white/10 text-white/80 hover:text-white transition-colors"
+          className="hidden lg:flex items-center gap-1.5 px-3.5 py-1.5 text-[14px] font-medium rounded-lg hover:bg-white/10 text-white/80 hover:text-white transition-colors"
         >
           <ExternalLink size={14} />
           Docs
@@ -184,9 +186,9 @@ export default function TopBar({ activePage, runId, report, sidebarCollapsed, on
               <div className="fixed inset-0 z-40" onClick={() => setShowNotifications(false)} />
               <div className="absolute right-0 top-12 w-80 bg-white border border-[#DCE3ED] rounded-xl shadow-xl z-50 overflow-hidden text-[#0B192C] animate-overlay-slideup">
                 <div className="px-5 py-3 border-b border-[#E8EEF5] bg-gray-50 flex items-center justify-between">
-                  <span className="font-extrabold text-sm text-[#0B192C]">Notifications</span>
+                  <span className="font-medium text-sm text-[#0B192C]">Notifications</span>
                   {notifications.length > 0 && (
-                    <span className="text-xs font-bold text-white bg-[#EF4444] px-2 py-0.5 rounded-full">
+                    <span className="text-xs font-medium text-white bg-[#EF4444] px-2 py-0.5 rounded-full">
                       {notifications.length} New
                     </span>
                   )}
@@ -208,8 +210,8 @@ export default function TopBar({ activePage, runId, report, sidebarCollapsed, on
                               <AlertTriangle size={16} />
                             </div>
                             <div>
-                              <p className="text-sm font-bold text-[#0B192C]">Anomaly Detected</p>
-                              <p className="text-xs font-semibold text-gray-600 mt-0.5">{n.category} issue for ₹{n.amount}</p>
+                              <p className="text-sm font-medium text-[#0B192C]">Anomaly Detected</p>
+                              <p className="text-xs font-medium text-gray-600 mt-0.5">{n.category} issue for ₹{n.amount}</p>
                             </div>
                           </div>
                         </div>
@@ -220,7 +222,7 @@ export default function TopBar({ activePage, runId, report, sidebarCollapsed, on
                 {notifications.length > 0 && (
                   <div className="p-3 border-t border-[#E8EEF5] text-center bg-gray-50 hover:bg-gray-100 cursor-pointer transition-colors"
                        onClick={() => { setShowNotifications(false); if (onNavigate) onNavigate('home'); }}>
-                    <span className="text-xs font-bold text-[#0065FF]">View All Exceptions</span>
+                    <span className="text-xs font-medium text-[#0065FF]">View All Exceptions</span>
                   </div>
                 )}
               </div>
@@ -236,11 +238,11 @@ export default function TopBar({ activePage, runId, report, sidebarCollapsed, on
             onClick={() => setShowProfile(!showProfile)}
             className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg hover:bg-white/10 transition-colors"
           >
-            <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-extrabold bg-[#0065FF] shadow-sm">
+            <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium bg-[#0065FF] shadow-sm">
               {initials}
             </div>
             <div className="hidden md:flex flex-col items-start">
-              <span className="text-[15px] font-bold leading-none text-white">{user?.name || 'Merchant Admin'}</span>
+              <span className="text-[14px] font-medium leading-none text-white">{user?.name || 'User'}</span>
               <span className="text-[13px] leading-none mt-1 text-white/50">{user?.role || 'Admin'}</span>
             </div>
             <ChevronDown size={14} className={`hidden md:block transition-transform duration-200 text-white/60 ${showProfile ? 'rotate-180' : ''}`} />
@@ -252,16 +254,18 @@ export default function TopBar({ activePage, runId, report, sidebarCollapsed, on
               <div className="absolute right-0 top-14 w-64 bg-white border border-[#DCE3ED] rounded-xl shadow-xl z-50 overflow-hidden text-[#0B192C] animate-overlay-slideup">
                 <div className="px-5 py-5 border-b border-[#E8EEF5] bg-gradient-to-br from-[#F8FAFC] to-[#F1F5F9]">
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="w-10 h-10 rounded-full flex items-center justify-center text-white text-base font-extrabold bg-[#0065FF] shadow-sm">
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center text-white text-base font-medium bg-[#0065FF] shadow-sm">
                       {initials}
                     </div>
                     <div>
-                      <p className="text-base font-extrabold text-[#05103E]">{user?.name || 'Merchant Admin'}</p>
-                      <p className="text-sm font-semibold text-[#718096] truncate">{user?.identifier || 'admin@gmail.com'}</p>
+                      <p className="text-sm font-semibold text-[#05103E]">{user?.name || 'User'}</p>
+                      {user?.identifier && (
+                        <p className="text-xs font-medium text-[#718096] truncate">{user.identifier}</p>
+                      )}
                     </div>
                   </div>
                   <div className="mt-3 flex items-center gap-2">
-                    <span className="text-[11px] uppercase tracking-wider font-extrabold text-[#0065FF] bg-[#0065FF]/10 px-2 py-0.5 rounded">ROLE: {user?.role || 'FINANCE_OPERATOR'}</span>
+                    <span className="text-[11px] uppercase tracking-wider font-medium text-[#0065FF] bg-[#0065FF]/10 px-2 py-0.5 rounded">ROLE: {user?.role || 'FINANCE_OPERATOR'}</span>
                   </div>
                 </div>
                 <div className="py-2">
@@ -270,7 +274,7 @@ export default function TopBar({ activePage, runId, report, sidebarCollapsed, on
                       setShowProfile(false)
                       if (onLogout) onLogout()
                     }}
-                    className="w-full flex items-center gap-3 px-5 py-2.5 text-[15px] hover:bg-gray-50 font-bold transition-colors text-gray-700"
+                    className="w-full flex items-center gap-3 px-5 py-2.5 text-[14px] hover:bg-gray-50 font-medium transition-colors text-gray-700"
                   >
                     <LogOut size={18} className="text-gray-400" /> Sign Out
                   </button>
@@ -316,7 +320,7 @@ export default function TopBar({ activePage, runId, report, sidebarCollapsed, on
                     className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-[#E6F0FF]/50 text-left transition-colors group"
                   >
                     <div>
-                      <span className="text-xs font-extrabold uppercase px-2 py-0.5 rounded bg-gray-100 text-[#0065FF] mr-2">
+                      <span className="text-xs font-semibold uppercase px-2 py-0.5 rounded bg-gray-100 text-[#0065FF] mr-2">
                         {item.type}
                       </span>
                       <span className="text-base font-semibold text-[#0B192C]">{item.title}</span>
