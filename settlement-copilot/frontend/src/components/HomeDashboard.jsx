@@ -6,15 +6,7 @@ import {
   Zap, Clock, CreditCard, AlertCircle, ChevronRight, Search
 } from 'lucide-react'
 
-const chartData = [
-  { name: '1 Jan', vol: 4000, refunds: 240 },
-  { name: '2 Jan', vol: 3000, refunds: 139 },
-  { name: '3 Jan', vol: 5000, refunds: 980 },
-  { name: '4 Jan', vol: 7280, refunds: 390 },
-  { name: '5 Jan', vol: 6890, refunds: 480 },
-  { name: '6 Jan', vol: 8390, refunds: 380 },
-  { name: '7 Jan', vol: 11490, refunds: 430 },
-]
+const chartData = []
 
 const QUICK_ACTIONS = [
   { 
@@ -39,13 +31,7 @@ const QUICK_ACTIONS = [
   },
 ]
 
-const RECENT_ACTIVITY = [
-  { icon: CheckCircle2, color: '#10B981', bg: '#D1FAE5', text: 'Settlement of ₹12,45,000 processed', time: '2 mins ago' },
-  { icon: Upload, color: '#0065FF', bg: '#E6F0FF', text: 'Reconciliation batch #1847 completed', time: '15 mins ago' },
-  { icon: CreditCard, color: '#8B5CF6', bg: '#EDE9FE', text: 'New payment of ₹8,900 captured (UPI)', time: '32 mins ago' },
-  { icon: AlertCircle, color: '#F59E0B', bg: '#FEF3C7', text: '3 exceptions flagged for manual review', time: '1 hour ago' },
-  { icon: Users, color: '#0065FF', bg: '#E6F0FF', text: 'New customer registered: Tech Solutions', time: '2 hours ago' },
-]
+const RECENT_ACTIVITY = []
 
 const GETTING_STARTED = [
   { id: 'api', label: 'Set up API keys', desc: 'Configure your live and test API credentials', done: true },
@@ -161,9 +147,9 @@ export default function HomeDashboard({ onNavigate }) {
 
       {/* KPIs */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        <StatCard title="Gross Volume" value="₹12.4M" trend="up" trendValue="14.2" icon={TrendingUp} bgColor="#E6F0FF" iconColor="#0065FF" />
-        <StatCard title="Net Settlement" value="₹11.8M" trend="up" trendValue="12.5" icon={ShieldCheck} bgColor="#D1FAE5" iconColor="#10B981" />
-        <StatCard title="Refunds" value="₹142.5K" trend="down" trendValue="2.4" icon={Activity} bgColor="#FEE2E2" iconColor="#EF4444" />
+        <StatCard title="Gross Volume" value="₹0" trend="up" trendValue="0" icon={TrendingUp} bgColor="#E6F0FF" iconColor="#0065FF" />
+        <StatCard title="Net Settlement" value="₹0" trend="up" trendValue="0" icon={ShieldCheck} bgColor="#D1FAE5" iconColor="#10B981" />
+        <StatCard title="Refunds" value="₹0" trend="down" trendValue="0" icon={Activity} bgColor="#FEE2E2" iconColor="#EF4444" />
       </div>
 
       {/* Quick Actions */}
@@ -301,7 +287,9 @@ export default function HomeDashboard({ onNavigate }) {
             </div>
 
             <div className="space-y-3">
-              {RECENT_ACTIVITY.map((item, i) => {
+              {RECENT_ACTIVITY.length === 0 ? (
+                <div className="text-sm text-gray-500 py-4 text-center">No recent activity for this run.</div>
+              ) : RECENT_ACTIVITY.map((item, i) => {
                 const Icon = item.icon
                 return (
                   <div key={i} className="flex items-start gap-3">

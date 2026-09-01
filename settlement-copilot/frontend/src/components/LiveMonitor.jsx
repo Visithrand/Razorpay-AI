@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Activity, AlertTriangle, ArrowRight, CheckCircle2, ShieldCheck, Zap } from 'lucide-react'
+import { Activity, AlertTriangle, ArrowRight, CheckCircle2, ShieldCheck, Zap, X, Check } from 'lucide-react'
 
 export default function LiveMonitor({ onNavigate }) {
   const [events, setEvents] = useState([])

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getMe, logout } from './api'
+import { useAuth } from './auth/AuthContext'
 import Sidebar from './components/Sidebar'
 import TopBar from './components/TopBar'
 import ExecutiveDashboard from './components/ExecutiveDashboard'
@@ -27,7 +27,8 @@ const USER_SESSION_KEY = 'razorpay_authenticated_user_v1'
 const ONBOARDING_KEY = 'razorpay_onboarding_done_v2'
 
 function App() {
-  const [user, setUser] = useState(null)
+  const { user, authLoading, logout } = useAuth()
+  
   const [activePage, setActivePage] = useState('overview')
   const [activeExceptionId, setActiveExceptionId] = useState(1)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
@@ -37,25 +38,7 @@ function App() {
   const [runId, setRunId] = useState(null)
   const [report, setReport] = useState(null)
 
-  const [authLoading, setAuthLoading] = useState(true)
-
-  // Check backend session
-  useEffect(() => {
-    const fetchSession = async () => {
-      try {
-        const userData = await getMe()
-        setUser(userData)
-      } catch (e) {
-        setUser(null)
-      } finally {
-        setAuthLoading(false)
-      }
-    }
-    fetchSession()
-  }, [])
-
   const handleLoginSuccess = (userData) => {
-    setUser(userData)
     // Check onboarding logic
     const done = localStorage.getItem(ONBOARDING_KEY)
     if (!done) {
@@ -64,12 +47,7 @@ function App() {
   }
 
   const handleLogout = async () => {
-    try {
-      await logout()
-    } catch(e) {
-      console.error('Logout failed:', e)
-    }
-    setUser(null)
+    await logout()
   }
 
   const handleOnboardingComplete = () => {
@@ -132,7 +110,7 @@ function App() {
         
         <main className="flex-1 overflow-y-auto custom-scrollbar p-6">
           {(activePage === 'overview' || activePage === 'home') && (
-            <ExecutiveDashboard onNavigate={setActivePage} />
+            <ExecutiveDashboard onNavigate={setActivePage} runId={runId} />
           )}
           {activePage === 'live-monitor' && (
             <LiveMonitor onNavigate={(page, param) => {
@@ -140,7 +118,7 @@ function App() {
               if (param) setActiveExceptionId(param)
             }} />
           )}
-          {activePage === 'transactions' && <TransactionsHistory />}
+          {activePage === 'transactions' && <TransactionsHistory runId={runId} />}
           {activePage === 'reconciliation' && (
             <ReconciliationApp 
               runId={runId} 
@@ -150,7 +128,7 @@ function App() {
             />
           )}
           {activePage === 'settlements' && <SettlementsMock />}
-          {activePage === 'exceptions' && <ExceptionTable />}
+          {activePage === 'exceptions' && <ExceptionTable runId={runId} />}
           {activePage === 'investigation' && (
             <ErrorBoundary>
               <InvestigationView exceptionId={activeExceptionId} />

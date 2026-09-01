@@ -62,7 +62,7 @@ export default function SettlementsMock() {
             </div>
             Next Settlement
           </div>
-          <p className="text-3xl font-bold text-[#0B192C]">₹154,000.00</p>
+          <p className="text-3xl font-bold text-[#0B192C]">₹0.00</p>
           <p className="text-sm text-[#718096] mt-1">Expected today by 6:00 PM</p>
         </div>
         <div className="bg-white rounded-xl border border-[#DCE3ED] p-6 shadow-sm">
@@ -72,8 +72,8 @@ export default function SettlementsMock() {
             </div>
             Total Settled (Jan)
           </div>
-          <p className="text-3xl font-bold text-[#0B192C]">₹4.2M</p>
-          <p className="text-sm text-[#718096] mt-1">Across 12 batches</p>
+          <p className="text-3xl font-bold text-[#0B192C]">₹0</p>
+          <p className="text-sm text-[#718096] mt-1">Across 0 batches</p>
         </div>
       </div>
 

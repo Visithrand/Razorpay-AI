@@ -28,3 +28,7 @@ CORS_ORIGINS = os.getenv(
 # Directory locations
 REPORTS_DIR_STR = os.getenv("REPORTS_DIR", "reports")
 REPORTS_DIR = Path(REPORTS_DIR_STR)
+
+# Authentication
+AUTH_SECRET_KEY = os.getenv("AUTH_SECRET_KEY", "fallback-secret-key-do-not-use-in-prod")
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "1440")) # 24 hours

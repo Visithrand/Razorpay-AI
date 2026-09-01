@@ -28,6 +28,22 @@ from app.services.reconciliation_service import ReconciliationService
 from app.live.detector import DetectionEngine, IdempotencyException
 from app.api.deps import require_operator, get_current_user
 
+def verify_run_ownership(run_id: str, db: Session, user_id: int) -> Report:
+    report = db.query(Report).filter(Report.run_id == run_id).first()
+    if not report:
+        raise HTTPException(status_code=404, detail="Run not found")
+    if report.user_id and report.user_id != user_id:
+        raise HTTPException(status_code=403, detail="Not authorized to access this run")
+    return report
+
+def verify_exception_ownership(exception_id: int, db: Session, user_id: int) -> ExceptionRecord:
+    exc = db.query(ExceptionRecord).filter(ExceptionRecord.id == exception_id).first()
+    if not exc:
+        raise HTTPException(status_code=404, detail="Exception not found")
+    if exc.run_id:
+        verify_run_ownership(exc.run_id, db, user_id)
+    return exc
+
 router = APIRouter(prefix="/api")
 logger = logging.getLogger("uvicorn")
 
@@ -160,7 +176,10 @@ def verify_otp(
 def get_settlement_health(
     run_id: Optional[str] = Query(None),
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
+    if run_id:
+        verify_run_ownership(run_id, db, current_user.id)
     service = ReconciliationService(db)
     return service.calculate_settlement_health(run_id)
 
@@ -169,15 +188,18 @@ def get_settlement_health(
 def get_settlement_risk(
     run_id: Optional[str] = Query(None),
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
+    if run_id:
+        verify_run_ownership(run_id, db, current_user.id)
     service = ReconciliationService(db)
     return service.calculate_settlement_risk(run_id)
 
 
 @router.get("/settlement/what-changed")
-def get_what_changed(db: Session = Depends(get_db)):
+def get_what_changed(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     """Calculates operational intelligence delta: current run vs previous run."""
-    reports = db.query(Report).order_by(Report.run_at.desc()).limit(2).all()
+    reports = db.query(Report).filter(Report.user_id == current_user.id).order_by(Report.run_at.desc()).limit(2).all()
     if len(reports) < 2:
         return {
             "has_delta": True,
@@ -213,7 +235,9 @@ async def investigate_exception(
     exception_id: int,
     force: bool = Query(False),
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
+    verify_exception_ownership(exception_id, db, current_user.id)
     """
     Executes Evidence-First Multi-Agent Investigation for an exception.
     """
@@ -357,7 +381,9 @@ def submit_human_feedback(
     decision: str = Form(...),
     notes: Optional[str] = Form(None),
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
+    verify_exception_ownership(exception_id, db, current_user.id)
     """Stores human operational learning feedback for future evaluation."""
     fb = HumanFeedback(
         exception_id=exception_id,
@@ -522,8 +548,9 @@ def reject_recommendation(
 def get_audit_logs(
     limit: int = Query(50),
     db: Session = Depends(get_db),
+    current_user: User = Depends(require_operator)
 ):
-    logs = db.query(AuditLog).order_by(AuditLog.timestamp.desc()).limit(limit).all()
+    logs = db.query(AuditLog).filter(AuditLog.user_id == current_user.id).order_by(AuditLog.timestamp.desc()).limit(limit).all()
     return {
         "audit_logs": [
             {
@@ -553,16 +580,18 @@ def get_exceptions(
     limit: int = Query(200),
     offset: int = Query(0),
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     if run_id:
+        verify_run_ownership(run_id, db, current_user.id)
         q = db.query(ExceptionRecord).filter(ExceptionRecord.run_id == run_id)
     else:
-        latest = db.query(Report).order_by(Report.run_at.desc()).first()
+        latest = db.query(Report).filter(Report.user_id == current_user.id).order_by(Report.run_at.desc()).first()
         if latest:
             q = db.query(ExceptionRecord).filter(ExceptionRecord.run_id == latest.run_id)
             run_id = latest.run_id
         else:
-            q = db.query(ExceptionRecord).order_by(ExceptionRecord.id.desc())
+            q = db.query(ExceptionRecord).filter(ExceptionRecord.id < 0) # empty fallback
 
     if category:
         q = q.filter(ExceptionRecord.category == category)
@@ -623,8 +652,8 @@ def get_exceptions(
 # ─── Reports ─────────────────────────────────────────────────────────────────
 
 @router.get("/reports")
-def list_reports(db: Session = Depends(get_db)):
-    reports = db.query(Report).order_by(Report.run_at.desc()).limit(20).all()
+def list_reports(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    reports = db.query(Report).filter(Report.user_id == current_user.id).order_by(Report.run_at.desc()).limit(20).all()
     return {
         "reports": [
             {
@@ -645,10 +674,8 @@ def list_reports(db: Session = Depends(get_db)):
 
 
 @router.get("/report/{run_id}")
-def get_report(run_id: str, db: Session = Depends(get_db)):
-    r = db.query(Report).filter(Report.run_id == run_id).first()
-    if not r:
-        raise HTTPException(404, f"Report not found for run_id={run_id}")
+def get_report(run_id: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    r = verify_run_ownership(run_id, db, current_user.id)
     return {
         "run_id": r.run_id,
         "run_at": r.run_at.isoformat() if r.run_at else None,
@@ -677,6 +704,7 @@ async def upload_and_match(
     ledger: Optional[UploadFile] = File(None),
     threshold: float = Form(0.70),
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     if not gateway and not bank:
         raise HTTPException(400, "At least gateway and bank files are required.")
@@ -699,37 +727,15 @@ async def upload_and_match(
         ingest_csv(led_bytes, "ledger", run_id, db)
 
     report = run_matching(db, run_id, threshold=threshold)
+    
+    # Assign the newly created report to the current user
+    rep = db.query(Report).filter(Report.run_id == run_id).first()
+    if rep:
+        rep.user_id = current_user.id
+        db.commit()
+        
     return {"run_id": run_id, **report}
 
-
-# ─── 1-Click Demo Run ─────────────────────────────────────────────────────────
-
-@router.post("/run-demo")
-def run_demo(
-    threshold: float = 0.70,
-    db: Session = Depends(get_db),
-):
-    run_id = str(uuid.uuid4())
-
-    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "data", "samples"))
-    gw_path = os.path.join(base_dir, "gateway.csv")
-    bank_path = os.path.join(base_dir, "bank.csv")
-    ledger_path = os.path.join(base_dir, "ledger.csv")
-
-    if os.path.exists(gw_path):
-        with open(gw_path, "rb") as f:
-            ingest_csv(f.read(), "gateway", run_id, db)
-
-    if os.path.exists(bank_path):
-        with open(bank_path, "rb") as f:
-            ingest_csv(f.read(), "bank", run_id, db)
-
-    if os.path.exists(ledger_path):
-        with open(ledger_path, "rb") as f:
-            ingest_csv(f.read(), "ledger", run_id, db)
-
-    report = run_matching(db, run_id, threshold=threshold)
-    return {"run_id": run_id, **report}
 
 
 # ─── Matches ─────────────────────────────────────────────────────────────────
@@ -742,12 +748,15 @@ def get_matches(
     limit: int = Query(200),
     offset: int = Query(0),
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     if not run_id:
-        latest = db.query(Report).order_by(Report.run_at.desc()).first()
+        latest = db.query(Report).filter(Report.user_id == current_user.id).order_by(Report.run_at.desc()).first()
         if not latest:
             return {"matches": [], "total": 0}
         run_id = latest.run_id
+    else:
+        verify_run_ownership(run_id, db, current_user.id)
 
     q = db.query(MatchResult).filter(
         MatchResult.run_id == run_id,
@@ -783,17 +792,54 @@ def get_matches(
     }
 
 
-# ─── AI Chat ─────────────────────────────────────────────────────────────────
+# ─── Transactions ──────────────────────────────────────────────────────────────
+
+@router.get("/transactions")
+def get_transactions(
+    run_id: Optional[str] = Query(None),
+    limit: int = Query(50),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    if not run_id:
+        return {"transactions": []}
+        
+    verify_run_ownership(run_id, db, current_user.id)
+    
+    txns = db.query(RawTransaction).filter(
+        RawTransaction.run_id == run_id,
+        RawTransaction.source == 'gateway'
+    ).limit(limit).all()
+    
+    return {
+        "transactions": [
+            {
+                "id": t.txn_id,
+                "amount": t.amount,
+                "status": t.status,
+                "method": t.payment_method,
+                "date": t.date.isoformat() if t.date else None,
+                "cust": "customer@example.com",
+                "gateway_utr": t.utr
+            }
+            for t in txns
+        ]
+    }
+
+# ─── Ask (NL2SQL) ─────────────────────────────────────────────────────────────────
 
 @router.post("/ask")
 async def ask(
     question: str = Form(...),
     run_id: Optional[str] = Form(None),
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
+    if run_id:
+        verify_run_ownership(run_id, db, current_user.id)
     async def event_generator():
         import json
-        async for chunk in ask_stream(question, db):
+        async for chunk in ask_stream(question, db, run_id):
             yield f"data: {json.dumps(chunk)}\n\n"
         yield "data: [DONE]\n\n"
 
@@ -862,39 +908,7 @@ class PaymentEventPayload(BaseModel):
     timestamp: str
     payment_status: str
 
-@router.get("/dashboard/metrics")
-def get_dashboard_metrics(db: Session = Depends(get_db)):
-    """Calculates real financial exposure metrics from the database."""
-    from sqlalchemy import func
-    
-    # Total volume (sum of all gateway and bank transactions)
-    gw_vol = db.query(func.sum(RawTransaction.amount)).filter(RawTransaction.source == "gateway").scalar() or 0.0
-    bank_vol = db.query(func.sum(RawTransaction.amount)).filter(RawTransaction.source == "bank").scalar() or 0.0
-    total_volume = max(gw_vol, bank_vol)
 
-    # Matched and unmatched amounts based on ExceptionRecords
-    at_risk_amount = db.query(func.sum(ExceptionRecord.amount)).filter(ExceptionRecord.status != "RESOLVED").scalar() or 0.0
-    matched_amount = total_volume - at_risk_amount if total_volume > at_risk_amount else 0.0
-
-    # Exception counts
-    open_exceptions = db.query(ExceptionRecord).filter(ExceptionRecord.status != "RESOLVED").count()
-    high_priority = db.query(ExceptionRecord).filter(
-        ExceptionRecord.status != "RESOLVED",
-        ExceptionRecord.priority.in_(["CRITICAL", "HIGH"])
-    ).count()
-
-    # Breakdown by category
-    categories = db.query(ExceptionRecord.category, func.sum(ExceptionRecord.amount)).filter(ExceptionRecord.status != "RESOLVED").group_by(ExceptionRecord.category).all()
-    breakdown = [{"category": cat, "amount": amt} for cat, amt in categories]
-
-    return {
-        "total_volume": total_volume,
-        "matched_amount": matched_amount,
-        "at_risk_amount": at_risk_amount,
-        "open_exceptions": open_exceptions,
-        "high_priority_exceptions": high_priority,
-        "breakdown": breakdown
-    }
 
 @router.get("/search")
 def global_search(q: str = Query(...), db: Session = Depends(get_db)):
@@ -976,35 +990,47 @@ def get_live_events(limit: int = Query(20), db: Session = Depends(get_db)):
 # ─── Dashboard Metrics & Activity Stream ──────────────────────────────────────
 
 @router.get("/dashboard/metrics")
-def get_dashboard_metrics(db: Session = Depends(get_db)):
+def get_dashboard_metrics(run_id: Optional[str] = Query(None), db: Session = Depends(get_db)):
     """Calculates real financial exposure and control metrics from the database."""
+    if not run_id or run_id == "undefined" or run_id == "null":
+        return {
+            "total_volume": 0, "matched_amount": 0, "at_risk_amount": 0,
+            "open_exceptions": 0, "high_priority_exceptions": 0, "breakdown": [],
+            "last_run": None,
+            "control_effectiveness": { "monitored": 0, "normal": 0, "anomalies_detected": 0, "exceptions_created": 0, "resolved": 0, "human_review": 0 },
+            "kpis": { "transactions": 0, "total_volume": 0, "matched_amount": 0, "amount_at_risk": 0, "match_rate": 0, "anomalies": 0, "exceptions": 0, "high_priority_exceptions": 0 }
+        }
+
+    from sqlalchemy import func
+    
     # Volume calculation
-    gw_vol = db.query(func.sum(RawTransaction.amount)).filter(RawTransaction.source == "gateway").scalar() or 0.0
-    bank_vol = db.query(func.sum(RawTransaction.amount)).filter(RawTransaction.source == "bank").scalar() or 0.0
-    events_vol = db.query(func.sum(PaymentEvent.amount)).scalar() or 0.0
-    total_volume = max(gw_vol, bank_vol) or events_vol or 1250000.0
+    gw_vol = db.query(func.sum(RawTransaction.amount)).filter(RawTransaction.run_id == run_id, RawTransaction.source == "gateway").scalar() or 0.0
+    bank_vol = db.query(func.sum(RawTransaction.amount)).filter(RawTransaction.run_id == run_id, RawTransaction.source == "bank").scalar() or 0.0
+    # Note: PaymentEvent doesn't have run_id. Let's rely entirely on RawTransaction.
+    total_volume = max(gw_vol, bank_vol)
 
     # Exception calculations
-    pending_exceptions = db.query(ExceptionRecord).filter(ExceptionRecord.status == "PENDING").all()
+    pending_exceptions = db.query(ExceptionRecord).filter(ExceptionRecord.run_id == run_id, ExceptionRecord.status == "PENDING").all()
     open_exceptions = len(pending_exceptions)
     at_risk_amount = sum(e.amount or 0.0 for e in pending_exceptions)
     matched_amount = max(0.0, total_volume - at_risk_amount)
 
     high_priority = db.query(ExceptionRecord).filter(
+        ExceptionRecord.run_id == run_id,
         ExceptionRecord.status != "RESOLVED",
         ExceptionRecord.priority.in_(["CRITICAL", "HIGH"])
     ).count()
 
-    total_processed = db.query(func.count(PaymentEvent.id)).scalar() or 0
-    total_txns = db.query(func.count(RawTransaction.id)).scalar() or 0
-    monitored_total = max(total_processed, total_txns) or 150
+    # We mock anomalies from exceptions for simplicity if events are missing run_id
+    total_txns = db.query(func.count(RawTransaction.id)).filter(RawTransaction.run_id == run_id).scalar() or 0
+    monitored_total = total_txns
 
-    anomalies_count = db.query(func.count(EventRisk.id)).filter(EventRisk.risk_level != "NORMAL").scalar() or 0
-    total_exceptions_ever = db.query(func.count(ExceptionRecord.id)).scalar() or 0
-    resolved_exceptions = db.query(func.count(ExceptionRecord.id)).filter(ExceptionRecord.status == "RESOLVED").scalar() or 0
+    anomalies_count = db.query(func.count(ExceptionRecord.id)).filter(ExceptionRecord.run_id == run_id).scalar() or 0
+    total_exceptions_ever = anomalies_count
+    resolved_exceptions = db.query(func.count(ExceptionRecord.id)).filter(ExceptionRecord.run_id == run_id, ExceptionRecord.status == "RESOLVED").scalar() or 0
 
-    latest_report = db.query(Report).order_by(Report.run_at.desc()).first()
-    match_rate = latest_report.match_rate if latest_report else (matched_amount / total_volume if total_volume > 0 else 0.94)
+    latest_report = db.query(Report).filter(Report.run_id == run_id).first()
+    match_rate = latest_report.match_rate if latest_report else (matched_amount / total_volume if total_volume > 0 else 0.0)
 
     last_run = None
     if latest_report:
@@ -1025,7 +1051,7 @@ def get_dashboard_metrics(db: Session = Depends(get_db)):
         "human_review": open_exceptions
     }
 
-    categories = db.query(ExceptionRecord.category, func.sum(ExceptionRecord.amount)).filter(ExceptionRecord.status != "RESOLVED").group_by(ExceptionRecord.category).all()
+    categories = db.query(ExceptionRecord.category, func.sum(ExceptionRecord.amount)).filter(ExceptionRecord.run_id == run_id, ExceptionRecord.status != "RESOLVED").group_by(ExceptionRecord.category).all()
     breakdown = [{"category": cat, "amount": amt} for cat, amt in categories]
 
     return {
@@ -1050,42 +1076,28 @@ def get_dashboard_metrics(db: Session = Depends(get_db)):
     }
 
 @router.get("/events/recent")
-def get_recent_events(limit: int = 40, db: Session = Depends(get_db)):
-    events = db.query(PaymentEvent).join(EventRisk).order_by(PaymentEvent.timestamp.desc()).limit(limit).all()
+def get_recent_events(run_id: Optional[str] = Query(None), limit: int = 40, db: Session = Depends(get_db)):
+    if not run_id or run_id == "undefined" or run_id == "null":
+        return {"data": []}
+    
+    # Dynamic fallback from RawTransactions and Exceptions to generate graph data
+    txns = db.query(RawTransaction).filter(RawTransaction.run_id == run_id).order_by(RawTransaction.id.desc()).limit(limit).all()
+    excs_by_txn = {e.txn_id: e for e in db.query(ExceptionRecord).filter(ExceptionRecord.run_id == run_id).all() if e.txn_id}
     
     graph_data = []
     
-    if events:
-        for ev in reversed(events):
-            risk_score = ev.risk_evaluation.risk_score if ev.risk_evaluation else 0
-            is_anomaly = 1 if ev.risk_evaluation and ev.risk_evaluation.risk_level != "NORMAL" else 0
-            classification = ev.risk_evaluation.classification if ev.risk_evaluation else ("Normal Transaction" if not is_anomaly else "Payment Anomaly")
-            
-            graph_data.append({
-                "time": ev.timestamp.strftime("%H:%M:%S") if ev.timestamp else "",
-                "risk": risk_score,
-                "amount": ev.amount or 0.0,
-                "is_anomaly": is_anomaly,
-                "label": ev.transaction_id or f"TXN-{ev.id}",
-                "classification": classification
-            })
-    else:
-        # Dynamic fallback from RawTransactions and Exceptions so the graph is never blank
-        txns = db.query(RawTransaction).order_by(RawTransaction.id.desc()).limit(limit).all()
-        excs_by_txn = {e.txn_id: e for e in db.query(ExceptionRecord).all() if e.txn_id}
+    for t in reversed(txns):
+        exc = excs_by_txn.get(t.id)
+        is_anomaly = 1 if exc else 0
+        risk_score = 85 if (exc and exc.priority in ["CRITICAL", "HIGH"]) else (45 if exc else 10)
         
-        for t in reversed(txns):
-            exc = excs_by_txn.get(t.id)
-            is_anomaly = 1 if exc else 0
-            risk_score = 85 if (exc and exc.priority in ["CRITICAL", "HIGH"]) else (45 if exc else 10)
-            
-            graph_data.append({
-                "time": t.date.strftime("%H:%M:%S") if t.date else "12:00:00",
-                "risk": risk_score,
-                "amount": t.amount or 0.0,
-                "is_anomaly": is_anomaly,
-                "label": t.txn_id or t.utr or f"TXN-{t.id}",
-                "classification": exc.category.replace("_", " ").title() if exc else "Normal Transaction"
-            })
+        graph_data.append({
+            "time": t.date.strftime("%H:%M:%S") if t.date else "12:00:00",
+            "risk": risk_score,
+            "amount": t.amount or 0.0,
+            "is_anomaly": is_anomaly,
+            "label": t.txn_id or t.utr or f"TXN-{t.id}",
+            "classification": exc.category.replace("_", " ").title() if exc else "Normal Transaction"
+        })
 
     return {"data": graph_data}

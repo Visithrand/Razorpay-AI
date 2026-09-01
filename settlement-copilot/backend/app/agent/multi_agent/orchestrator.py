@@ -205,18 +205,31 @@ class InvestigationOrchestrator:
             logger.info(f'{{"event": "judge_completed", "exception_id": {exception_id}, "confidence": {judge_result.confidence}, "latency_ms": {latency_ms}}}')
         except Exception as e:
             logger.error(f"Judge Agent failed: {e}")
-            
             # Deterministic Fallback
             det = InvestigationOrchestrator._run_deterministic_checks(raw_anomaly)
-            reasoning = "AI SERVICE UNAVAILABLE: Deterministic evidence analysis used.\n\n"
-            reasoning += f"Amount match       {'✓' if det['amount_match'] else '✕'}\n"
-            reasoning += f"UTR match           {'✓' if det['utr_match'] else '✕'}\n"
-            reasoning += f"Timing drift        {'⚠' if det['timing_drift'] else '✓'}\n"
-            reasoning += f"Duplicate           {'⚠' if det['duplicate'] else '✓'}\n"
+            gw = raw_anomaly.get("gateway_record") or {}
+            bank = raw_anomaly.get("bank_record") or {}
+            gw_amt = gw.get("amount", 0.0)
+            bank_amt = bank.get("amount", 0.0)
+            diff = abs(gw_amt - bank_amt)
+            
+            reasoning = "Decision source: Deterministic fallback.\n\n"
+            if diff > 0:
+                reasoning += f"Amount discrepancy of ₹{diff:,.2f} detected between gateway and bank records.\n"
+            elif det["duplicate"]:
+                reasoning += "Duplicate transaction suspected based on references.\n"
+            elif det["timing_drift"]:
+                reasoning += "Timing drift detected between systems.\n"
+            elif not det["ledger_entry"]:
+                reasoning += "No ledger entry found for this transaction.\n"
+            else:
+                reasoning += "Investigation required. Deterministic rules found no clear matching pattern.\n"
+                
+            reasoning += f"\nEvidence Matrix:\nAmount match: {'✓' if det['amount_match'] else '✕'}\nUTR match: {'✓' if det['utr_match'] else '✕'}"
 
             judge_result = JudgeResult(
                 anomaly_id=raw_anomaly["anomaly_id"],
-                final_confidence_0_100=70.0,
+                final_confidence_0_100=85.0,
                 proposed_action="Manual operator review required.",
                 requires_hitl=True,
                 hitl_reason="System fallback triggered.",

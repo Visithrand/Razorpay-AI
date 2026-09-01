@@ -100,10 +100,10 @@ Keep answers structured and under 150 words.
 """
 
 
-async def generate_sql(question: str) -> str:
+async def generate_sql(question: str, run_id: str) -> str:
     """Ask Groq to generate a SQL SELECT query for the question."""
     if not GROQ_API_KEY:
-        return fallback_sql_generator(question)
+        return fallback_sql_generator(question, run_id)
 
     try:
         from groq import AsyncGroq
@@ -112,7 +112,7 @@ async def generate_sql(question: str) -> str:
             model=MODEL,
             messages=[
                 {"role": "system", "content": SCHEMA_CONTEXT},
-                {"role": "user", "content": f"Generate a SQL SELECT query for: {question}"},
+                {"role": "user", "content": f"Generate a SQL SELECT query for: {question}. IMPORTANT: The active run_id is '{run_id}'. You MUST include 'run_id = \"{run_id}\"' in your WHERE clause for any table queried."},
             ],
             temperature=0.1,
             max_tokens=512,
@@ -123,22 +123,24 @@ async def generate_sql(question: str) -> str:
         return sql.strip()
     except Exception as exc:
         logger.warning(f"Groq API call failed: {exc}. Using deterministic SQL generator.")
-        return fallback_sql_generator(question)
+        return fallback_sql_generator(question, run_id)
 
 
-def fallback_sql_generator(question: str) -> str:
+def fallback_sql_generator(question: str, run_id: str) -> str:
     """Deterministic fallback SQL query generator for common financial questions."""
     q_lower = question.lower()
-    if "where" in q_lower or "25 lakh" in q_lower or "settlement" in q_lower or "money" in q_lower:
-        return "SELECT source, category, amount, description, utr FROM exceptions ORDER BY amount DESC LIMIT 10"
-    elif "unmatched" in q_lower or "10,000" in q_lower or "above" in q_lower:
-        return "SELECT id, source, category, amount, utr, description FROM exceptions WHERE amount > 10000 ORDER BY amount DESC"
+    run_filter = f"run_id = '{run_id}'" if run_id else "1=1"
+    
+    if "where" in q_lower or "settlement" in q_lower or "money" in q_lower:
+        return f"SELECT source, category, amount, description, utr FROM exceptions WHERE {run_filter} ORDER BY amount DESC LIMIT 10"
+    elif "unmatched" in q_lower or "above" in q_lower:
+        return f"SELECT id, source, category, amount, utr, description FROM exceptions WHERE amount > 10000 AND {run_filter} ORDER BY amount DESC"
     elif "why" in q_lower or "not matched" in q_lower:
-        return "SELECT category, count(*) as exception_count, sum(amount) as total_amount FROM exceptions GROUP BY category"
+        return f"SELECT category, count(*) as exception_count, sum(amount) as total_amount FROM exceptions WHERE {run_filter} GROUP BY category"
     elif "report" in q_lower or "summary" in q_lower or "health" in q_lower:
-        return "SELECT run_id, total_gateway, total_bank, matched, unmatched, match_rate FROM reports ORDER BY run_at DESC LIMIT 1"
+        return f"SELECT run_id, total_gateway, total_bank, matched, unmatched, match_rate FROM reports WHERE {run_filter} ORDER BY run_at DESC LIMIT 1"
     else:
-        return "SELECT source, amount, status, date FROM raw_transactions ORDER BY amount DESC LIMIT 10"
+        return f"SELECT source, amount, status, date FROM raw_transactions WHERE {run_filter} ORDER BY amount DESC LIMIT 10"
 
 
 def validate_sql(sql: str, db: Session) -> tuple[bool, str]:
@@ -184,15 +186,16 @@ def execute_sql(sql: str, db: Session, limit: int = 50) -> list[dict]:
 async def ask_stream(
     question: str,
     db: Session,
+    run_id: str,
 ) -> AsyncGenerator[str, None]:
     """
     End-to-end NL → SQL → Answer streaming generator.
     Yields SSE-compatible text chunks.
     """
     try:
-        sql = await generate_sql(question)
+        sql = await generate_sql(question, run_id)
     except Exception as exc:
-        sql = fallback_sql_generator(question)
+        sql = fallback_sql_generator(question, run_id)
 
     if sql.upper() == "UNSUPPORTED":
         yield "I'm sorry, I can't answer that question with the available database tables. Try asking about transaction amounts, match rates, or specific UTR numbers."
@@ -200,7 +203,7 @@ async def ask_stream(
 
     is_valid, err = validate_sql(sql, db)
     if not is_valid:
-        sql = fallback_sql_generator(question)
+        sql = fallback_sql_generator(question, run_id)
         is_valid, err = validate_sql(sql, db)
         if not is_valid:
             yield f"❌ Query validation error: {err}"
@@ -248,30 +251,31 @@ async def ask_stream(
 
     # Deterministic Financial Trace Answer Generator
     q_lower = question.lower()
-    if "25 lakh" in q_lower or "where" in q_lower or "money" in q_lower:
-        gw_sum = sum(r.get('amount', 0) for r in rows if r.get('source') == 'gateway') or 2500000.0
-        bank_sum = 2370000.0
-        diff = gw_sum - bank_sum
-
+    
+    yield "### Decision source: Deterministic fallback\n\n"
+    
+    if not rows:
+        yield "No matching records found in the database for your query criteria."
+    elif "report" in q_lower or "summary" in q_lower or "health" in q_lower:
+        r = rows[0]
         yield (
-            f"### 💵 Settlement Trace Analysis\n\n"
-            f"I traced your settlement across Gateway, Bank, and Ledger records:\n\n"
-            f"- **Gateway Processed Volume:** ₹{gw_sum:,.2f}\n"
-            f"- **Bank Credited Settlement:** ₹{bank_sum:,.2f}\n"
-            f"- **Net Difference:** ₹{diff:,.2f}\n\n"
-            f"#### Breakdown of Difference:\n"
-            f"- **₹82,000.00** — Timing drift (T+2 bank credit delay)\n"
-            f"- **₹31,000.00** — Gateway MDR fee deductions\n"
-            f"- **₹17,000.00** — Pending bank credit verification\n\n"
-            f"**Status:** Mostly Explained (93.2%). Would you like me to investigate the pending ₹17,000.00 credit?"
+            f"**Reconciliation Summary:**\n"
+            f"- **Gateway Total:** ₹{r.get('total_gateway', 0):,.2f}\n"
+            f"- **Bank Total:** ₹{r.get('total_bank', 0):,.2f}\n"
+            f"- **Match Rate:** {r.get('match_rate', 0)}%\n"
+            f"- **Matched:** {r.get('matched', 0)} | **Unmatched:** {r.get('unmatched', 0)}"
         )
+    elif "why" in q_lower or "not matched" in q_lower:
+        yield "**Exception Breakdown:**\n\n"
+        for i, r in enumerate(rows, 1):
+            amt = r.get('total_amount') or 0
+            cnt = r.get('exception_count') or 0
+            cat = r.get('category') or 'Unknown'
+            yield f"{i}. **{cat}**: {cnt} exceptions (Total: ₹{amt:,.2f})\n"
     else:
-        yield f"### 📊 Financial Investigation Query Results ({len(rows)} records found)\n\n"
-        if not rows:
-            yield "No matching records found in the database for your query criteria."
-        else:
-            for i, r in enumerate(rows[:10], 1):
-                amt = f"₹{r.get('amount', 0):,.2f}" if 'amount' in r else "—"
-                cat = r.get('category', r.get('status', 'Record'))
-                desc = r.get('description', r.get('utr', '—'))
-                yield f"{i}. **{cat}** — {amt} ({desc})\n"
+        yield f"**Top Results ({len(rows)} records):**\n\n"
+        for i, r in enumerate(rows[:10], 1):
+            amt = f"₹{r.get('amount', 0):,.2f}" if 'amount' in r else "—"
+            cat = r.get('category', r.get('status', 'Record'))
+            desc = r.get('description', r.get('utr', '—'))
+            yield f"{i}. **{cat}** — {amt} ({desc})\n"

@@ -23,6 +23,51 @@ The system produces a complete reconciliation run with:
 
 ---
 
+## 🚀 Quick Start (Razorpay Judge-Ready)
+
+This repository is configured to run locally out-of-the-box. The frontend and backend communicate securely, and an automatic synthetic data generator is included to generate 50+ deterministic test records.
+
+### 1. Backend Setup
+
+```bash
+cd backend
+python -m venv venv
+# Windows: venv\Scripts\activate
+# Mac/Linux: source venv/bin/activate
+pip install -r requirements.txt
+
+# Create an .env file (The app gracefully degrades if API key is invalid/missing)
+cp ../.env.example .env
+
+# Generate 50+ synthetic transaction records for testing
+python scripts/generate_synthetic_data.py
+
+# Start the FastAPI server (Automatically creates SQLite tables)
+uvicorn app.main:app --reload --port 8080
+```
+
+### 2. Frontend Setup
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+### 3. End-to-End Evaluation Flow
+
+1. Open `http://localhost:5173` (or the port Vite provides) in your browser.
+2. The initial **Executive Dashboard** will cleanly show an empty state ("No Settlement Data").
+3. Click **Upload Dataset**.
+4. Select the three CSV files generated inside `backend/data/`:
+   - `gateway_records.csv`
+   - `bank_statement.csv`
+   - `erp_ledger.csv`
+5. The engine will ingest the data, automatically run deterministic reconciliation rules, and create a unique `run_id`.
+6. Inspect the resulting matches, exact vs. fuzzy counts, exceptions, and anomalies. All data is dynamically rendered!
+
+---
+
 ## 1. The Problem
 
 Payment systems generate multiple representations of the same financial event.

@@ -20,8 +20,15 @@ class ScenarioConfig(BaseModel):
     timing_drift_rate: float = 0.04
     high_value_rate: float = 0.02
 
+from app.api.deps import get_current_user
+from app.models import User
+
 @router.post("/generate")
-def generate_scenario(config: ScenarioConfig, db: Session = Depends(get_db)):
+def generate_scenario(
+    config: ScenarioConfig, 
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
     start_time = time.time()
     
     generated_events = []

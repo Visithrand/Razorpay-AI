@@ -39,3 +39,17 @@ def init_db():
             logger.info("Migrated SQLite table 'exceptions': added status column.")
         except Exception:
             pass  # Column already exists
+            
+        try:
+            conn.execute(text("ALTER TABLE users ADD COLUMN is_active INTEGER DEFAULT 1"))
+            conn.commit()
+            logger.info("Migrated SQLite table 'users': added is_active column.")
+        except Exception:
+            pass
+            
+        try:
+            conn.execute(text("ALTER TABLE reports ADD COLUMN user_id INTEGER REFERENCES users(id)"))
+            conn.commit()
+            logger.info("Migrated SQLite table 'reports': added user_id column.")
+        except Exception:
+            pass

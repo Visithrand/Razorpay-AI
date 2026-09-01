@@ -3,17 +3,31 @@
 const BASE = import.meta.env.VITE_API_URL || '/api'
 
 async function request(path, opts = {}) {
-  const res = await fetch(`${BASE}${path}`, opts)
+  const defaultOpts = { credentials: 'include' }
+  const finalOpts = { ...defaultOpts, ...opts }
+  if (opts.headers) {
+    finalOpts.headers = { ...defaultOpts.headers, ...opts.headers }
+  }
+  
+  const res = await fetch(`${BASE}${path}`, finalOpts)
   if (!res.ok) {
     const err = await res.text().catch(() => res.statusText)
-    throw new Error(err || `HTTP ${res.status}`)
+    try {
+      const jsonErr = JSON.parse(err);
+      throw new Error(jsonErr.detail || `HTTP ${res.status}`);
+    } catch (e) {
+      if (e.message.startsWith('HTTP ') || e.message.includes('detail')) {
+        throw e;
+      }
+      throw new Error(err || `HTTP ${res.status}`)
+    }
   }
   return res.json()
 }
 
 /** Register a new user */
 export async function register(name, email, password) {
-  return request('/auth/register', {
+  return request('/auth/signup', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name, email, password })
@@ -49,21 +63,21 @@ export async function uploadAndMatch(gateway, bank, ledger, threshold = 0.70) {
   return request('/upload', { method: 'POST', body: fd })
 }
 
-/** 1-click demo run using pre-loaded synthetic dataset. */
-export async function runDemoReconciliation(threshold = 0.70) {
-  return request(`/run-demo?threshold=${threshold}`, { method: 'POST' })
-}
 
-/** Get match results for a run. */
 export async function getMatches(runId, threshold = 0, matchType = null, limit = 200) {
-  const params = new URLSearchParams({ run_id: runId, threshold, limit })
+  const params = new URLSearchParams({ threshold, limit })
+  if (runId && runId !== 'undefined' && runId !== 'null') {
+    params.append('run_id', runId)
+  }
   if (matchType) params.append('match_type', matchType)
   return request(`/matches?${params}`)
 }
 
-/** Get exception list. */
 export async function getExceptions(runId, category = null, limit = 200) {
-  const params = new URLSearchParams({ run_id: runId, limit })
+  const params = new URLSearchParams({ limit })
+  if (runId && runId !== 'undefined' && runId !== 'null') {
+    params.append('run_id', runId)
+  }
   if (category) params.append('category', category)
   return request(`/exceptions?${params}`)
 }
@@ -87,7 +101,9 @@ export async function rematch(runId, threshold) {
 export async function askQuestion(question, runId, onChunk) {
   const fd = new FormData()
   fd.append('question', question)
-  if (runId) fd.append('run_id', runId)
+  if (runId && runId !== 'undefined' && runId !== 'null') {
+    fd.append('run_id', runId)
+  }
 
   const res = await fetch(`${BASE}/ask`, { method: 'POST', body: fd })
   if (!res.ok) throw new Error(`HTTP ${res.status}`)

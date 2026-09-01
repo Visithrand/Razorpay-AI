@@ -8,7 +8,7 @@ import {
   ServerCrash, RefreshCw, FileText, Check, ShieldAlert, Sparkles, 
   Database, Play, RotateCcw, AlertOctagon, TrendingUp
 } from 'lucide-react'
-import { runDemoReconciliation, uploadAndMatch, getExceptions, getReport } from '../api'
+import { uploadAndMatch, getExceptions, getReport } from '../api'
 
 // ─── Custom Graph Tooltip ────────────────────────────────────────────────────
 function CustomGraphTooltip({ active, payload, label }) {
@@ -50,11 +50,11 @@ function CustomGraphTooltip({ active, payload, label }) {
   return null
 }
 
-export default function ExecutiveDashboard({ onNavigate }) {
+export default function ExecutiveDashboard({ onNavigate, runId }) {
   const [metrics, setMetrics] = useState(null)
   const [graphData, setGraphData] = useState([])
   const [exceptions, setExceptions] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [graphView, setGraphView] = useState('risk') // 'risk' | 'volume'
 
@@ -65,11 +65,19 @@ export default function ExecutiveDashboard({ onNavigate }) {
   const fileInputRef = useRef(null)
 
   const fetchDashboardData = async () => {
+    if (!runId) {
+      setMetrics(null)
+      setGraphData([])
+      setExceptions([])
+      return
+    }
+
+    setLoading(true)
     try {
       const [metricsRes, eventsRes, exceptionsRes] = await Promise.all([
-        fetch('/api/dashboard/metrics'),
-        fetch('/api/events/recent?limit=40'),
-        fetch('/api/exceptions?limit=50')
+        fetch(`/api/dashboard/metrics?run_id=${runId}`),
+        fetch(`/api/events/recent?limit=40&run_id=${runId}`),
+        fetch(`/api/exceptions?limit=50&run_id=${runId}`)
       ])
 
       if (!metricsRes.ok || !eventsRes.ok || !exceptionsRes.ok) {
@@ -83,6 +91,8 @@ export default function ExecutiveDashboard({ onNavigate }) {
       setMetrics(metricsData)
       if (eventsData.data && eventsData.data.length > 0) {
         setGraphData(eventsData.data)
+      } else {
+        setGraphData([])
       }
       setExceptions(exceptionsData.exceptions || [])
       setError(null)
@@ -96,31 +106,8 @@ export default function ExecutiveDashboard({ onNavigate }) {
 
   useEffect(() => {
     fetchDashboardData()
-    const interval = setInterval(fetchDashboardData, 3000)
-    return () => clearInterval(interval)
-  }, [])
+  }, [runId])
 
-  // ─── Real Ingestion Handlers ───────────────────────────────────────────────
-  const handleRunDemoIngestion = async () => {
-    setUploadStatus('uploading')
-    setUploadStep('Loading Tri-Party Synthetic Ledger Data...')
-
-    try {
-      setUploadStep('Ingesting Gateway, Bank & ERP CSV streams...')
-      const report = await runDemoReconciliation(0.70)
-      
-      setUploadStep('Executing Multi-Engine Reconciliation...')
-      setIngestionSummary(report)
-      setUploadStatus('complete')
-      
-      // Refresh dashboard metrics
-      await fetchDashboardData()
-    } catch (err) {
-      console.error("Demo ingestion failed:", err)
-      setUploadStatus('error')
-      setUploadStep(`Ingestion failed: ${err.message}`)
-    }
-  }
 
   const handleFileUpload = async (e) => {
     const files = e.target.files
@@ -155,11 +142,31 @@ export default function ExecutiveDashboard({ onNavigate }) {
     }
   }
 
-  if (loading && !metrics) {
+  if (loading) {
     return (
       <div className="flex-1 flex items-center justify-center p-12 text-[#6B7280]">
         <Activity className="animate-spin mr-2 text-[#0065FF]" size={24} /> 
         <span className="font-semibold">Loading Live Financial Control Center...</span>
+      </div>
+    )
+  }
+
+  if (!runId && uploadStatus === 'idle') {
+    return (
+      <div className="flex-1 flex items-center justify-center p-12 bg-[#F7F8FA]">
+        <div className="bg-white rounded-2xl border border-gray-200 p-10 max-w-lg text-center shadow-sm">
+          <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <UploadCloud size={32} />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">No Settlement Data</h2>
+          <p className="text-gray-500 mb-8">Upload your Gateway, Bank, and Ledger data to begin reconciliation and generate analytics.</p>
+          <button 
+            onClick={() => onNavigate && onNavigate('reconciliation')}
+            className="btn-primary"
+          >
+            Upload Dataset
+          </button>
+        </div>
       </div>
     )
   }
@@ -252,7 +259,7 @@ export default function ExecutiveDashboard({ onNavigate }) {
           <div className="bg-white border border-[#E5E7EB] rounded-xl p-5 shadow-xs">
             <p className="text-xs font-bold text-[#6B7280] uppercase tracking-wider mb-1">Matched Rate</p>
             <p className="text-[22px] font-extrabold text-[#059669]">
-              {kpis.total_volume > 0 ? ((kpis.matched_amount / kpis.total_volume) * 100).toFixed(1) : '94.2'}%
+              {kpis.total_volume > 0 ? ((kpis.matched_amount / kpis.total_volume) * 100).toFixed(1) : '0.0'}%
             </p>
           </div>
           <div className="bg-white border border-[#E5E7EB] rounded-xl p-5 shadow-xs border-l-4 border-l-[#D97706]">
@@ -485,20 +492,6 @@ export default function ExecutiveDashboard({ onNavigate }) {
                     <p className="text-sm font-bold text-[#374151] mb-0.5">Click to upload custom CSV files</p>
                     <p className="text-xs text-[#6B7280]">Gateway, Bank, and Ledger files</p>
                   </div>
-
-                  <div className="relative flex py-1 items-center">
-                    <div className="flex-grow border-t border-gray-200"></div>
-                    <span className="flex-shrink mx-3 text-xs font-bold text-gray-400 uppercase">Or Demo Engine</span>
-                    <div className="flex-grow border-t border-gray-200"></div>
-                  </div>
-
-                  <button
-                    onClick={handleRunDemoIngestion}
-                    className="w-full flex items-center justify-center gap-2 bg-[#0065FF] hover:bg-[#0052CC] text-white py-2.5 px-4 rounded-xl text-sm font-bold shadow-sm transition-all hover:shadow-md"
-                  >
-                    <Play size={16} fill="white" />
-                    <span>Run 1-Click Demo Ingestion</span>
-                  </button>
                 </div>
               )}
 
@@ -522,15 +515,15 @@ export default function ExecutiveDashboard({ onNavigate }) {
                     <div className="space-y-1.5 text-xs text-[#047857] font-medium">
                       <div className="flex justify-between">
                         <span>Matched Transactions:</span>
-                        <span className="font-bold">{ingestionSummary?.matched || '268'} records</span>
+                        <span className="font-bold">{ingestionSummary?.matched || 0} records</span>
                       </div>
                       <div className="flex justify-between">
                         <span>Exceptions Flagged:</span>
-                        <span className="font-bold text-[#B91C1C]">{ingestionSummary?.unmatched || '16'} records</span>
+                        <span className="font-bold text-[#B91C1C]">{ingestionSummary?.unmatched || 0} records</span>
                       </div>
                       <div className="flex justify-between">
                         <span>Reconciliation Rate:</span>
-                        <span className="font-bold">{((ingestionSummary?.match_rate || 0.94) * 100).toFixed(1)}%</span>
+                        <span className="font-bold">{((ingestionSummary?.match_rate || 0) * 100).toFixed(1)}%</span>
                       </div>
                     </div>
                   </div>

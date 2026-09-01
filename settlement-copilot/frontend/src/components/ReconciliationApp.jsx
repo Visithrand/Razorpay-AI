@@ -6,7 +6,7 @@ import ExceptionTable from './ExceptionTable'
 import MatchTable from './MatchTable'
 import ChatPanel from './ChatPanel'
 import TransactionModal from './TransactionModal'
-import { uploadAndMatch, runDemoReconciliation, getMatches, getExceptions, rematch } from '../api'
+import { uploadAndMatch, getMatches, getExceptions, rematch } from '../api'
 
 export default function ReconciliationApp({ runId, setRunId, report, setReport }) {
   const [loading, setLoading] = useState(false)
@@ -30,19 +30,7 @@ export default function ReconciliationApp({ runId, setRunId, report, setReport }
     }
   }
 
-  const handleRunDemo = async () => {
-    setLoading(true)
-    try {
-      const data = await runDemoReconciliation(threshold)
-      setRunId(data.run_id)
-      setReport(data)
-      await loadData(data.run_id, threshold)
-    } catch (err) {
-      alert("Demo run error: " + err.message)
-    } finally {
-      setLoading(false)
-    }
-  }
+
 
   const handleThresholdChange = async (newThresh) => {
     setThreshold(newThresh)
@@ -86,7 +74,7 @@ export default function ReconciliationApp({ runId, setRunId, report, setReport }
         </div>
       </div>
 
-      <UploadZone onResults={handleUpload} onRunDemo={handleRunDemo} loading={loading} />
+      <UploadZone onResults={handleUpload} loading={loading} />
 
       {runId && (
         <div className="space-y-6">

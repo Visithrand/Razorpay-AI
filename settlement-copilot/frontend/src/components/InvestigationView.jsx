@@ -16,7 +16,7 @@ export default function InvestigationView({ exceptionId = 1, onClose }) {
   const fetchInvestigation = async () => {
     setLoading(true)
     try {
-      const res = await fetch(`/api/investigate/${exceptionId}`, { method: 'POST' })
+      const res = await fetch(`/api/investigate/${exceptionId}?force=true`, { method: 'POST' })
       if (res.ok) {
         const data = await res.json()
         setInvestigation(data)

@@ -1,7 +1,7 @@
 import { UploadCloud, CheckCircle2, FileText, AlertTriangle, Play, Sparkles } from 'lucide-react'
 import { useState } from 'react'
 
-export default function UploadZone({ onResults, onRunDemo, loading }) {
+export default function UploadZone({ onResults, loading }) {
   const [files, setFiles] = useState({ gateway: null, bank: null, ledger: null })
   
   const handleFileChange = (type) => (e) => {
@@ -15,8 +15,6 @@ export default function UploadZone({ onResults, onRunDemo, loading }) {
   const handleStartReconciliation = () => {
     if (allPresent) {
       onResults(files.gateway, files.bank, files.ledger, 0.7)
-    } else {
-      onRunDemo()
     }
   }
 
@@ -29,19 +27,10 @@ export default function UploadZone({ onResults, onRunDemo, loading }) {
           </div>
           <div>
             <h2 className="text-xl font-extrabold text-[#0B192C]">Data Ingestion Engine</h2>
-            <p className="text-base text-[#4A5568] mt-0.5">Upload your transaction files or run the instant AI reconciliation demo.</p>
+            <p className="text-base text-[#4A5568] mt-0.5">Upload your transaction files to run reconciliation.</p>
           </div>
         </div>
 
-        {/* 1-Click Demo Trigger */}
-        <button
-          onClick={onRunDemo}
-          disabled={loading}
-          className="px-5 py-2.5 bg-gradient-to-r from-[#0065FF] to-[#00C2FF] hover:from-[#0052CC] hover:to-[#00B0E6] text-white font-bold text-base rounded-lg transition-all shadow-md hover:shadow-lg flex items-center gap-2 flex-shrink-0 disabled:opacity-50"
-        >
-          <Sparkles size={16} className="text-[#00E6A0]" />
-          {loading ? 'Running AI Engine...' : '⚡ Run 1-Click AI Demo'}
-        </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -96,7 +85,7 @@ export default function UploadZone({ onResults, onRunDemo, loading }) {
         <div className="flex items-center gap-2.5 text-[15px] font-bold">
           <AlertTriangle size={18} className={allPresent ? 'text-[#10B981]' : 'text-[#0065FF]'} />
           <span className="text-[#0B192C]">
-            {allPresent ? 'Custom files attached and ready.' : 'Click button to run 3-pass reconciliation engine on demo or uploaded data.'}
+            {allPresent ? 'Custom files attached and ready.' : 'Upload required files and click button to run 3-pass reconciliation engine.'}
           </span>
         </div>
         

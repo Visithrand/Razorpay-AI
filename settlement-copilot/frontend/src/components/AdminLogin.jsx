@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { ArrowRight, CheckCircle2, Shield, Sparkles, Lock, User, Mail, KeyRound } from 'lucide-react'
-import { login, register } from '../api'
+import { useAuth } from '../auth/AuthContext'
 
 export default function AdminLogin({ onLoginSuccess }) {
+  const { login, signup } = useAuth()
   const [mode, setMode] = useState('login') // 'login' | 'register'
   
   // Form state
@@ -32,7 +33,7 @@ export default function AdminLogin({ onLoginSuccess }) {
     try {
       let user = null
       if (mode === 'register') {
-        user = await register(name.trim(), email.trim(), password)
+        user = await signup(name.trim(), email.trim(), password)
       } else {
         user = await login(email.trim(), password)
       }

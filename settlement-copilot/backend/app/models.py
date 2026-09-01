@@ -24,6 +24,7 @@ class User(Base):
     otp = Column(String, nullable=True) # legacy
     otp_expires_at = Column(DateTime, nullable=True) # legacy
     is_verified = Column(Integer, default=1)
+    is_active = Column(Integer, default=1)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -133,6 +134,7 @@ class Report(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     run_id = Column(String, unique=True, index=True, nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     run_at = Column(DateTime, default=datetime.utcnow)
     total_gateway = Column(Integer, default=0)
     total_bank = Column(Integer, default=0)

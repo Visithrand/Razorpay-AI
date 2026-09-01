@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { AlertCircle, AlertTriangle, ArrowRight, Zap, RefreshCw, Search, Filter, RotateCcw } from 'lucide-react'
 import InvestigationView from './InvestigationView'
 
@@ -19,10 +19,12 @@ const PRIORITY_STYLES = {
   LOW: { bg: '#D1FAE5', text: '#059669', border: '#10B981', icon: '🟢' },
 }
 
-export default function ExceptionTable({ exceptions = [], loading = false }) {
-  const [selectedInvestigateId, setSelectedInvestigateId] = useState(null)
+export default function ExceptionTable({ exceptions, runId }) {
+  const safeExceptions = exceptions || []
+  
   const [liveData, setLiveData] = useState([])
   const [isFetching, setIsFetching] = useState(false)
+  const [selectedInvestigateId, setSelectedInvestigateId] = useState(null)
 
   const [searchTerm, setSearchTerm] = useState('')
   const [priorityFilter, setPriorityFilter] = useState('all')
@@ -30,19 +32,22 @@ export default function ExceptionTable({ exceptions = [], loading = false }) {
   const [minAmount, setMinAmount] = useState('')
   const [maxAmount, setMaxAmount] = useState('')
 
+  const lastFetchedRunId = useRef(null)
+
   // Fetch live exceptions from backend API if props are empty
   useEffect(() => {
-    if (exceptions.length > 0) {
-      setLiveData(exceptions)
-    } else {
+    if (safeExceptions.length > 0) {
+      setLiveData(safeExceptions)
+    } else if (runId && lastFetchedRunId.current !== runId) {
+      lastFetchedRunId.current = runId
       fetchLiveExceptions()
     }
-  }, [exceptions])
+  }, [exceptions, runId])
 
   const fetchLiveExceptions = async () => {
     setIsFetching(true)
     try {
-      const res = await fetch('/api/exceptions')
+      const res = await fetch(`/api/exceptions?run_id=${runId}`)
       if (res.ok) {
         const data = await res.json()
         setLiveData(data.exceptions || [])
@@ -54,7 +59,7 @@ export default function ExceptionTable({ exceptions = [], loading = false }) {
     }
   }
 
-  const items = liveData.length > 0 ? liveData : (exceptions.length > 0 ? exceptions : FALLBACK_EXCEPTIONS)
+  const items = liveData.length > 0 ? liveData : safeExceptions
 
   const filteredItems = useMemo(() => {
     return items.filter((row) => {

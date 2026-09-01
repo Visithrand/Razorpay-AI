@@ -1,18 +1,7 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { Filter, Download, CreditCard, Smartphone, CheckCircle2, XCircle, Clock, Search, Calendar, ChevronRight, RotateCcw } from 'lucide-react'
 import { exportToCSV } from '../api'
 import TransactionModal from './TransactionModal'
-
-const INITIAL_TXNS = [
-  { id: 'pay_Nj8Qtty5Y2Jr8',  gateway_txn_ref: 'pay_Nj8Qtty5Y2Jr8', amount: 520000.00, gateway_amount: 520000.00, bank_amount: 520000.00, method: 'upi',  status: 'captured', gateway_date: '2024-01-24T14:45:00', date: 'Jan 24, 2:45 PM', cust: 'raj.kumar@example.com', gateway_utr: 'UTR984729104819' },
-  { id: 'pay_Nj3Xgf9Q5rDoQ',  gateway_txn_ref: 'pay_Nj3Xgf9Q5rDoQ', amount: 12999.0, gateway_amount: 12999.0, bank_amount: 12999.0, method: 'card', status: 'refunded', gateway_date: '2024-01-24T13:12:00', date: 'Jan 24, 1:12 PM', cust: 'sneha.patel@gmail.com', gateway_utr: 'UTR819401827491' },
-  { id: 'pay_Nj1LryE89FxX9',  gateway_txn_ref: 'pay_Nj1LryE89FxX9', amount: 5450.50,  gateway_amount: 5450.50,  bank_amount: 0.00,    method: 'upi',  status: 'failed',   gateway_date: '2024-01-24T11:30:00', date: 'Jan 24, 11:30 AM', cust: 'amit.singh@yahoo.com', gateway_utr: '—' },
-  { id: 'pay_Ni9HfqcooTnj2',  gateway_txn_ref: 'pay_Ni9HfqcooTnj2', amount: 89000.00, gateway_amount: 89000.00, bank_amount: 89000.00, method: 'netbanking', status: 'captured', gateway_date: '2024-01-23T16:20:00', date: 'Jan 23, 4:20 PM', cust: 'corporate@techsolutions.in', gateway_utr: 'UTR773019284019' },
-  { id: 'pay_Ni7SrcbplJd84',  gateway_txn_ref: 'pay_Ni7SrcbplJd84', amount: 150.00,  gateway_amount: 150.00,  bank_amount: 150.00,  method: 'upi',  status: 'captured', gateway_date: '2024-01-23T14:15:00', date: 'Jan 23, 2:15 PM', cust: 'priya.sharma@example.com', gateway_utr: 'UTR491029481029' },
-  { id: 'pay_Ni4P0tvhhpBmy',  gateway_txn_ref: 'pay_Ni4P0tvhhpBmy', amount: 6799.00, gateway_amount: 6799.00, bank_amount: 6799.00, method: 'card', status: 'captured', gateway_date: '2024-01-23T09:05:00', date: 'Jan 23, 9:05 AM', cust: 'vikram.reddy@gmail.com', gateway_utr: 'UTR194029481920' },
-  { id: 'pay_Nh8M291azHzkn',  gateway_txn_ref: 'pay_Nh8M291azHzkn', amount: 120.00,  gateway_amount: 120.00,  bank_amount: 120.00,  method: 'upi',  status: 'captured', gateway_date: '2024-01-22T18:30:00', date: 'Jan 22, 6:30 PM', cust: 'neha.gupta@example.com', gateway_utr: 'UTR918401928491' },
-  { id: 'pay_Nh5Wvfgyw6Zbn',  gateway_txn_ref: 'pay_Nh5Wvfgyw6Zbn', amount: 5400.00, gateway_amount: 5400.00, bank_amount: 5400.00, method: 'card', status: 'captured', gateway_date: '2024-01-22T15:10:00', date: 'Jan 22, 3:10 PM', cust: 'rohit.verma@yahoo.com', gateway_utr: 'UTR294019284019' },
-]
 
 const STATUS_CFG = {
   captured: { icon: CheckCircle2, color: '#10B981', bg: '#D1FAE5' },
@@ -26,7 +15,7 @@ const METHOD_CFG = {
   netbanking: { icon: Clock,      label: 'Netbanking' },
 }
 
-export default function TransactionsHistory() {
+export default function TransactionsHistory({ runId }) {
   const [activeTab, setActiveTab] = useState('all')
   const [methodFilter, setMethodFilter] = useState('all')
   const [priorityFilter, setPriorityFilter] = useState('all')
@@ -34,10 +23,22 @@ export default function TransactionsHistory() {
   const [maxAmount, setMaxAmount] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedTxn, setSelectedTxn] = useState(null)
+  const [transactions, setTransactions] = useState([])
+
+  useEffect(() => {
+    if (runId) {
+      fetch(`/api/transactions?run_id=${runId}`)
+        .then(r => r.json())
+        .then(data => setTransactions(data.transactions || []))
+        .catch(console.error)
+    } else {
+      setTransactions([])
+    }
+  }, [runId])
 
   // Filter transactions dynamically
   const filteredTxns = useMemo(() => {
-    return INITIAL_TXNS.filter(t => {
+    return transactions.filter(t => {
       // Status filter
       if (activeTab !== 'all' && t.status !== activeTab) return false
       // Method filter
@@ -62,8 +63,8 @@ export default function TransactionsHistory() {
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase().trim()
         const matchId = t.id.toLowerCase().includes(q)
-        const matchCust = t.cust.toLowerCase().includes(q)
-        const matchUtr = t.gateway_utr.toLowerCase().includes(q)
+        const matchCust = t.cust ? t.cust.toLowerCase().includes(q) : false
+        const matchUtr = t.gateway_utr ? t.gateway_utr.toLowerCase().includes(q) : false
         if (!matchId && !matchCust && !matchUtr) return false
       }
       return true
@@ -104,10 +105,10 @@ export default function TransactionsHistory() {
         <div className="px-6 py-3 border-b border-[#DCE3ED] flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#EFF3F8]/30">
           <div className="flex items-center gap-6 text-base font-bold text-[#4A5568]">
             {[
-              { id: 'all', label: `All (${INITIAL_TXNS.length})` },
-              { id: 'captured', label: `Captured (${INITIAL_TXNS.filter(t => t.status === 'captured').length})` },
-              { id: 'failed', label: `Failed (${INITIAL_TXNS.filter(t => t.status === 'failed').length})` },
-              { id: 'refunded', label: `Refunded (${INITIAL_TXNS.filter(t => t.status === 'refunded').length})` },
+              { id: 'all', label: `All (${transactions.length})` },
+              { id: 'captured', label: `Captured (${transactions.filter(t => t.status === 'captured').length})` },
+              { id: 'failed', label: `Failed (${transactions.filter(t => t.status === 'failed').length})` },
+              { id: 'refunded', label: `Refunded (${transactions.filter(t => t.status === 'refunded').length})` },
             ].map(t => (
               <button
                 key={t.id}
@@ -275,7 +276,7 @@ export default function TransactionsHistory() {
 
         {/* Footer */}
         <div className="px-6 py-4 border-t border-[#DCE3ED] flex items-center justify-between text-[15px] text-[#718096]">
-          <span className="font-semibold">Showing {filteredTxns.length} of {INITIAL_TXNS.length} entries</span>
+          <span className="font-semibold">Showing {filteredTxns.length} of {transactions.length} entries</span>
         </div>
       </div>
 
