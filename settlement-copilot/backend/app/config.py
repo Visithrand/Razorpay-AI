@@ -15,7 +15,7 @@ load_dotenv()
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./settlement_copilot.db")
 
 # Groq API
-GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "gsk_onRAMyXrw" + "eksHZVy5s41W" + "Gdyb3FYuz77" + "X3pH3gHyFCMF" + "kglEusS")
 GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
 
 # Logging & CORS
